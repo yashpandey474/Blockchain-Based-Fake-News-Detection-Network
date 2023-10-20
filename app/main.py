@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify, redirect
-import time,os
+import time
 from blockchain.blockchain import Blockchain
 from ..wallet.wallet import Wallet
 from ..wallet.transaction_pool import TransactionPool
 from p2pserver import P2pServer
+import config
 
 app = Flask(__name__)
 
-HTTP_PORT = int(os.environ.get('HTTP_PORT', 3001))
+HTTP_PORT = int(config.HTTP_PORT)
 
 blockchain = Blockchain()
 wallet = Wallet(str(int(time.time())))  # Using current timestamp as seed for wallet

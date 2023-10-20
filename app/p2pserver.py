@@ -1,4 +1,3 @@
-import os
 import json
 import websocket
 from blockchain.blockchain import Blockchain
@@ -6,9 +5,10 @@ from wallet.wallet import Wallet
 from wallet.transaction_pool import TransactionPool
 from websocket_server import WebsocketServer
 from typing import Type
+import config
 
-P2P_PORT = int(os.environ.get('P2P_PORT', 5000))
-PEERS = os.environ.get('PEERS').split(",") if os.environ.get('PEERS') else []
+P2P_PORT = int(config.P2P_PORT)
+PEERS = config.PEERS
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',
@@ -18,7 +18,7 @@ MESSAGE_TYPE = {
 }
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool, wallet):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool:Type[TransactionPool], wallet:Type[Wallet]):
         self.blockchain = blockchain
         self.sockets = []
         self.transaction_pool = transaction_pool
@@ -60,6 +60,7 @@ class P2pServer:
             if self.blockchain.is_valid_block(data["block"]):
                 self.broadcast_block(data["block"])
                 self.transaction_pool.clear()
+            #TODO: Add logic to handle invalid block and penalise the validator
 
     def connect_to_peers(self):
         for peer in PEERS:
