@@ -2,14 +2,24 @@ from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
 import uuid
 import hashlib
+import time
+
 
 class ChainUtil:
-    
+    import hashlib
+
     @staticmethod
-    def gen_key_pair(secret):
+    def generate_32_byte_seed_from_timestamp():
+        current_time = str(int(time.time()))
+        hashed = hashlib.sha256(current_time.encode()).digest()
+        return hashed
+
+    @staticmethod
+    def gen_key_pair():
         # Assume secret is a bytes-like object
-        signing_key = SigningKey(seed=secret)
-        return signing_key,signing_key.verify_key.encode(encoder=HexEncoder).decode()
+        signing_key = SigningKey(
+            seed=ChainUtil.generate_32_byte_seed_from_timestamp())
+        return signing_key, signing_key.verify_key.encode(encoder=HexEncoder).decode()
 
     @staticmethod
     def id():

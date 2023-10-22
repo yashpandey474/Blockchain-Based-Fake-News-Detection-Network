@@ -1,8 +1,8 @@
-from block import Block
-from stake import Stake
-from account import Account
-from validators import Validators
-from wallet import Wallet
+from .block import Block
+from .stake import Stake
+from .account import Account
+from .validators import Validators
+from pyblock.wallet.wallet import Wallet
 
 secret = "i am the first leader"
 
@@ -11,6 +11,7 @@ TRANSACTION_TYPE = {
     "stake": "STAKE",
     "validator_fee": "VALIDATOR_FEE"
 }
+
 
 class Blockchain:
     def __init__(self):
@@ -58,7 +59,7 @@ class Blockchain:
     def get_balance(self, public_key):
         return self.accounts.get_balance(public_key)
 
-#TODO: check this make this random func
+# TODO: check this make this random func
     def get_leader(self):
         return self.stakes.get_max(self.validators.list)
 
@@ -68,10 +69,10 @@ class Blockchain:
 
     def is_valid_block(self, block):
         last_block = self.chain[-1]
-        if (block.last_hash == last_block.hash and 
-            block.hash == Block.block_hash(block) and 
+        if (block.last_hash == last_block.hash and
+            block.hash == Block.block_hash(block) and
             Block.verify_block(block) and
-            Block.verify_leader(block, self.get_leader())):
+                Block.verify_leader(block, self.get_leader())):
             print("block valid")
             self.add_block(block)
             self.execute_transactions(block)
@@ -79,7 +80,7 @@ class Blockchain:
         else:
             return False
 
-#TODO: check
+# TODO: check
     def execute_transactions(self, block):
         for transaction in block.data:
             t_type = transaction.type
@@ -88,12 +89,14 @@ class Blockchain:
                 self.accounts.transfer_fee(block, transaction)
             elif t_type == TRANSACTION_TYPE["stake"]:
                 self.stakes.update(transaction)
-                self.accounts.decrement(transaction.input.from_address, transaction.output.amount)
+                self.accounts.decrement(
+                    transaction.input.from_address, transaction.output.amount)
                 self.accounts.transfer_fee(block, transaction)
             elif t_type == TRANSACTION_TYPE["validator_fee"]:
                 print("VALIDATOR_FEE")
                 if self.validators.update(transaction):
-                    self.accounts.decrement(transaction.input.from_address, transaction.output.amount)
+                    self.accounts.decrement(
+                        transaction.input.from_address, transaction.output.amount)
                     self.accounts.transfer_fee(block, transaction)
 
     def execute_chain(self, chain):

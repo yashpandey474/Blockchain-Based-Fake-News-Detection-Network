@@ -1,6 +1,7 @@
-from transaction import Transaction
+from .transaction import Transaction
 
 TRANSACTION_THRESHOLD = 3  # Import or define your TRANSACTION_THRESHOLD here
+
 
 class TransactionPool:
     def __init__(self):

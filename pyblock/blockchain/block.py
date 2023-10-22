@@ -3,8 +3,9 @@
 import hashlib
 import json
 # Assuming ChainUtil.py exists in the same directory
-from ..chainutil import ChainUtil
+from pyblock.chainutil import ChainUtil
 import time
+
 
 class Block:
     def __init__(self, timestamp, lastHash, hash, data, validator, signature):
@@ -14,6 +15,16 @@ class Block:
         self.data = data
         self.validator = validator
         self.signature = signature
+
+    def to_json(self):
+        return {
+            "timestamp": self.timestamp,
+            "lastHash": self.lastHash,
+            "hash": self.hash,
+            "data": self.data,
+            "validator": self.validator,
+            "signature": self.signature.hex() if self.signature else None
+        }
 
     def __str__(self):
         return (f"Block -\n"

@@ -1,24 +1,25 @@
 from flask import Flask, request, jsonify, redirect
 import time
-from blockchain.blockchain import Blockchain
-from ..wallet.wallet import Wallet
-from ..wallet.transaction_pool import TransactionPool
-from p2pserver import P2pServer
-import config
+from pyblock.blockchain.blockchain import Blockchain
+from pyblock.wallet.wallet import Wallet
+from pyblock.wallet.transaction_pool import TransactionPool
+from pyblock.p2pserver import P2pServer
+import pyblock.config as config
 
 app = Flask(__name__)
 
 HTTP_PORT = int(config.HTTP_PORT)
 
 blockchain = Blockchain()
-wallet = Wallet(str(int(time.time())))  # Using current timestamp as seed for wallet
+# Using current timestamp as seed for wallet
+wallet = Wallet()
 transaction_pool = TransactionPool()
 p2pserver = P2pServer(blockchain, transaction_pool, wallet)
 
 
 @app.route('/blocks', methods=['GET'])
 def get_blocks():
-    return jsonify(blockchain.chain)
+    return jsonify([block.to_json() for block in blockchain.chain])
 
 
 @app.route('/transactions', methods=['GET'])
@@ -32,7 +33,8 @@ def post_transact():
     to = data['to']
     amount = data['amount']
     type_ = data['type']
-    transaction = wallet.create_transaction(to, amount, type_, blockchain, transaction_pool)
+    transaction = wallet.create_transaction(
+        to, amount, type_, blockchain, transaction_pool)
     p2pserver.broadcast_transaction(transaction)
     return redirect('/transactions')
 

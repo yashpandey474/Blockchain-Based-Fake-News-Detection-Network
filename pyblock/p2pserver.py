@@ -1,11 +1,11 @@
 import json
 import websocket
-from blockchain.blockchain import Blockchain
-from wallet.wallet import Wallet
-from wallet.transaction_pool import TransactionPool
+from pyblock.blockchain.blockchain import Blockchain
+from pyblock.wallet.wallet import Wallet
+from pyblock.wallet.transaction_pool import TransactionPool
 from websocket_server import WebsocketServer
 from typing import Type
-import config
+import pyblock.config as config
 
 P2P_PORT = int(config.P2P_PORT)
 PEERS = config.PEERS
@@ -17,8 +17,9 @@ MESSAGE_TYPE = {
     'clear_transactions': 'CLEAR_TRANSACTIONS'
 }
 
+
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool:Type[TransactionPool], wallet:Type[Wallet]):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet]):
         self.blockchain = blockchain
         self.sockets = []
         self.transaction_pool = transaction_pool
@@ -54,21 +55,22 @@ class P2pServer:
                 self.broadcast_transaction(data["transaction"])
                 if self.transaction_pool.threshold_reached():
                     if self.blockchain.get_leader() == self.wallet.get_public_key():
-                        block = self.blockchain.create_block(self.transaction_pool.transactions, self.wallet)
+                        block = self.blockchain.create_block(
+                            self.transaction_pool.transactions, self.wallet)
                         self.broadcast_block(block)
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 self.broadcast_block(data["block"])
                 self.transaction_pool.clear()
-            #TODO: Add logic to handle invalid block and penalise the validator
+            # TODO: Add logic to handle invalid block and penalise the validator
 
     def connect_to_peers(self):
         for peer in PEERS:
             try:
-                socket_app = websocket.WebSocketApp(peer, 
-                                          on_message=self.on_peer_message, 
-                                          on_close=self.on_peer_close,
-                                          on_open=self.on_peer_open)
+                socket_app = websocket.WebSocketApp(peer,
+                                                    on_message=self.on_peer_message,
+                                                    on_close=self.on_peer_close,
+                                                    on_open=self.on_peer_open)
                 socket_app.run_forever()
             except Exception as e:
                 print(f"Failed to connect to peer {peer}. Error: {e}")
