@@ -117,6 +117,9 @@ class P2pServer:
         })
         self.server.send_message(socket, message)
 
+# Bootstrap system..
+
+
 # if __name__ == "__main__":
 #     blockchain = Blockchain()
 #     transaction_pool = TransactionPool()
