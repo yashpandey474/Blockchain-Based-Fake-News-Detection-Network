@@ -7,6 +7,15 @@ import time
 
 class ChainUtil:
     import hashlib
+    @staticmethod
+    def verify_signature(public_key: str, signature: str, data_hash: str) -> bool:
+
+        try:
+            verify_key = VerifyKey(public_key, encoder=HexEncoder)
+            verify_key.verify(data_hash.encode(), signature.encode('hex'))
+            return True
+        except:
+            return False
 
     @staticmethod
     def generate_32_byte_seed_from_timestamp():
@@ -30,14 +39,7 @@ class ChainUtil:
         data_string = str(data).encode()
         return hashlib.sha256(data_string).hexdigest()
 
-    @staticmethod
-    def verify_signature(public_key_hex, signature, data_hash):
-        verify_key = VerifyKey(public_key_hex, encoder=HexEncoder)
-        try:
-            verify_key.verify(data_hash.encode(), signature.encode())
-            return True
-        except:
-            return False
+
 
 # # Example usage
 # if __name__ == '__main__':
