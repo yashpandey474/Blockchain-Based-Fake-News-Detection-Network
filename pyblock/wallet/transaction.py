@@ -34,7 +34,10 @@ class Transaction:
         transaction_hash = ChainUtil.hash(transaction.partialTransaction)
 
         # Obtain the score from the ML model
-        model_score = MLModel.get_score(transaction.partial_transaction)
+        content = IPFSHandler.get_from_ipfs(
+            transaction.partial_transaction.ipfs_address)
+        
+        model_score = MLModel.get_score(content)
 
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
