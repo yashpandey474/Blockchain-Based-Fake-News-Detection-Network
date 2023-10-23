@@ -1,5 +1,6 @@
 import json
-import websocket
+import websocket,websocket_server
+from websocket import WebSocketApp
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
@@ -67,7 +68,7 @@ class P2pServer:
     def connect_to_peers(self):
         for peer in PEERS:
             try:
-                socket_app = websocket.WebSocketApp(peer,
+                socket_app = WebSocketApp(peer,
                                                     on_message=self.on_peer_message,
                                                     on_close=self.on_peer_close,
                                                     on_open=self.on_peer_open)

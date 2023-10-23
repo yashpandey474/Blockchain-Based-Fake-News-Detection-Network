@@ -56,5 +56,7 @@ def get_balance():
 
 
 if __name__ == '__main__':
-    app.run(port=HTTP_PORT, debug=True, host="0.0.0.0")
+    print(config.P2P_PORT)
     p2pserver.listen()
+    app.run(port=HTTP_PORT, debug=True,host="0.0.0.0")
+
