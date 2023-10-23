@@ -19,16 +19,6 @@ class Wallet:
     def sign(self, data_hash):
         return self.key_pair.sign(data_hash).to_hex()
 
-    def create_transaction(self, to, amount, txn_type, blockchain, transaction_pool):
-        self.balance = self.get_balance(blockchain)
-        if amount > self.balance:
-            print(
-                f"Amount: {amount} exceeds the current balance: {self.balance}")
-            return
-        transaction = Transaction.new_transaction(self, to, amount, txn_type)
-        transaction_pool.add_transaction(transaction)
-        return transaction
-
     def get_balance(self, blockchain):
         return blockchain.get_balance(self.public_key)
 
