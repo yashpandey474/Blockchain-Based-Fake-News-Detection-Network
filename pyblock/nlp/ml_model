@@ -1,5 +1,0 @@
-import random
-class MLModel:
-    def get_score(ipfs_address):
-    # Generate a random double value between 0 and 1
-        return random.random(0,1)
