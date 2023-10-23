@@ -3,3 +3,4 @@
 __pycache__/
 venv/
 pyblock/config.py
+wallet/__pycache__
