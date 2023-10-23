@@ -5,6 +5,7 @@ from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
 import pyblock.config as config
+import threading
 
 app = Flask(__name__)
 
@@ -55,10 +56,13 @@ def get_balance():
     return jsonify(balance=blockchain.get_balance(wallet.public_key))
 
 
-if __name__ == '__main__':
-    print(config.P2P_PORT)
+def run_p2pserver():
+    print("Running p2p server on port: "+str(config.P2P_PORT))
     p2pserver.listen()
-    app.run(port=HTTP_PORT, debug=True,host="0.0.0.0")
 
-    p2pserver.listen()
-    app.run(port=HTTP_PORT, debug=True, host="0.0.0.0")
+
+if __name__ == '__main__':
+    p2p_thread = threading.Thread(target=run_p2pserver)
+    p2p_thread.start()
+    app.run(port=HTTP_PORT, debug=False, host="0.0.0.0")
+

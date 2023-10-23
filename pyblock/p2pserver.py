@@ -1,6 +1,5 @@
 import json
-import websocket,websocket_server
-from websocket import WebSocketApp
+import websocket
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
@@ -27,13 +26,13 @@ class P2pServer:
         self.wallet = wallet
 
     def listen(self):
-        self.server = WebsocketServer(port=P2P_PORT)
+        print("Starting p2p server...")
+        self.server = WebsocketServer(port=P2P_PORT,host="0.0.0.0")
         self.server.set_fn_new_client(self.new_client)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
         self.server.run_forever()
-        print(f"Listening for peer-to-peer connections on port: {P2P_PORT}")
 
     def new_client(self, client, server):
         print("Socket connected:", client['id'])
@@ -41,6 +40,7 @@ class P2pServer:
         self.send_chain(client)
 
     def client_left(self, client, server):
+        print(client)
         print("Client left:", client['id'])
         self.sockets.remove(client)
 
@@ -68,7 +68,7 @@ class P2pServer:
     def connect_to_peers(self):
         for peer in PEERS:
             try:
-                socket_app = WebSocketApp(peer,
+                socket_app = websocket.WebSocketApp(peer,
                                                     on_message=self.on_peer_message,
                                                     on_close=self.on_peer_close,
                                                     on_open=self.on_peer_open)
@@ -86,11 +86,13 @@ class P2pServer:
         pass
 
     def send_chain(self, socket):
+        chain_as_json = [block.to_json() for block in self.blockchain.chain]
         message = json.dumps({
             "type": MESSAGE_TYPE["chain"],
-            "chain": self.blockchain.chain
+            "chain": chain_as_json
         })
         self.server.send_message(socket, message)
+
 
     def sync_chain(self):
         for socket in self.sockets:
@@ -117,9 +119,6 @@ class P2pServer:
             "block": block
         })
         self.server.send_message(socket, message)
-
-# Bootstrap system..
-
 
 # if __name__ == "__main__":
 #     blockchain = Blockchain()
