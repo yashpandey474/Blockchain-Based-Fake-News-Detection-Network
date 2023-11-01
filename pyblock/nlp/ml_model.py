@@ -1,36 +1,11 @@
-import random
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.metrics import accuracy_score, precision_score, f1_score, roc_auc_score, precision_score, recall_score, classification_report
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.svm import LinearSVC, SVC
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
-from sklearn.linear_model import RidgeClassifier, SGDClassifier, LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier
-from sklearn.naive_bayes import BernoulliNB, MultinomialNB
-from sklearn.feature_extraction.text import TfidfVectorizer
+
 import pandas as pd
-import numpy as np
 from nltk.stem import PorterStemmer
 import spacy
-import time
-import pandas as pd
-import numpy as np
 import string
-# FRE SCORE
 from textstat import flesch_reading_ease
-# SENTIMENT ANALYSIS USING VADER
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-# POS TAGGING
 import spacy
-# VECTORISING TEXT AND CREATING PIPELINE
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import Pipeline, FeatureUnion
-# COSINE SIMILARITY BETWEEN REVIEWS
-from sklearn.metrics.pairwise import cosine_similarity
 
 nlp = spacy.load('en_core_web_sm')
 stemmer = PorterStemmer()
@@ -147,8 +122,6 @@ with open("moedl_1.pkl", "rb") as file:
     
 def get_score(content):
     # Generate a random double value between 0 and 1
-    
-
     data = {
         'NEWS TITLE': [content.split("\n")[0]],
         'NEWS TEXT': [" ".join(content.split("\n")[1:])]

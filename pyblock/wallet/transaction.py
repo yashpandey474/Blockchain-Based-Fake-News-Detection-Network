@@ -4,6 +4,7 @@ from pyblock.ipfs.ipfs_handler import IPFSHandler
 from pyblock.nlp.ml_model import MLModel
 from pyblock.wallet.wallet import Wallet
 from typing import Type
+
 class Transaction:
     def __init__(self):
         self.partialTransaction = None
@@ -13,31 +14,37 @@ class Transaction:
         self.timestamp = None
         self.model_score = None 
 
+    def get_transaction_score(self):
+        content = IPFSHandler.get_from_ipfs(
+            self.partialTransaction.ipfs_address
+        )
+
+        return MLModel.get_score(content)
+    
     @staticmethod
     def create_transaction(partial_transaction, validator_wallet:Type[Wallet]):
         # Verify the partial_transaction
         if not PartialTransaction.verify_partial_transaction(partial_transaction):
             print("Invalid PartialTransaction!")
             return None
+        
         transaction = Transaction()
         transaction.partialTransaction = partial_transaction
         transaction.validator_address = validator_wallet.public_key
         transaction.timestamp = time.time()
         transaction.sign = validator_wallet.sign(ChainUtil.hash(partial_transaction))
         # Get the model score using MLModel and set it to the transaction
-        transaction.model_score = MLModel.get_score(partial_transaction)
+        transaction.model_score = transaction.get_transaction_score()
+        
         return transaction
     
     @staticmethod
-    def verify_transaction(transaction: Type[Transaction], error_bound: float = 0.01):
+    def verify_transaction(transaction, error_bound: float = 0.01):
         signature = transaction.sign
         transaction_hash = ChainUtil.hash(transaction.partialTransaction)
 
         # Obtain the score from the ML model
-        content = IPFSHandler.get_from_ipfs(
-            transaction.partial_transaction.ipfs_address)
-        
-        model_score = MLModel.get_score(content)
+        model_score = transaction.get_transaction_score()
 
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
