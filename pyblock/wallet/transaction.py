@@ -65,9 +65,8 @@ class PartialTransaction:
         self.timestamp = None
 
     @staticmethod
-    def generate_from_file(sender_wallet:Type[Wallet], file_path):
-        with open(file_path, 'r') as file:
-            data = file.read()
+    def generate_from_file(sender_wallet:Type[Wallet], file):
+        data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         partial_transaction = PartialTransaction()
         partial_transaction.ipfs_address = ipfs_address
