@@ -55,6 +55,11 @@ def valid_creds():
     return True
 
 
+#CHANGE THE SCREEN OF GUI
+def change_screen(input_string):
+    st.session_state.screen = input_string
+    st.experimental_rerun()
+    
 #STREAMLIT GUI
 def main_page():
     st.title("Fake News Detection System Utilising Blockchain")
@@ -64,37 +69,54 @@ def main_page():
             #GET UPLOADED TEXT FILE
         uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
-            #CREATE PARTIAL TRANSACTION
-        partial_transaction = PartialTransaction.generate_from_file(wallet = wallet, file = uploaded_file)
+        if uploaded_file:
+                #CREATE PARTIAL TRANSACTION
+            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = wallet, file = uploaded_file)
+                
+                #CREATE TRANSACTION
+            transaction = Transaction.create_transaction(partial_transaction, wallet)
             
-            #CREATE TRANSACTION
-        transaction = Transaction.create_transaction(partial_transaction, wallet)
-        
-        #BROADCASE NEWLY CREATED TRANSACTION
-        p2pserver.broadcast_transaction(transaction)
-            
+            #BROADCASE NEWLY CREATED TRANSACTION
+            p2pserver.broadcast_transaction(transaction)
+                
             
     if st.button("View all Verified News"):
-        # contest_validation()
-        show_blocks_news()
+        change_screen("show_blocks")
             
     if st.button("View Account Information"):
-        show_account_info()
+        change_screen("account_info")
         
     if st.button("View all transactions in mempool"):
-        show_transactions()
+        change_screen("show_transac")
 
 
 def login():
     st.title("YOYOYOYO")
     if valid_creds():
-        main_page()
+        change_screen("main_page")
+        
     else:
         st.write("Incorrect")
 
-
+def main():
+    if "screen" not in st.session_state:
+        st.session_state.screen = "login"
+        
+    if st.session_state.screen == "main_page":
+        main_page()
+        
+    if st.session_state.screen == "account_info":
+        show_account_info()
+    
+    if st.session_state.screen == "show_transac":
+        show_transactions()
+        
+    if st.session_state.screen == "show_blocks":
+        show_blocks_news()
+        
+    
 
 if __name__ == '__main__':
     p2p_thread = threading.Thread(target=run_p2pserver)
     p2p_thread.start()
-    login()
+    main()
