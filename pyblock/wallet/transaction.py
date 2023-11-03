@@ -14,19 +14,28 @@ class Transaction:
         self.timestamp = None
         self.model_score = None 
 
+    def get_transaction_score(self):
+        content = IPFSHandler.get_from_ipfs(
+            self.partialTransaction.ipfs_address
+        )
+
+        return MLModel.get_score(content)
+    
     @staticmethod
     def create_transaction(partial_transaction, validator_wallet:Type[Wallet]):
         # Verify the partial_transaction
         if not PartialTransaction.verify_partial_transaction(partial_transaction):
             print("Invalid PartialTransaction!")
             return None
+        
         transaction = Transaction()
         transaction.partialTransaction = partial_transaction
         transaction.validator_address = validator_wallet.public_key
         transaction.timestamp = time.time()
         transaction.sign = validator_wallet.sign(ChainUtil.hash(partial_transaction))
         # Get the model score using MLModel and set it to the transaction
-        transaction.model_score = MLModel.get_score(partial_transaction)
+        transaction.model_score = transaction.get_transaction_score()
+        
         return transaction
     
     @staticmethod
@@ -35,7 +44,7 @@ class Transaction:
         transaction_hash = ChainUtil.hash(transaction.partialTransaction)
 
         # Obtain the score from the ML model
-        model_score = MLModel.get_score(transaction.partial_transaction)
+        model_score = transaction.get_transaction_score()
 
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
@@ -53,17 +62,14 @@ class PartialTransaction:
         self.ipfs_address = None
         self.sender_address = None
         self.sign = None
-        self.timestamp = None
 
     @staticmethod
-    def generate_from_file(sender_wallet:Type[Wallet], file_path):
-        with open(file_path, 'r') as file:
-            data = file.read()
+    def generate_from_file(sender_wallet:Type[Wallet], file):
+        data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         partial_transaction = PartialTransaction()
         partial_transaction.ipfs_address = ipfs_address
         partial_transaction.sender_address = sender_wallet.public_key
-        partial_transaction.timestamp = time.time()
         partial_transaction.sign = sender_wallet.sign(ChainUtil.hash(partial_transaction))
         return partial_transaction
 

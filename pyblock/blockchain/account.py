@@ -8,12 +8,13 @@ class Account:
         if address not in self.balance:
             self.balance[address] = 0
             self.addresses.append(address)
-
-    def transfer(self, from_address, to_address, amount):
-        self.initialize(from_address)
-        self.initialize(to_address)
-        self.increment(to_address, amount)
-        self.decrement(from_address, amount)
+            
+    #NOT NEEDED
+    # def transfer(self, from_address, to_address, amount):
+    #     self.initialize(from_address)
+    #     self.initialize(to_address)
+    #     self.increment(to_address, amount)
+    #     self.decrement(from_address, amount)
 
     def increment(self, to_address, amount):
         self.balance[to_address] += amount
