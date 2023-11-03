@@ -1,4 +1,7 @@
+from Crypto.PublicKey import RSA
 from ..chainutil import ChainUtil
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
 # from .transaction import Transaction
 # from .transaction_pool import TransactionPool
 
@@ -10,17 +13,20 @@ if TYPE_CHECKING:
 
 class Wallet:
     def __init__(self):
-        self.balance = 100
-        self.key_pair, self.public_key = ChainUtil.gen_key_pair()
-
+        # self.balance = 100
+        self.private_key = RSA.generate(2048)
+        self.public_key = self.private_key.publickey().export_key()
+        
     def __str__(self):
         return f"Wallet -\n\tpublicKey: {self.public_key}\n\tbalance: {self.balance}"
 
-    def sign(self, data_hash):
-        return self.key_pair.sign(data_hash).to_hex()
-
-    def get_balance(self, blockchain):
-        return blockchain.get_balance(self.public_key)
+    def sign(self, data):
+        data_hash = SHA256.new(data.encode())
+        signature = pkcs1_15.new(self.private_key).sign(data_hash)
+        return signature
 
     def get_public_key(self):
         return self.public_key
+
+
+

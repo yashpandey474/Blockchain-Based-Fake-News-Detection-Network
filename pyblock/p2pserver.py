@@ -66,6 +66,7 @@ class P2pServer:
                         block = self.blockchain.create_block(
                             self.transaction_pool.transactions, self.wallet)
                         self.broadcast_block(block)
+                        
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 self.broadcast_block(data["block"])
