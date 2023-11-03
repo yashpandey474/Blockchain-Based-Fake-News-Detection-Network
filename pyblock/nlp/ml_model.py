@@ -129,6 +129,7 @@ def get_score(content):
 
     df1 = pd.DataFrame(data)
 
+    #NEWS TEXT WORD COUNT
     df1['TEXT WORD COUNT'] = df1['NEWS TEXT'].apply(lambda x: len(x.split()))
 
     # ADD COLUMN FOR NUMBER OF WORDS IN TITLE
@@ -161,6 +162,7 @@ def get_score(content):
 
     X_scaled = scaler.transform(X)
 
-    prediction = model.predict(X_scaled)
+    prediction = model.predict_proba(X_scaled)
 
-    return prediction
+    return prediction[:, 1][0]
+
