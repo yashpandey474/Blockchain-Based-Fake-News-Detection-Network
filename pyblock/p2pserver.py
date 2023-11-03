@@ -50,6 +50,7 @@ class P2pServer:
 
         if data["type"] == MESSAGE_TYPE["chain"]:
             self.blockchain.replace_chain(data["chain"])
+            
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             if not self.transaction_pool.transaction_exists(data["transaction"]):
                 self.transaction_pool.add_transaction(data["transaction"])

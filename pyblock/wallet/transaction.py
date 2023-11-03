@@ -1,7 +1,7 @@
 import time
 from pyblock.chainutil import ChainUtil
 from pyblock.ipfs.ipfs_handler import IPFSHandler
-from pyblock.nlp.ml_model import MLModel
+from pyblock.nlp.ml_model import *
 from pyblock.wallet.wallet import Wallet
 from typing import Type
 
@@ -19,7 +19,7 @@ class Transaction:
             self.partialTransaction.ipfs_address
         )
 
-        return MLModel.get_score(content)
+        return get_score(content)
     
     @staticmethod
     def create_transaction(partial_transaction, validator_wallet:Type[Wallet]):

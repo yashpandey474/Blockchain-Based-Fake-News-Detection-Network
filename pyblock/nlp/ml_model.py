@@ -6,6 +6,7 @@ import string
 from textstat import flesch_reading_ease
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import spacy
+import pickle 
 
 nlp = spacy.load('en_core_web_sm')
 stemmer = PorterStemmer()
@@ -113,13 +114,14 @@ def calculate_lexical_diversity(text):
 
 #ADD COLUMN FOR NUMBER OF WORDS IN TEXT
 
-
-with open("moedl_1.pkl", "rb") as file:
-    model = file["MODEL"]
-    scaler = file["SCALER"]
-
-
+with open("/Users/kpandey/Desktop/3-1/Blockchain Technology/Project/BlockchainProject2/pyblock/nlp/model_1.pkl", "rb") as file:
+    data = pickle.load(file)
     
+model = data["MODEL"]
+scaler = data["SCALER"]
+
+
+
 def get_score(content):
     # Generate a random double value between 0 and 1
     data = {
