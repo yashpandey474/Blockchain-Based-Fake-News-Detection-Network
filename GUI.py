@@ -51,6 +51,9 @@ def show_transactions():
 def show_blocks_news():
     pass
 
+def valid_creds():
+    return True
+
 
 #STREAMLIT GUI
 def main_page():
@@ -80,9 +83,18 @@ def main_page():
         
     if st.button("View all transactions in mempool"):
         show_transactions()
-            
-        
+
+
+def login():
+    st.title("YOYOYOYO")
+    if valid_creds():
+        main_page()
+    else:
+        st.write("Incorrect")
+
+
+
 if __name__ == '__main__':
     p2p_thread = threading.Thread(target=run_p2pserver)
     p2p_thread.start()
-    main_page()
+    login()
