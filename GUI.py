@@ -14,30 +14,7 @@ wallet = Wallet()
 transaction_pool = TransactionPool()
 p2pserver = P2pServer(blockchain, transaction_pool, wallet)
 
-
-# @app.route('/blocks', methods=['GET'])
-def get_blocks():
-    return jsonify([block.to_json() for block in blockchain.chain])
-
-
-# @app.route('/transactions', methods=['GET'])
-def get_transactions():
-    return jsonify(transaction_pool.transactions)
-
-
-# @app.route('/transact', methods=['POST'])
-
-
-
-# @app.route('/bootstrap', methods=['GET'])
-def bootstrap_system():
-    p2pserver.bootstrap_system()
-    return jsonify(message="System bootstrapped")
-
-def get_balance():
-    return jsonify(balance=blockchain.get_balance(wallet.public_key))
-
-
+#START LISTENING ON P2P SERVER
 def run_p2pserver():
     print("Running p2p server on port: "+str(config.P2P_PORT))
     p2pserver.listen()
@@ -88,6 +65,7 @@ def main_page():
             #CREATE TRANSACTION
         transaction = Transaction.create_transaction(partial_transaction, wallet)
         
+        #BROADCASE NEWLY CREATED TRANSACTION
         p2pserver.broadcast_transaction(transaction)
             
             
