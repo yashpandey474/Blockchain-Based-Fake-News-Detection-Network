@@ -7,6 +7,7 @@ from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
+import crypto_logic
 
 
 blockchain = Blockchain()
@@ -51,9 +52,6 @@ def show_transactions():
 def show_blocks_news():
     pass
 
-def valid_creds():
-    return True
-
 
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
@@ -91,12 +89,29 @@ def main_page():
 
 
 def login():
-    st.title("YOYOYOYO")
-    if valid_creds():
-        change_screen("main_page")
-        
-    else:
-        st.write("Incorrect")
+    st.title("Login")
+    user_input = st.text_input("Enter your sk", "here...")
+    if user_input:
+        vc = crypto_logic.verify(user_input)
+        if vc[0]:
+            change_screen("main_page")
+            
+        else:
+            st.write(vc[1])
+
+    if st.button("Sign 🆙"):
+        change_screen("sign_up")
+
+def sign_up():
+    st.title("Sign Up")
+
+    if st.button("Gen new key"):
+        st.write("new key, wont see again, keep for future")
+        st.write(crypto_logic.gen_sk())
+    
+        if st.button("Go to main"):
+            change_screen("main_page")
+
 
 def main():
     if "screen" not in st.session_state:
@@ -113,6 +128,9 @@ def main():
         
     if st.session_state.screen == "show_blocks":
         show_blocks_news()
+
+    if st.session_state.screen == "sign_up":
+        sign_up()
         
     
 
