@@ -1,5 +1,5 @@
 
-class userAccount:
+class UserAccount:
     def __init__(self, role, wallet, name, email):
         self.role = role
         self.wallet = wallet
