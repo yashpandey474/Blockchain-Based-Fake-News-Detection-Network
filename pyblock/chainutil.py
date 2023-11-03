@@ -36,8 +36,7 @@ class ChainUtil:
 
     @staticmethod
     def hash(data):
-        data_string = str(data).encode()
-        return hashlib.sha256(data_string).hexdigest()
+        return hashlib.sha256(str(data).encode()).hexdigest()
 
 
 

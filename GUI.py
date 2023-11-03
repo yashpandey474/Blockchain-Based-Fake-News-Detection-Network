@@ -8,7 +8,7 @@ from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
 
-HTTP_PORT = int(config.HTTP_PORT)
+
 blockchain = Blockchain()
 wallet = Wallet()
 transaction_pool = TransactionPool()
@@ -50,6 +50,8 @@ def show_transactions():
 #SHOW ALL NEWS ARTICLES ADDED TO BLOCKCHAIN
 def show_blocks_news():
     pass
+
+
 #STREAMLIT GUI
 def main_page():
     st.title("Fake News Detection System Utilising Blockchain")
