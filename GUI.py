@@ -23,7 +23,7 @@ def run_p2pserver():
 #SHOW ALL ACCOUNT RELATED INFO
 def show_account_info():
     st.title("ACCOUNT INFORMATION")
-    balance = wallet.get_balance()
+    balance = wallet.get_balance(blockchain)
     public_key = wallet.get_public_key()
     st.write("BALANCE = ", balance)
     st.write("PUBLIC KEY = ", public_key)
@@ -65,7 +65,7 @@ def main_page():
         uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
             #CREATE PARTIAL TRANSACTION
-        partial_transaction = PartialTransaction.generate_from_file(uploaded_file)
+        partial_transaction = PartialTransaction.generate_from_file(wallet = wallet, file = uploaded_file)
             
             #CREATE TRANSACTION
         transaction = Transaction.create_transaction(partial_transaction, wallet)
