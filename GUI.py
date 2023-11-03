@@ -10,15 +10,6 @@ import threading
 import crypto_logic
 
 
-blockchain = Blockchain()
-wallet = Wallet()
-transaction_pool = TransactionPool()
-p2pserver = P2pServer(blockchain, transaction_pool, wallet)
-
-#START LISTENING ON P2P SERVER
-def run_p2pserver():
-    print("Running p2p server on port: "+str(config.P2P_PORT))
-    p2pserver.listen()
 
 
 #SHOW ALL ACCOUNT RELATED INFO
@@ -52,11 +43,10 @@ def show_transactions():
 def show_blocks_news():
     pass
 
-
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
     st.session_state.screen = input_string
-    st.experimental_rerun()
+    # st.experimental_rerun()
     
 #STREAMLIT GUI
 def main_page():
@@ -90,7 +80,7 @@ def main_page():
 
 def login():
     st.title("Login")
-    user_input = st.text_input("Enter your sk", "here...")
+    user_input = st.text_input("Enter your Private Key")
     if user_input:
         vc = crypto_logic.verify(user_input)
         if vc[0]:
@@ -99,12 +89,12 @@ def login():
         else:
             st.write(vc[1])
 
-    if st.button("Sign 🆙"):
+    if st.button("Sign up"):
         change_screen("sign_up")
 
 def sign_up():
     st.title("Sign Up")
-
+    
     if st.button("Gen new key"):
         st.write("new key, wont see again, keep for future")
         st.write(crypto_logic.gen_sk())
@@ -113,9 +103,13 @@ def sign_up():
             change_screen("main_page")
 
 
+
 def main():
-    if "screen" not in st.session_state:
+    if "screen" not in st.session_state.screen:
         st.session_state.screen = "login"
+
+    if st.session_state.screen == "login":
+        login()
         
     if st.session_state.screen == "main_page":
         main_page()
@@ -131,10 +125,4 @@ def main():
 
     if st.session_state.screen == "sign_up":
         sign_up()
-        
-    
 
-if __name__ == '__main__':
-    p2p_thread = threading.Thread(target=run_p2pserver)
-    p2p_thread.start()
-    main()
