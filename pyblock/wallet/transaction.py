@@ -4,6 +4,7 @@ from pyblock.ipfs.ipfs_handler import IPFSHandler
 from pyblock.nlp.ml_model import MLModel
 from pyblock.wallet.wallet import Wallet
 from typing import Type
+
 class Transaction:
     def __init__(self):
         self.partialTransaction = None
@@ -29,7 +30,7 @@ class Transaction:
         return transaction
     
     @staticmethod
-    def verify_transaction(transaction: Type[Transaction], error_bound: float = 0.01):
+    def verify_transaction(transaction, error_bound: float = 0.01):
         signature = transaction.sign
         transaction_hash = ChainUtil.hash(transaction.partialTransaction)
 
