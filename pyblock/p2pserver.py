@@ -83,7 +83,7 @@ class P2pServer:
             else:
                 # The public key is already known, so no need to verify it again
                 # You could handle this case as you see fit, perhaps logging it or sending a response
-
+                pass
     def verify_new_validator(self, public_key: str, signature: str, challenge: str):
         # Verify the signature against the challenge using ChainUtil
         return ChainUtil.verify_signature(public_key, signature, ChainUtil.hash(challenge))
