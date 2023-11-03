@@ -61,16 +61,18 @@ class PartialTransaction:
         self.id = ChainUtil.id()
         self.ipfs_address = None
         self.sender_address = None
+        self.sender_reputation = None
         self.sign = None
 
     @staticmethod
-    def generate_from_file(sender_wallet:Type[Wallet], file):
+    def generate_from_file(sender_wallet:Type[Wallet], file, blockchain):
         data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         partial_transaction = PartialTransaction()
         partial_transaction.ipfs_address = ipfs_address
         partial_transaction.sender_address = sender_wallet.public_key
         partial_transaction.sign = sender_wallet.sign(ChainUtil.hash(partial_transaction))
+        partial_transaction.sender_reputation = blockchain.get_balance()
         return partial_transaction
 
     @staticmethod

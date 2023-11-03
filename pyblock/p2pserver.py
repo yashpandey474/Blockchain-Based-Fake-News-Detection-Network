@@ -70,6 +70,7 @@ class P2pServer:
                         block = self.blockchain.create_block(
                             self.transaction_pool.transactions, self.wallet)
                         self.broadcast_block(block)
+                        
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 self.broadcast_block(data["block"])
@@ -78,9 +79,15 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
-            proposed_stake= data["stake"]
-            self.send_challenge(client, new_validator_public_key,proposed_stake)
-
+            
+            # Check if the public key is already known or not
+            if new_validator_public_key not in self.known_validators:
+                # Send a challenge to the new validator
+                self.send_challenge(client, new_validator_public_key)
+            else:
+                # The public key is already known, so no need to verify it again
+                # You could handle this case as you see fit, perhaps logging it or sending a response
+                pass
     def verify_new_validator(self, public_key: str, signature: str, challenge: str):
         # Verify the signature against the challenge using ChainUtil
         return ChainUtil.verify_signature(public_key, signature, ChainUtil.hash(challenge))
