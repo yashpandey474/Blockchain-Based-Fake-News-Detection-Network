@@ -62,7 +62,6 @@ class PartialTransaction:
         self.ipfs_address = None
         self.sender_address = None
         self.sign = None
-        self.timestamp = None
 
     @staticmethod
     def generate_from_file(sender_wallet:Type[Wallet], file):
@@ -71,7 +70,6 @@ class PartialTransaction:
         partial_transaction = PartialTransaction()
         partial_transaction.ipfs_address = ipfs_address
         partial_transaction.sender_address = sender_wallet.public_key
-        partial_transaction.timestamp = time.time()
         partial_transaction.sign = sender_wallet.sign(ChainUtil.hash(partial_transaction))
         return partial_transaction
 
