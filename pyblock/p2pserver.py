@@ -7,7 +7,8 @@ from websocket_server import WebsocketServer
 from typing import Type
 import pyblock.config as config
 import pyblock.chainutil as ChainUtil
-
+from pyblock.blockchain.account import Account
+from pyblock.blockchain.stake import Stake
 P2P_PORT = int(config.P2P_PORT)
 PEERS = config.PEERS
 
@@ -18,18 +19,19 @@ MESSAGE_TYPE = {
     'clear_transactions': 'CLEAR_TRANSACTIONS',
     'new_validator': 'NEW_VALIDATOR',
     'login': 'LOGIN',
-
-}
-
+    'challenge': 'CHALLENGE',
+    'challenge_response': 'CHALLENGE_RESPONSE'
+    }
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet]):
+    def __init__(self, blockchain: Type[Blockchain], stakes:Type[Stake],transaction_pool: Type[TransactionPool], wallet: Type[Wallet], account: Type[Account]):
         self.blockchain = blockchain
         self.sockets = []
         self.validator_sockets = []
         self.transaction_pool = transaction_pool
         self.wallet = wallet
         self.challenges = {}
+        self.account = account
 
     def listen(self):
         print("Starting p2p server...")
@@ -49,6 +51,8 @@ class P2pServer:
         print(client)
         print("Client left:", client['id'])
         self.sockets.remove(client)
+        if client in self.validator_sockets:
+            self.validator_sockets.remove(client)
 
     def message_received(self, client, server, message):
         data = json.loads(message)
@@ -74,24 +78,18 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
-            
-            # Check if the public key is already known or not
-            if new_validator_public_key not in self.known_validators:
-                # Send a challenge to the new validator
-                self.send_challenge(client, new_validator_public_key)
-            else:
-                # The public key is already known, so no need to verify it again
-                # You could handle this case as you see fit, perhaps logging it or sending a response
+            proposed_stake= data["stake"]
+            self.send_challenge(client, new_validator_public_key,proposed_stake)
 
     def verify_new_validator(self, public_key: str, signature: str, challenge: str):
         # Verify the signature against the challenge using ChainUtil
         return ChainUtil.verify_signature(public_key, signature, ChainUtil.hash(challenge))
 
-    def send_challenge(self, client_socket, public_key: str):
+    def send_challenge(self, client_socket, public_key: str,stake):
         # Generate a challenge
         challenge = ChainUtil.hash(ChainUtil.id())  # Could be any unique piece of data
         # Store the challenge somewhere to verify it later when the signature comes back
-        self.challenges[public_key] = challenge
+        self.challenges[public_key] = (challenge, stake)
 
         # Send the challenge to the validator
         message = json.dumps({
@@ -105,12 +103,16 @@ class P2pServer:
         # Extract the public key, signature, and challenge from the message
         public_key = message['public_key']
         signature = message['signature']
-        challenge = self.challenges.get(public_key)
+        challenge = self.challenges.get(public_key)[0]
+        stake = self.challenges.get(public_key)[1]
 
         # Verify the signature
         if challenge and self.verify_new_validator(public_key, signature, challenge):
             # The validator has been verified
             print(f"Validator with public key {public_key} has been successfully verified.")
+            self.validator_sockets.append(client_socket)
+            self.account.initialize(public_key,stake)
+            
             # Here you would add the validator to the list of known validators
         else:
             # The validation failed
@@ -121,9 +123,8 @@ class P2pServer:
             del self.challenges[public_key]
     
     def send_challenge_response(self, validator_socket, public_key: str, challenge: str):
-    # The validator would create a signature for the challenge
-        signing_key, _ = ChainUtil.gen_key_pair()
-        signature = signing_key.sign(challenge.encode()).signature.hex()
+        # The validator would create a signature for the challenge using its own signing key
+        signature = self.wallet.sign(challenge)
 
         # Send the signature back as a response to the challenge
         message = json.dumps({
@@ -132,6 +133,7 @@ class P2pServer:
             "signature": signature
         })
         self.server.send_message(validator_socket, message)
+
         
     def connect_to_peers(self):
         for peer in PEERS:

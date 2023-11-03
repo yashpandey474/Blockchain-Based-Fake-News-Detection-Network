@@ -59,10 +59,6 @@ class Blockchain:
     def get_balance(self, public_key):
         return self.accounts.get_balance(public_key)
 
-# TODO: check this make this random func
-    def get_leader(self):
-        return self.stakes.get_max(self.validators.list)
-
     def initialize(self, address):
         self.accounts.initialize(address)
         self.stakes.initialize(address)
