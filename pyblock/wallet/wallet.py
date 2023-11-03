@@ -1,6 +1,6 @@
 from ..chainutil import ChainUtil
-from .transaction import Transaction
-from .transaction_pool import TransactionPool
+# from .transaction import Transaction
+# from .transaction_pool import TransactionPool
 
 from typing import TYPE_CHECKING
 

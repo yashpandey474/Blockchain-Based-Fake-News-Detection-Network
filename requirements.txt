@@ -19,6 +19,7 @@ click==7.1.2
 cloudant==2.14.0
 comm==0.1.4
 confection==0.0.4
+crypto==1.4.1
 cymem==2.0.7
 debugpy==1.8.0
 decorator==5.1.1
@@ -74,6 +75,7 @@ matplotlib-inline==0.1.6
 mdurl==0.1.2
 ml-dtypes==0.2.0
 murmurhash==1.0.9
+Naked==0.1.32
 nest-asyncio==1.5.8
 nltk==3.8.1
 numpy==1.23.5
@@ -242,6 +244,7 @@ rpds-py==0.10.6
 rsa==4.9
 scikit-learn==1.2.2
 scipy==1.10.1
+shellescape==3.8.1
 six==1.16.0
 sklearn==0.0.post5
 smart-open==6.3.0
