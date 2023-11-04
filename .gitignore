@@ -5,3 +5,4 @@ venv/
 pyblock/config.py
 wallet/__pycache__
 WELFake_Dataset.csv
+temp.txt

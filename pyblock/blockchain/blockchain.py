@@ -57,7 +57,7 @@ class Blockchain:
         self.chain = new_chain
 
     def get_balance(self, public_key):
-        return self.accounts.get_balance(public_key)
+        return self.accounts.get_stake(public_key)
 
     def initialize(self, address):
         self.accounts.initialize(address)
