@@ -155,21 +155,21 @@ class P2pServer:
         })
         self.server.send_message(socket, message)
 
-    def handle_challenge(self,validator_socket, message):
-        """
-        Handle a received challenge message.
-        """
-        public_key = message['public_key']
-        challenge = message['challenge']
-        signature = self.wallet.sign(challenge)
+    # def handle_challenge(self,validator_socket, message):
+    #     """
+    #     Handle a received challenge message.
+    #     """
+    #     public_key = message['public_key']
+    #     challenge = message['challenge']
+    #     signature = self.wallet.sign(challenge)
 
-        # Send the signature back as a response to the challenge
-        message = json.dumps({
-            "type": "CHALLENGE_RESPONSE",
-            "public_key": public_key,
-            "signature": signature
-        })
-        self.server.send_message(validator_socket, message)
+    #     # Send the signature back as a response to the challenge
+    #     message = json.dumps({
+    #         "type": "CHALLENGE_RESPONSE",
+    #         "public_key": public_key,
+    #         "signature": signature
+    #     })
+    #     self.server.send_message(validator_socket, message)
 
     def connect_to_peers(self):
         for peer in PEERS:
