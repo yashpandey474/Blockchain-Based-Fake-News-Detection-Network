@@ -117,7 +117,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["new_validator"],
             "public_key": public_key
         })
-        self.server.send_message(socket, message)
+        self.sendEncryptedMessage(socket, message)
 
     # def handle_challenge(self,validator_socket, message):
     #     """
@@ -133,7 +133,7 @@ class P2pServer:
     #         "public_key": public_key,
     #         "signature": signature
     #     })
-    #     self.server.send_message(validator_socket, message)
+    #     self.sendEncryptedMessage(validator_socket, message)
 
     def connect_to_peers(self):
         for peer in PEERS:
@@ -172,7 +172,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json
         })
-        self.server.send_message(socket, message)
+        self.sendEncryptedMessage(socket, message)
 
     def sync_chain(self):
         for socket in self.sockets:
@@ -187,7 +187,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["transaction"],
             "transaction": transaction
         })
-        self.server.send_message(socket, message)
+        self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
         for socket in self.sockets:
@@ -198,7 +198,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["block"],
             "block": block
         })
-        self.server.send_message(socket, message)
+        self.sendEncryptedMessage(socket, message)
 
 # if __name__ == "__main__":
 #     blockchain = Blockchain()
