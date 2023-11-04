@@ -28,13 +28,12 @@ class P2pServer:
     def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], accounts: Type[Accounts]):
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
-        self.wallet = wallet # assuming initialised wallet
+        self.wallet = wallet  # assuming initialised wallet
         self.accounts = accounts
 
-
-    def sendEncryptedMessage(self,socket,message):
-         self.server.send_message(socket, ChainUtil.encryptWithSoftwareKey(message))
-
+    def sendEncryptedMessage(self, socket, message):
+        self.server.send_message(
+            socket, ChainUtil.encryptWithSoftwareKey(message))
 
     def listen(self):
         print("Starting p2p server...")
@@ -88,13 +87,13 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
-            new_validator_stake=data["stake"]
-            self.accounts.makeAccountValidatorNode(address=new_validator_public_key,stake=new_validator_stake)
-            
-        elif data["type"]==MESSAGE_TYPE["new_node"]:
-            public_key=data["public_key"]
-            self.accounts.addANewClient(address=public_key,clientPort=client)
+            new_validator_stake = data["stake"]
+            self.accounts.makeAccountValidatorNode(
+                address=new_validator_public_key, stake=new_validator_stake)
 
+        elif data["type"] == MESSAGE_TYPE["new_node"]:
+            public_key = data["public_key"]
+            self.accounts.addANewClient(address=public_key, clientPort=client)
 
     # def initialize_wallet(self, public_key: str, private_key: str):
     #     # """
@@ -103,21 +102,28 @@ class P2pServer:
     #     self.wallet.initialize(public_key, private_key)
     #     self.broadcast_new_validator(public_key)
 
-    def broadcast_new_validator(self):
+    def broadcast_new_validator(self, stake):
         """
         Broadcast the new validator's public key to all connected nodes.
         """
+        # try:
+        # self.accounts.makeAccountValidatorNode(address=self.wallet.get_public_key(),stake=stake)
+        # TODO: check if self message works
         active_accounts = self.accounts.get_active_accounts()
         for address in active_accounts:
-            self.send_new_validator(active_accounts[address].clientPort, self.wallet.get_public_key())
+            self.send_new_validator(
+                active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
+        # except:
+        #     return False
 
-    def send_new_validator(self, socket, public_key: str):
+    def send_new_validator(self, socket, public_key: str, stake):
         """
         Send a new validator's public key to the specified socket.
         """
         message = json.dumps({
             "type": MESSAGE_TYPE["new_validator"],
-            "public_key": public_key
+            "public_key": public_key,
+            "stake": stake
         })
         self.sendEncryptedMessage(socket, message)
 
@@ -157,7 +163,6 @@ class P2pServer:
     def on_peer_open(self, ws):
         self.send_new_node(ws, self.wallet.public_key)
 
-
     def send_new_node(self, ws, public_key: str):
         """
         Send a new node message with the public key to the specified socket.
@@ -185,11 +190,11 @@ class P2pServer:
             if socket:
                 self.send_chain(socket)
 
-
     def broadcast_transaction(self, transaction):
         active_accounts = self.accounts.get_active_accounts()
         for address in active_accounts:
-            self.send_transaction(active_accounts[address].clientPort, transaction)
+            self.send_transaction(
+                active_accounts[address].clientPort, transaction)
 
     def send_transaction(self, socket, transaction):
         message = json.dumps({
