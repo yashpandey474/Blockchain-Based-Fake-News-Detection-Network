@@ -17,13 +17,14 @@ class Accounts:
         if address not in self.accounts:
             self.accounts[address] = Account(balance=balance, stake=stake, clientPort=clientPort)
 
-    def clientLeft(self, address):
-        if address in self.accounts:
-            account = self.accounts[address]
-            account.isActive = False
-            if account.stake is not None:
-                account.balance += account.stake
-            account.clientPort = None
+    def clientLeft(self, clientport):
+        for address, account in self.accounts.items():
+            if account.clientPort == clientport:
+                account.isActive = False
+                if account.stake is not None:
+                    account.balance += account.stake
+                account.clientPort = None
+                break  # Assuming only one account can have this clientPort, we can break after finding it
 
     def get_account(self, address):
         return self.accounts.get(address)
@@ -53,8 +54,13 @@ class Accounts:
         self.makeAccountValidatorNode(address, stake)
 
     def addANewClient(self, address, clientPort):
-        if address in self.accounts and self.accounts[address].isActive:
-            raise ValueError("Client with this address already exists and is active.")
+        if address in self.accounts:
+            if self.accounts[address].isActive:
+                raise ValueError("Client with this address already exists and is active.")
+            else:
+                self.accounts[address].isActive=True
+                self.accounts[address].clientPort=clientPort
+        
         self.initialize(address, clientPort=clientPort)
 
     def choose_validator(self, seed):

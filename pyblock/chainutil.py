@@ -1,18 +1,18 @@
+from nacl.secret import SecretBox
+from nacl.utils import random
+from nacl.encoding import HexEncoder, RawEncoder
 from nacl.signing import SigningKey, VerifyKey
-from nacl.encoding import HexEncoder
-import uuid
 import hashlib
 import time
-
+import uuid
+import pyblock.config as config
 
 class ChainUtil:
-    import hashlib
     @staticmethod
     def verify_signature(public_key: str, signature: str, data_hash: str) -> bool:
-
         try:
             verify_key = VerifyKey(public_key, encoder=HexEncoder)
-            verify_key.verify(data_hash.encode(), signature.encode('hex'))
+            verify_key.verify(data_hash.encode(), bytes.fromhex(signature))
             return True
         except:
             return False
@@ -25,9 +25,7 @@ class ChainUtil:
 
     @staticmethod
     def gen_key_pair():
-        # Assume secret is a bytes-like object
-        signing_key = SigningKey(
-            seed=ChainUtil.generate_32_byte_seed_from_timestamp())
+        signing_key = SigningKey(ChainUtil.generate_32_byte_seed_from_timestamp())
         return signing_key, signing_key.verify_key.encode(encoder=HexEncoder).decode()
 
     @staticmethod
@@ -38,13 +36,27 @@ class ChainUtil:
     def hash(data):
         return hashlib.sha256(str(data).encode()).hexdigest()
 
+    @staticmethod
+    def encryptWithSoftwareKey(data):
+        if isinstance(data, str):
+            data = data.encode()  # Ensure the data is in bytes
+        key = config.VM_PRIVATE_KEY.encode()  # Ensure the key is in bytes
+        box = SecretBox(key, encoder=HexEncoder)
+        nonce = random(SecretBox.NONCE_SIZE)
+        encrypted = box.encrypt(data, nonce, encoder=RawEncoder)
+        return (nonce + encrypted).hex()
 
+    @staticmethod
+    def decryptWithSoftwareKey(data):
+        if isinstance(data, str):
+            data = bytes.fromhex(data)  # Decode if data is in hex string
+        key = config.VM_PRIVATE_KEY.encode()  # Ensure the key is in bytes
+        box = SecretBox(key, encoder=HexEncoder)
+        nonce = data[:SecretBox.NONCE_SIZE]
+        encrypted = data[SecretBox.NONCE_SIZE:]
+        decrypted = box.decrypt(encrypted, nonce, encoder=RawEncoder)
+        return decrypted.decode()  # Return as a string
 
-# # Example usage
+# Example usage, the secret must be provided in config module as VM_PRIVATE_KEY
 # if __name__ == '__main__':
-#     secret = b"some_secret_key_that_is_32bytes"
-#     signing_key = ChainUtil.gen_key_pair(secret)
-#     public_key = signing_key.verify_key.encode(encoder=HexEncoder).decode()
-#     message = b"Hello, World!"
-#     signature = signing_key.sign(message).signature
-#     print(ChainUtil.verify_signature(public_key, signature.decode(), ChainUtil.hash(message)))
+#     # ... the rest of your example usage

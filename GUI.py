@@ -9,7 +9,6 @@ from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
 from pyblock.blockchain.account import *
-from pyblock.blockchain.stake import *
 
 
 #START LISTENING ON P2P SERVER
