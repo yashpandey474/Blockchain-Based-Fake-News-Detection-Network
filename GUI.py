@@ -9,6 +9,7 @@ from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
 from pyblock.blockchain.account import *
+import time
 
 # https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D
 # https://i.pinimg.com/originals/88/15/63/881563d6444b370fa4ceea0c3183bb4c.gif
@@ -129,11 +130,17 @@ def main_page(p2pserver, wallet):
             st.session_state.numerical_value = st.number_input("Enter a numerical value", min_value = config.MIN_STAKE, max_value = current_balance, value=config.MIN_STAKE, step=1)
             
         if st.session_state.try_be_validator:
-            if st.button("Check Value"):
+            if st.button("Submit Stake"):
                 st.session_state.validator = True
                 #TO DO: DECREMENT BALANCE IN ACCOUNT, MAKE HIM VALIDATOR AND SEND MESSAGE
                 st.session_state.p2pserver.broadcast_new_validator(stake = st.session_state.numerical_value)
 
+                st.write("You are successfully registered as a validator.")
+                
+                time.sleep(2)
+                
+                st.session_state.try_be_validator = False
+                change_screen("main_page")
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
