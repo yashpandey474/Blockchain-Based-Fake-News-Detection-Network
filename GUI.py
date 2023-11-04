@@ -10,6 +10,38 @@ import pyblock.config as config
 import threading
 from pyblock.blockchain.account import *
 
+# https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D
+# https://i.pinimg.com/originals/88/15/63/881563d6444b370fa4ceea0c3183bb4c.gif
+background_style = '''<style>
+section {
+background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
+background-size: cover;
+background-position: center;
+transition: transform 0.3s ease-in-out;
+width: 100%;
+height: 100vh;
+}
+</style>
+<script>
+        const sections = document.querySelectorAll("section");
+    sections.forEach(section => {
+        section.addEventListener("mousemove", function(e) {
+            const width = section.offsetWidth;
+            const height = section.offsetHeight;
+            const offsetX = 0.5 - e.pageX / width;
+            const offsetY = 0.5 - e.pageY / height;
+            section.style.transform = "perspective(1000px) rotateX(" + (offsetY * 4) + "deg) rotateY(" + (offsetX * 4) + "deg)";
+        });
+        section.addEventListener("mouseleave", function() {
+            this.style.transform = "none";
+        });
+    });
+    </script>
+'''
+st.markdown(background_style, unsafe_allow_html=True)
+st.title("Fake News Detection System Utilising Blockchain")
+
+
 
 #START LISTENING ON P2P SERVER
 def run_p2pserver(p2pserver):
@@ -115,7 +147,7 @@ def initialise(private_key = None):
         print("P2P SERVER CALLED!")
         
         st.session_state.p2pserver = P2pServer(
-            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, account=st.session_state.accounts
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, accounts=st.session_state.accounts
         )
         
         p2p_thread = threading.Thread(
