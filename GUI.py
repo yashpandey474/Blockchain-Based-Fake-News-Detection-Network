@@ -150,33 +150,27 @@ if __name__ == "__main__":
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
-    if "wallet" not in st.session_state:
         st.session_state.wallet = Wallet()
 
-    if "accounts" not in st.session_state:
         st.session_state.accounts = Account()
 
-    if "transaction_pool" not in st.session_state:
         st.session_state.transaction_pool = TransactionPool()
 
-    if "stake" not in st.session_state:
         st.session_state.stake = Stake()
 
-    if "p2pserver" not in st.session_state:
         print("P2P SERVER CALLED!")
         st.session_state.p2pserver = P2pServer(
             blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool,
             stakes=st.session_state.stake, wallet=st.session_state.wallet, account=st.session_state.accounts
         )
         p2p_thread = threading.Thread(
-            target=run_p2pserver, args=(st.session_state.p2pserver,))
+            target=run_p2pserver, args=(st.session_state.p2pserver,)
+        )
         p2p_thread.start()
         
-    if "screen" not in st.session_state:
         print("SCREEN INITILIASED")
         st.session_state.screen = "login"
         
-    if "gen_key_pressed" not in st.session_state:
         st.session_state.gen_key_pressed = False
         
     main()
