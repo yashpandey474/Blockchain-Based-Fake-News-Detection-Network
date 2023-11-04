@@ -178,12 +178,10 @@ if __name__ == "__main__":
         st.session_state.blockchain = Blockchain()
 
         st.session_state.wallet = Wallet()
-
-        st.session_state.accounts = Account()
+        
+        st.session_state.accounts = st.session_state.blockchain.accounts
 
         st.session_state.transaction_pool = TransactionPool()
-
-        st.session_state.stake = Stake()
 
         print("P2P SERVER CALLED!")
         st.session_state.p2pserver = P2pServer(

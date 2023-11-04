@@ -16,9 +16,7 @@ TRANSACTION_TYPE = {
 class Blockchain:
     def __init__(self):
         self.chain = [Block.genesis()]
-        self.stakes = Stake()
         self.accounts = Account()
-        self.validators = Validators()
 
     def add_block(self, data):
         block = Block.create_block(self.chain[-1], data, Wallet(secret))
