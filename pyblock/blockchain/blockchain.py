@@ -1,7 +1,5 @@
 from .block import Block
-from .stake import Stake
-from .account import Account
-from .validators import Validators
+from .account import *
 from pyblock.wallet.wallet import Wallet
 
 secret = "i am the first leader"
@@ -16,7 +14,7 @@ TRANSACTION_TYPE = {
 class Blockchain:
     def __init__(self):
         self.chain = [Block.genesis()]
-        self.accounts = Account()
+        self.accounts = Accounts()
 
     def add_block(self, data):
         block = Block.create_block(self.chain[-1], data, Wallet(secret))

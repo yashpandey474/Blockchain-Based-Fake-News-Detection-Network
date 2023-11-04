@@ -6,6 +6,7 @@ def verify(private_key):
         rsa_private_key = RSA.import_key(private_key)
     except:
         return 0, "incorrect key"
+    
     rsa_public_key = rsa_private_key.publickey()
 
     public_key_pem = rsa_public_key.export_key()
