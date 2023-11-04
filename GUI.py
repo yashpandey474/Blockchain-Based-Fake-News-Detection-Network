@@ -132,7 +132,7 @@ def main_page(p2pserver, wallet):
             if st.button("Check Value"):
                 st.session_state.validator = True
                 #TO DO: DECREMENT BALANCE IN ACCOUNT, MAKE HIM VALIDATOR AND SEND MESSAGE
-                pass
+                st.session_state.p2pserver.broadcast_new_validator(stake = st.session_state.numerical_value)
 
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:

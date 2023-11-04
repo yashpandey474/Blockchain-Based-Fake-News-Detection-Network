@@ -34,7 +34,7 @@ class Transaction:
         transaction.timestamp = time.time()
         transaction.sign = validator_wallet.sign(ChainUtil.hash(partial_transaction))
         # Get the model score using MLModel and set it to the transaction
-        transaction.model_score = transaction.get_transaction_score()
+        # transaction.model_score = transaction.get_transaction_score()
         
         return transaction
     
@@ -62,7 +62,15 @@ class PartialTransaction:
         self.ipfs_address = None
         self.sender_address = None
         self.sender_reputation = None
+        self.model_score = None
         self.sign = None
+        
+    def get_transaction_score(self):
+        content = IPFSHandler.get_from_ipfs(
+            self.ipfs_address
+        )
+
+        return get_score(content)
 
     @staticmethod
     def generate_from_file(sender_wallet:Type[Wallet], file, blockchain):
@@ -73,6 +81,7 @@ class PartialTransaction:
         partial_transaction.sender_address = sender_wallet.public_key
         partial_transaction.sign = sender_wallet.sign(ChainUtil.hash(partial_transaction))
         partial_transaction.sender_reputation = blockchain.get_balance()
+        partial_transaction.model_score = partial_transaction.get_transaction_score()
         return partial_transaction
 
     @staticmethod

@@ -43,25 +43,13 @@ class ChainUtil:
 
     @staticmethod
     def encryptWithSoftwareKey(data):
-        if isinstance(data, str):
-            data = data.encode()  # Ensure the data is in bytes
-        key = config.VM_PRIVATE_KEY.encode()  # Ensure the key is in bytes
-        box = SecretBox(key, encoder=HexEncoder)
-        nonce = random(SecretBox.NONCE_SIZE)
-        encrypted = box.encrypt(data, nonce, encoder=RawEncoder)
-        return (nonce + encrypted).hex()
+        encrypted_data = config.VM_PUBLIC_KEY.encrypt(data, None)
+        return encrypted_data
 
     @staticmethod
     def decryptWithSoftwareKey(data):
-        if isinstance(data, str):
-            data = bytes.fromhex(data)  # Decode if data is in hex string
-        key = config.VM_PRIVATE_KEY.encode()  # Ensure the key is in bytes
-        box = SecretBox(key, encoder=HexEncoder)
-        nonce = data[:SecretBox.NONCE_SIZE]
-        encrypted = data[SecretBox.NONCE_SIZE:]
-        decrypted = box.decrypt(encrypted, nonce, encoder=RawEncoder)
-        return decrypted.decode()  # Return as a string
-
+        decrypted_data = config.VM_PRIVATE_KEY.decrypt(data)
+        return decrypted_data
 # Example usage, the secret must be provided in config module as VM_PRIVATE_KEY
 # if __name__ == '__main__':
 #     # ... the rest of your example usage

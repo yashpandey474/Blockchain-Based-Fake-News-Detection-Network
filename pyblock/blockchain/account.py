@@ -38,6 +38,7 @@ class Accounts:
         return account.stake if account else 0
     
     def makeAccountValidatorNode(self, address, stake):
+        
         if address not in self.accounts:
             raise ValueError("Account does not exist.")
         
