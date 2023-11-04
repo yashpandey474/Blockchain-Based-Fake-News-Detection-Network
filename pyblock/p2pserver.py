@@ -8,7 +8,6 @@ from typing import Type
 import pyblock.config as config
 import pyblock.chainutil as ChainUtil
 from pyblock.blockchain.account import Account
-from pyblock.blockchain.stake import Stake
 P2P_PORT = int(config.P2P_PORT)
 PEERS = config.PEERS
 

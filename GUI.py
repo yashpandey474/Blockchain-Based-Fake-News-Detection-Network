@@ -9,7 +9,6 @@ from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
 from pyblock.blockchain.account import *
-from pyblock.blockchain.stake import *
 
 
 #START LISTENING ON P2P SERVER
@@ -57,7 +56,7 @@ def show_blocks_news():
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
     st.session_state.screen = input_string
-    st.experimental_rerun()
+    st.rerun()
     
 #STREAMLIT GUI
 def main_page(p2pserver, wallet):
@@ -124,6 +123,8 @@ def initialise(private_key = None):
         )
         
         p2p_thread.start()
+        
+        print("EVERYTHING INITIIALISED")
 
 
 def login():
@@ -170,16 +171,23 @@ def enter():
     
     if st.button("Login/Signup as News Auditor"):
         st.session_state.user_type = "Auditor"
+        print("BUTTON CLICKED")
         change_screen("login")
     
     if st.button("Enter as a Reader."):
         st.session_state.user_type = "Reader"
+        
+        print("BUTTON CLICKED")
         initialise()
+        
         change_screen("main_page")
 
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
+    if st.session_state.screen == "enter":
+        print("CALL: ENTER")
+        enter()
     if st.session_state.screen == "login":
         print("CALL: LOGIN")
         login()
@@ -207,19 +215,18 @@ def main():
 
 
 if __name__ == "__main__":
-    if "blockchain" not in st.session_state:
+    if "screen" not in st.session_state:
         
         print("SCREEN INITILIASED")
         st.session_state.initialise = False
         
-        st.session_state.screen = "login"
+        st.session_state.screen = "enter"
         
         st.session_state.gen_key_pressed = False
         
         st.session_state.try_be_validator = False
 
-        st.session_state.validator = True
-        
-        enter()
+        st.session_state.validator = False
         
     main()
+        
