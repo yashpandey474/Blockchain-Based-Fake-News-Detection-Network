@@ -16,6 +16,8 @@ class Wallet:
         # self.balance = 100
         if not private_key:
             self.private_key = RSA.generate(2048)
+        else:
+            self.private_key = private_key
         self.public_key = self.private_key.publickey().export_key()
         
     def __str__(self):
