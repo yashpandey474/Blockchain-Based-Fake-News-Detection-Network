@@ -1,36 +1,38 @@
 # from flask import Flask, request, jsonify, redirect
 from pyblock.wallet.transaction import PartialTransaction, Transaction
 import streamlit as st
+import crypto_logic
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
-import crypto_logic
+from pyblock.blockchain.account import *
+from pyblock.blockchain.stake import *
 
-
-blockchain = Blockchain()
-wallet = Wallet()
-transaction_pool = TransactionPool()
-p2pserver = P2pServer(blockchain, transaction_pool, wallet)
 
 #START LISTENING ON P2P SERVER
-def run_p2pserver():
+def run_p2pserver(p2pserver):
     print("Running p2p server on port: "+str(config.P2P_PORT))
     p2pserver.listen()
+    
+#INSTANTIATE  VARIABLES NEEDED BETWEEN RERUNS OF STREAMLIT APP
 
+
+    
+    
 
 #SHOW ALL ACCOUNT RELATED INFO
-def show_account_info():
+def show_account_info(wallet, blockchain):
     st.title("ACCOUNT INFORMATION")
-    balance = wallet.get_balance(blockchain)
+    balance = blockchain.get_balance(wallet.public_key)
     public_key = wallet.get_public_key()
     st.write("BALANCE = ", balance)
     st.write("PUBLIC KEY = ", public_key)
     
 #SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
-def show_transactions():
+def show_transactions(transaction_pool):
     st.title("Current Network Transactions")
     table_data = []
     for transaction in transaction_pool.transactions:
@@ -52,14 +54,13 @@ def show_transactions():
 def show_blocks_news():
     pass
 
-
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
     st.session_state.screen = input_string
     st.experimental_rerun()
     
 #STREAMLIT GUI
-def main_page():
+def main_page(p2pserver, wallet):
     st.title("Fake News Detection System Utilising Blockchain")
     st.write("Welcome, user.")
         
@@ -90,7 +91,7 @@ def main_page():
 
 def login():
     st.title("Login")
-    user_input = st.text_input("Enter your sk", "here...")
+    user_input = st.text_input("Enter your Private Key")
     if user_input:
         vc = crypto_logic.verify(user_input)
         if vc[0]:
@@ -99,42 +100,83 @@ def login():
         else:
             st.write(vc[1])
 
-    if st.button("Sign 🆙"):
+    if st.button("Sign up"):
         change_screen("sign_up")
 
 def sign_up():
     st.title("Sign Up")
-
+    
     if st.button("Gen new key"):
         st.write("new key, wont see again, keep for future")
         st.write(crypto_logic.gen_sk())
-    
+        st.session_state.gen_key_pressed = True
+
+    if st.session_state.gen_key_pressed:
         if st.button("Go to main"):
+            print("BUTTON CLICKED")
             change_screen("main_page")
+            
+
 
 
 def main():
-    if "screen" not in st.session_state:
-        st.session_state.screen = "login"
-        
-    if st.session_state.screen == "main_page":
-        main_page()
-        
-    if st.session_state.screen == "account_info":
-        show_account_info()
+    print("CURRENT SCREEN = ", st.session_state.screen)
     
-    if st.session_state.screen == "show_transac":
-        show_transactions()
+    if st.session_state.screen == "login":
+        print("CALL: LOGIN")
+        login()
+            
+    if st.session_state.screen == "main_page":
+        print("YES. WE TRIED TO CALL THE MAIN PAGE")
+        main_page(st.session_state.p2pserver, st.session_state.wallet)
+            
+    if st.session_state.screen == "account_info":
+        print("CALL: ACC INFO")
+        show_account_info(wallet= st.session_state.wallet, blockchain= st.session_state.blockchain)
         
+    if st.session_state.screen == "show_transac":
+        print("CALL: SHOW TRANSAC")
+        show_transactions(transaction_pool = st.session_state.transaction_pool)
+            
     if st.session_state.screen == "show_blocks":
+        print("CALL: SHOW BLOCKS")
         show_blocks_news()
 
     if st.session_state.screen == "sign_up":
         sign_up()
-        
-    
 
-if __name__ == '__main__':
-    p2p_thread = threading.Thread(target=run_p2pserver)
-    p2p_thread.start()
+
+if __name__ == "__main__":
+    if "blockchain" not in st.session_state:
+        st.session_state.blockchain = Blockchain()
+
+    if "wallet" not in st.session_state:
+        st.session_state.wallet = Wallet()
+
+    if "accounts" not in st.session_state:
+        st.session_state.accounts = Account()
+
+    if "transaction_pool" not in st.session_state:
+        st.session_state.transaction_pool = TransactionPool()
+
+    if "stake" not in st.session_state:
+        st.session_state.stake = Stake()
+
+    if "p2pserver" not in st.session_state:
+        print("P2P SERVER CALLED!")
+        st.session_state.p2pserver = P2pServer(
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool,
+            stakes=st.session_state.stake, wallet=st.session_state.wallet, account=st.session_state.accounts
+        )
+        p2p_thread = threading.Thread(
+            target=run_p2pserver, args=(st.session_state.p2pserver,))
+        p2p_thread.start()
+        
+    if "screen" not in st.session_state:
+        print("SCREEN INITILIASED")
+        st.session_state.screen = "login"
+        
+    if "gen_key_pressed" not in st.session_state:
+        st.session_state.gen_key_pressed = False
+        
     main()
