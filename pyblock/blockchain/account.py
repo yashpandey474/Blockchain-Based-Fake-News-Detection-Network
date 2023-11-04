@@ -77,3 +77,7 @@ class Accounts:
         random_generator = random.Random(seed)
         chosen_validator = random_generator.choices(sorted_accounts, weights=weights, k=1)[0]
         return chosen_validator
+    
+    def get_active_accounts(self):
+        # Return a dictionary of accounts that have an active clientPort (i.e., are connected)
+        return {address: account for address, account in self.accounts.items() if account.isActive}    

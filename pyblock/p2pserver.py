@@ -90,6 +90,7 @@ class P2pServer:
             new_validator_public_key = data["public_key"]
             new_validator_stake=data["stake"]
             self.accounts.makeAccountValidatorNode(address=new_validator_public_key,stake=new_validator_stake)
+            
         elif data["type"]==MESSAGE_TYPE["new_node"]:
             public_key=data["public_key"]
             self.accounts.addANewClient(address=public_key,clientPort=client)
@@ -106,8 +107,9 @@ class P2pServer:
         """
         Broadcast the new validator's public key to all connected nodes.
         """
-        for socket in self.sockets:
-            self.send_new_validator(socket, self.wallet.get_public_key())
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            self.send_new_validator(active_accounts[address].clientPort, self.wallet.get_public_key())
 
     def send_new_validator(self, socket, public_key: str):
         """
@@ -175,12 +177,19 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def sync_chain(self):
-        for socket in self.sockets:
-            self.send_chain(socket)
+        active_accounts = self.accounts.get_active_accounts()
+        for address, account in active_accounts.items():
+            # Assuming the account's clientPort can be used to send messages
+            # and there's a method in P2pServer to get the socket by its client port
+            socket = self.get_socket_by_client_port(account.clientPort)
+            if socket:
+                self.send_chain(socket)
+
 
     def broadcast_transaction(self, transaction):
-        for socket in self.sockets:
-            self.send_transaction(socket, transaction)
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            self.send_transaction(active_accounts[address].clientPort, transaction)
 
     def send_transaction(self, socket, transaction):
         message = json.dumps({
@@ -190,8 +199,9 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
-        for socket in self.sockets:
-            self.send_block(socket, block)
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            self.send_block(active_accounts[address].clientPort, block)
 
     def send_block(self, socket, block):
         message = json.dumps({
