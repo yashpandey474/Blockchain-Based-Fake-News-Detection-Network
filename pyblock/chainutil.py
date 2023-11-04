@@ -4,18 +4,31 @@ from nacl.encoding import HexEncoder, RawEncoder
 from nacl.signing import SigningKey, VerifyKey
 import hashlib
 import time
+<<<<<<< Updated upstream
 import uuid
 import pyblock.config as config
+=======
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+
+>>>>>>> Stashed changes
 
 class ChainUtil:
     @staticmethod
     def verify_signature(public_key: str, signature: str, data_hash: str) -> bool:
         try:
+<<<<<<< Updated upstream
             verify_key = VerifyKey(public_key, encoder=HexEncoder)
             verify_key.verify(data_hash.encode(), bytes.fromhex(signature))
+=======
+            # data_hash = SHA256.new(data.encode())
+            pkcs1_15.new(public_key).verify(data_hash, signature)
+>>>>>>> Stashed changes
             return True
-        except:
-            return False
+        
+        except (ValueError, TypeError):
+            return False 
 
     @staticmethod
     def generate_32_byte_seed_from_timestamp():
