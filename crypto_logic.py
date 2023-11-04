@@ -5,7 +5,7 @@ def verify(private_key):
     try:
         rsa_private_key = RSA.import_key(private_key)
     except:
-        return 0, "incorrect key"
+        return 0, "incorrect key", None
     
     rsa_public_key = rsa_private_key.publickey()
 
@@ -13,13 +13,14 @@ def verify(private_key):
 
     print("Public Key (PEM format):")
     print(public_key_pem.decode())
-    return 1, "success"
+    return 1, "success", rsa_private_key
 
 
 def gen_sk():
     key = RSA.generate(2048)
-    sk = key.export_key()
-    return (sk.decode())
+    # sk = key.export_key()
+    # return (sk.decode())
+    return key
 
 
 # if __name__ == "__main__":
