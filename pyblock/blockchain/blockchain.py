@@ -97,6 +97,4 @@ class Blockchain:
 
     def reset_state(self):
         self.chain = [Block.genesis()]
-        self.stakes = Stake()
         self.accounts = Account()
-        self.validators = Validators()
