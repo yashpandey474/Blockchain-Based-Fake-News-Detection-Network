@@ -72,7 +72,7 @@ def main_page(p2pserver, wallet):
                 #CREATE PARTIAL TRANSACTION
             partial_transaction = PartialTransaction.generate_from_file(sender_wallet = wallet, file = uploaded_file)
                 
-                #CREATE TRANSACTION
+            #CREATE TRANSACTION
             transaction = Transaction.create_transaction(partial_transaction, wallet)
             
             #BROADCASE NEWLY CREATED TRANSACTION
@@ -81,13 +81,30 @@ def main_page(p2pserver, wallet):
             
     if st.button("View all Verified News"):
         change_screen("show_blocks")
-            
+        
     if st.button("View Account Information"):
         change_screen("account_info")
-        
-    if st.button("View all transactions in mempool"):
-        change_screen("show_transac")
 
+    if st.session_state.user_type == "Auditor":
+        if st.button("View all transactions in mempool"):
+            change_screen("show_transac")
+            
+        if st.button("Become a Validator."):
+            st.session_state.try_be_validator = True
+            current_balance = st.session_state.accounts.get_balance(st.session_state.wallet.public_key)
+            st.write("Please enter an amount to stake.")
+            st.write("Minimum Stake Required: ", config.MIN_STAKE)
+            st.write("Your Current Balance: ", current_balance)
+            
+            
+            numerical_value = st.number_input("Enter a numerical value", min_value = config.MIN_STAKE, max_value = current_balance, value=config.MIN_STAKE, step=1)
+            
+        if st.session_state.try_be_validator:
+            if st.button("Check Value"):
+                st.session_state.validator = True
+                #TO DO: DECREMENT BALANCE IN ACCOUNT, MAKE HIM VALIDATOR AND SEND MESSAGE
+                pass
+                
 
 def login():
     st.title("Login")
@@ -96,7 +113,6 @@ def login():
         vc = crypto_logic.verify(user_input)
         if vc[0]:
             change_screen("main_page")
-            
         else:
             st.write(vc[1])
 
@@ -117,7 +133,16 @@ def sign_up():
             change_screen("main_page")
             
 
-
+def enter():
+    st.title("Choose Role to enter into Network")
+    
+    if st.button("Login/Signup as News Auditor"):
+        st.session_state.user_type = "Auditor"
+        change_screen("login")
+    
+    if st.button("Enter as a Reader."):
+        st.session_state.user_type = "Reader"
+        change_screen("main_page")
 
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
@@ -144,39 +169,39 @@ def main():
 
     if st.session_state.screen == "sign_up":
         sign_up()
+        
+    
 
 
 if __name__ == "__main__":
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
-    if "wallet" not in st.session_state:
         st.session_state.wallet = Wallet()
+        
+        st.session_state.accounts = st.session_state.blockchain.accounts
 
-    if "accounts" not in st.session_state:
-        st.session_state.accounts = Account()
-
-    if "transaction_pool" not in st.session_state:
         st.session_state.transaction_pool = TransactionPool()
 
-    if "stake" not in st.session_state:
-        st.session_state.stake = Stake()
-
-    if "p2pserver" not in st.session_state:
         print("P2P SERVER CALLED!")
         st.session_state.p2pserver = P2pServer(
             blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool,
             stakes=st.session_state.stake, wallet=st.session_state.wallet, account=st.session_state.accounts
         )
         p2p_thread = threading.Thread(
-            target=run_p2pserver, args=(st.session_state.p2pserver,))
+            target=run_p2pserver, args=(st.session_state.p2pserver,)
+        )
         p2p_thread.start()
         
-    if "screen" not in st.session_state:
         print("SCREEN INITILIASED")
         st.session_state.screen = "login"
         
-    if "gen_key_pressed" not in st.session_state:
         st.session_state.gen_key_pressed = False
+        
+        st.session_state.try_be_validator = False
+
+        st.session_state.validator = True
+        
+        enter()
         
     main()
