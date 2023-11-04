@@ -84,7 +84,14 @@ def show_transactions(transaction_pool):
     
 #SHOW ALL NEWS ARTICLES ADDED TO BLOCKCHAIN
 def show_blocks_news():
-    pass
+    for block in st.session_state.blockchain.chain:
+        st.write("### Block", block.index)
+            
+        st.write("TIMESTAMP = ", block.timestamp)
+        
+        st.write("DATA = ", block.data)
+        
+        st.write(" - - - ")
 
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
