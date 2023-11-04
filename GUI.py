@@ -95,24 +95,48 @@ def main_page(p2pserver, wallet):
             st.write("Please enter an amount to stake.")
             st.write("Minimum Stake Required: ", config.MIN_STAKE)
             st.write("Your Current Balance: ", current_balance)
-            
-            
-            numerical_value = st.number_input("Enter a numerical value", min_value = config.MIN_STAKE, max_value = current_balance, value=config.MIN_STAKE, step=1)
+            st.session_state.numerical_value = st.number_input("Enter a numerical value", min_value = config.MIN_STAKE, max_value = current_balance, value=config.MIN_STAKE, step=1)
             
         if st.session_state.try_be_validator:
             if st.button("Check Value"):
                 st.session_state.validator = True
                 #TO DO: DECREMENT BALANCE IN ACCOUNT, MAKE HIM VALIDATOR AND SEND MESSAGE
                 pass
-                
+
+def initialise(private_key = None):
+    if "blockchain" not in st.session_state:
+        st.session_state.blockchain = Blockchain()
+
+        st.session_state.accounts = st.session_state.blockchain.accounts
+
+        st.session_state.transaction_pool = TransactionPool()
+
+        st.session_state.wallet = Wallet(private_key)
+        
+        print("P2P SERVER CALLED!")
+        
+        st.session_state.p2pserver = P2pServer(
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, account=st.session_state.accounts
+        )
+        
+        p2p_thread = threading.Thread(
+            target=run_p2pserver, args=(st.session_state.p2pserver,)
+        )
+        
+        p2p_thread.start()
+
 
 def login():
     st.title("Login")
     user_input = st.text_input("Enter your Private Key")
+    
     if user_input:
         vc = crypto_logic.verify(user_input)
+        
         if vc[0]:
+            initialise(user_input)
             change_screen("main_page")
+            
         else:
             st.write(vc[1])
 
@@ -124,7 +148,15 @@ def sign_up():
     
     if st.button("Gen new key"):
         st.write("new key, wont see again, keep for future")
-        st.write(crypto_logic.gen_sk())
+        
+        private_key = crypto_logic.gen_sk()
+        
+        st.session_state.initialise = True
+        
+        initialise(private_key)
+        
+        st.write(private_key)
+        
         st.session_state.gen_key_pressed = True
 
     if st.session_state.gen_key_pressed:
@@ -142,6 +174,7 @@ def enter():
     
     if st.button("Enter as a Reader."):
         st.session_state.user_type = "Reader"
+        initialise()
         change_screen("main_page")
 
 def main():
@@ -175,25 +208,10 @@ def main():
 
 if __name__ == "__main__":
     if "blockchain" not in st.session_state:
-        st.session_state.blockchain = Blockchain()
-
-        st.session_state.wallet = Wallet()
-        
-        st.session_state.accounts = st.session_state.blockchain.accounts
-
-        st.session_state.transaction_pool = TransactionPool()
-
-        print("P2P SERVER CALLED!")
-        st.session_state.p2pserver = P2pServer(
-            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool,
-            stakes=st.session_state.stake, wallet=st.session_state.wallet, account=st.session_state.accounts
-        )
-        p2p_thread = threading.Thread(
-            target=run_p2pserver, args=(st.session_state.p2pserver,)
-        )
-        p2p_thread.start()
         
         print("SCREEN INITILIASED")
+        st.session_state.initialise = False
+        
         st.session_state.screen = "login"
         
         st.session_state.gen_key_pressed = False

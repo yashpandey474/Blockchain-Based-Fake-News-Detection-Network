@@ -25,7 +25,7 @@ MESSAGE_TYPE = {
 
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], stakes: Type[Stake], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], account: Type[Account]):
+    def __init__(self, blockchain: Type[Blockchain],  transaction_pool: Type[TransactionPool], wallet: Type[Wallet], account: Type[Account]):
         self.blockchain = blockchain
         self.sockets = []
         self.validator_sockets = []
