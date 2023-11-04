@@ -129,17 +129,20 @@ def initialise(private_key = None):
 
 def login():
     st.title("Login")
-    user_input = st.text_input("Enter your Private Key")
-    
-    if user_input:
-        vc = crypto_logic.verify(user_input)
+
+    user_input = st.text_area("Enter your Private Key")
+
+    if st.button("Continue"):
         
-        if vc[0]:
-            initialise(user_input)
-            change_screen("main_page")
+        if user_input:
+            vc = crypto_logic.verify(user_input)
             
-        else:
-            st.write(vc[1])
+            if vc[0]:
+                initialise(vc[2])
+                change_screen("main_page")
+                
+            else:
+                st.write(vc[1])
 
     if st.button("Sign up"):
         change_screen("sign_up")
@@ -156,7 +159,7 @@ def sign_up():
         
         initialise(private_key)
         
-        st.write(private_key)
+        st.write(private_key.export_key().decode())
         
         st.session_state.gen_key_pressed = True
 
