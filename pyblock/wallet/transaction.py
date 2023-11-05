@@ -8,11 +8,7 @@ from typing import Type
 class Transaction:
     def __init__(self):
         self.partialTransaction = None
-        self.validator_address = None
-        self.sign = None 
-        self.votes= None
-        self.timestamp = None
-        self.model_score = None 
+        self.votes= 0
 
     def get_transaction_score(self):
         content = IPFSHandler.get_from_ipfs(
@@ -22,20 +18,14 @@ class Transaction:
         return get_score(content)
     
     @staticmethod
-    def create_transaction(partial_transaction, validator_wallet:Type[Wallet]):
-        # Verify the partial_transaction
+    def create_transaction(partial_transaction):
+        # Verify the partial_transaction [NOT NEEDED]
         if not PartialTransaction.verify_partial_transaction(partial_transaction):
             print("Invalid PartialTransaction!")
             return None
         
         transaction = Transaction()
         transaction.partialTransaction = partial_transaction
-        transaction.validator_address = validator_wallet.public_key
-        transaction.timestamp = time.time()
-        transaction.sign = validator_wallet.sign(ChainUtil.hash(partial_transaction))
-        # Get the model score using MLModel and set it to the transaction
-        # transaction.model_score = transaction.get_transaction_score()
-        
         return transaction
     
     @staticmethod
@@ -80,7 +70,7 @@ class PartialTransaction:
         partial_transaction.ipfs_address = ipfs_address
         partial_transaction.sender_address = sender_wallet.public_key
         partial_transaction.sign = sender_wallet.sign(ChainUtil.hash(partial_transaction))
-        partial_transaction.sender_reputation = blockchain.get_balance()
+        partial_transaction.sender_reputation = blockchain.get_balance(sender_wallet.public_key)
         partial_transaction.model_score = partial_transaction.get_transaction_score()
         return partial_transaction
 

@@ -3,6 +3,7 @@ from pyblock.wallet.transaction import PartialTransaction, Transaction
 import streamlit as st
 import crypto_logic
 from pyblock.blockchain.blockchain import Blockchain
+from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
@@ -13,6 +14,7 @@ import time
 
 # https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D
 # https://i.pinimg.com/originals/88/15/63/881563d6444b370fa4ceea0c3183bb4c.gif
+
 background_style = '''<style>
 section {
 background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
@@ -39,7 +41,21 @@ height: 100vh;
     });
     </script>
 '''
+
 st.markdown(background_style, unsafe_allow_html=True)
+
+
+# st.markdown(
+#     """
+#     <iframe
+#       src="HTML/custom_background.html"
+#       width="100%"
+#       height="100%"
+#     >
+#     </iframe>
+#     """,
+#     unsafe_allow_html=True,
+# )
 st.title("Fake News Detection System Utilising Blockchain")
 
 
@@ -100,7 +116,7 @@ def change_screen(input_string):
     
 #STREAMLIT GUI
 def main_page(p2pserver, wallet):
-    st.title("Fake News Detection System Utilising Blockchain")
+    # st.title("Fake News Detection System Utilising Blockchain")
     st.write("Welcome, user.")
         
     if st.button("Upload New News"):
@@ -109,13 +125,13 @@ def main_page(p2pserver, wallet):
 
         if uploaded_file:
                 #CREATE PARTIAL TRANSACTION
-            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = wallet, file = uploaded_file)
+            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = st.session_state.p2pserver.wallet, file = uploaded_file)
                 
-            #CREATE TRANSACTION
-            transaction = Transaction.create_transaction(partial_transaction, wallet)
+            # #CREATE TRANSACTION
+            # transaction = Transaction.create_transaction(partial_transaction, wallet)
             
             #BROADCASE NEWLY CREATED TRANSACTION
-            p2pserver.broadcast_transaction(transaction)
+            st.session_state.p2pserver.broadcast_transaction(partial_transaction)
                 
             
     if st.button("View all Verified News"):
@@ -157,7 +173,53 @@ def main_page(p2pserver, wallet):
                 time.sleep(1)
                 st.session_state.try_be_validator = False
                 
-                
+    #IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
+    if st.session_state.validator and st.session_state.block_proposer:
+        #SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
+        table_data = []
+        for partial_transaction in st.session_state.p2pserver.transaction_pool:
+            table_data.append({
+                "ID": partial_transaction.id,
+                "IPFS Address": partial_transaction.ipfs_address,
+                "Model Score": partial_transaction.model_score,
+                "Sender Reputation": partial_transaction.sender_reputation
+            })
+
+        max_selections = config.BLOCK_TRANSACTION_LIMIT
+        
+        #DISPLAY TABLE OF PARTAL TRANSACS. WITH SELECT BOX
+        selected_partial_transactions = st.multiselect(
+            "Select partial transactions",
+            table_data,
+            default=[],
+            key="transactions",
+        )
+
+        #WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
+        if len(selected_partial_transactions) > max_selections:
+            st.warning(
+                f"Maximum selections allowed: {max_selections}. Please deselect items.")
+
+        #CONFIRM THE SELECTION
+        if st.button("Confirm Selection") and len(selected_partial_transactions) <= max_selections:
+            # selected_ids = [partial_transaction["ID"] for partial_transaction in selected_transactions]
+            transactions = [
+                Transaction.create_transaction(partial_transaction=partial_transaction) for partial_transaction in selected_partial_transactions
+                ]
+            
+            # TODO: CONFIRM TYPE OF DATA AS LIST OF TRANSACTIONS
+            #CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
+            block = Block.create_block(
+                lastBlock = st.session_state.blockchain.chain[-1],
+                _data = transactions,
+                wallet = st.session_state.p2pserver.wallet
+            )
+            
+            #BROADCAST THE BLOCK
+            st.session_state.p2pserver.broadcast_block(block)
+            
+            #CONFIRMATION MESSAGE
+            st.write("The created block was transmitted. Waiting for confirmations.")
                 
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:
