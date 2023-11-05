@@ -177,7 +177,8 @@ def main_page(p2pserver, wallet):
     if st.session_state.validator and st.session_state.block_proposer:
         #SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
-        for partial_transaction in st.session_state.p2pserver.transaction_pool:
+        partial_transactions = st.session_state.p2pserver.transaction_pool
+        for partial_transaction in partial_transactions:
             table_data.append({
                 "ID": partial_transaction.id,
                 "IPFS Address": partial_transaction.ipfs_address,
@@ -203,11 +204,9 @@ def main_page(p2pserver, wallet):
         #CONFIRM THE SELECTION
         if st.button("Confirm Selection") and len(selected_partial_transactions) <= max_selections:
             # selected_ids = [partial_transaction["ID"] for partial_transaction in selected_transactions]
-            transactions = [
-                Transaction.create_transaction(partial_transaction=partial_transaction) for partial_transaction in selected_partial_transactions
-                ]
-            
-            # TODO: CONFIRM TYPE OF DATA AS LIST OF TRANSACTIONS
+            selected_transactions_1 = [
+                
+            ]
             #CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
             block = Block.create_block(
                 lastBlock = st.session_state.blockchain.chain[-1],
@@ -220,6 +219,12 @@ def main_page(p2pserver, wallet):
             
             #CONFIRMATION MESSAGE
             st.write("The created block was transmitted. Waiting for confirmations.")
+            
+            st.session_state.block_confirmations = 0
+            
+            
+    if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
+        pass
                 
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:
