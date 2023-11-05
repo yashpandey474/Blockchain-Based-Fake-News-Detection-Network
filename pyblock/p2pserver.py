@@ -85,15 +85,14 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 # self.broadcast_block(data["block"])
-
-                # REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
-                self.transaction_pool.remove(data["block"].data)
-
-                # VOTE ON THE TRANSACTIONS
+                
+                # #REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
+                # self.transaction_pool.remove(data["block"].data)
+                
+                #VOTE ON THE TRANSACTIONS
                 st.session_state.block_received = True
                 st.session_state.received_block = data["block"]
-
-            # TODO: Add logic to handle invalid block and penalise the validator
+        
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]

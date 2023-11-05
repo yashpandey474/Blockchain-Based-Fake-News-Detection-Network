@@ -244,8 +244,47 @@ def main_page():
     if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
         st.write("Current Confirmations: ", st.session_state.block_confirmations)
         
+    #IF RECEIVED A BLOCK
+    if st.session_state.block_received:
+        #SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
+        st.header("Block Info")
+        st.write("Validator:", block.validator)
+        st.write("Timestamp:", block.timestamp)
+        st.header("Vote on Transactions")
+        block = st.session_state.received_block
+        transaction_votes = {}
+        table_data = []
         
-                
+        for transaction in block.data:
+            transaction_id = transaction.id
+            vote = st.radio(
+                f"Vote for Transaction {transaction_id}", ("True", "False"))
+            transaction_votes[transaction_id] = vote
+            
+            table_data.append({
+                "ID": transaction.id,
+                "IPFS Address": transaction.ipfs_address,
+                "Sender Address": transaction.sender_address,
+                "Sender Reputation": transaction.sender_reputation,
+                "Model Score": transaction.model_score,
+                "Sign of Sender": transaction.sign,
+                "Vote": vote,
+            })
+
+        st.table(table_data)
+        
+        if st.button("Submit Votes"):
+            #BROADCAST THE VOTES
+            st.session_state.p2pserver.broadcast_votes(transaction_votes)
+            
+            st.write("Votes Submitted. Thank you")
+            
+            time.sleep(1)
+            
+            st.session_state.block_received = False
+            
+
+        
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
