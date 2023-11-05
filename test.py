@@ -3,6 +3,16 @@ import datetime
 import time
 import pyblock.config as config
 
+def block_logic():
+    #IF > 50% VOTES RECEIVED
+    total_active_accounts = len(st.session_state.p2pserver.accounts.get_active_accounts())
+    if st.session_state.received_block.votes >= 0.5 * (total_active_accounts):
+        #REMOVE THE TRANSACTIONS FROM THE MEMPOOL
+        st.session_state.p2pserver.transaction_pool.remove(st.session_state.received_block.data)
+        
+        #ADD THE BLOCK TO THE BLOCKCHAIN
+        st.session_state.blokchain.chain.append(st.session_state.received_block)
+        
 
 def seconds_until_next_check(start_time, interval):
     current_time = datetime.datetime.now()

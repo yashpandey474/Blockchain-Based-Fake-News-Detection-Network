@@ -14,7 +14,7 @@ class Transaction:
         self.sender_reputation = None
         self.model_score = None
         self.sign = None
-        self.votes = None
+        self.positive_votes = None
 
     
 
