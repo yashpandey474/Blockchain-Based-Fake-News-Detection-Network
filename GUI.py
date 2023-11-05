@@ -133,7 +133,7 @@ def main_page(p2pserver, wallet):
             #BROADCASE NEWLY CREATED TRANSACTION
             st.session_state.p2pserver.broadcast_transaction(partial_transaction)
                 
-            
+    #VIEW NEWS STORED IN BLOCKCHAIN
     if st.button("View all Verified News"):
         change_screen("show_blocks")
         
@@ -177,40 +177,45 @@ def main_page(p2pserver, wallet):
     if st.session_state.validator and st.session_state.block_proposer:
         #SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
-        partial_transactions = st.session_state.p2pserver.transaction_pool
-        for partial_transaction in partial_transactions:
+        transactions = st.session_state.p2pserver.transaction_pool.transactions
+        transaction_dict = {
+            transaction.id: transaction for transaction in transactions
+            }
+
+        for transaction in transactions:
             table_data.append({
-                "ID": partial_transaction.id,
-                "IPFS Address": partial_transaction.ipfs_address,
-                "Model Score": partial_transaction.model_score,
-                "Sender Reputation": partial_transaction.sender_reputation
+                "ID": transaction.id,
+                "IPFS Address": transaction.ipfs_address,
+                "Model Score": transaction.model_score,
+                "Sender Reputation": transaction.sender_reputation
             })
 
         max_selections = config.BLOCK_TRANSACTION_LIMIT
         
-        #DISPLAY TABLE OF PARTAL TRANSACS. WITH SELECT BOX
-        selected_partial_transactions = st.multiselect(
-            "Select partial transactions",
+        #DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
+        selected_transactions = st.multiselect(
+            "Select transactions",
             table_data,
             default=[],
             key="transactions",
         )
 
         #WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
-        if len(selected_partial_transactions) > max_selections:
+        if len(selected_transactions) > max_selections:
             st.warning(
-                f"Maximum selections allowed: {max_selections}. Please deselect items.")
+                f"Maximum selections allowed: {max_selections}. Please deselect items."
+                )
 
         #CONFIRM THE SELECTION
-        if st.button("Confirm Selection") and len(selected_partial_transactions) <= max_selections:
-            # selected_ids = [partial_transaction["ID"] for partial_transaction in selected_transactions]
-            selected_transactions_1 = [
-                
+        if st.button("Confirm Selection") and len(selected_transactions) <= max_selections:
+            selected_transaction_objects = [
+                transaction_dict[transaction["ID"]] for transaction in selected_transactions
             ]
+
             #CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
             block = Block.create_block(
                 lastBlock = st.session_state.blockchain.chain[-1],
-                _data = transactions,
+                _data = selected_transaction_objects,
                 wallet = st.session_state.p2pserver.wallet
             )
             
@@ -220,11 +225,14 @@ def main_page(p2pserver, wallet):
             #CONFIRMATION MESSAGE
             st.write("The created block was transmitted. Waiting for confirmations.")
             
+            
             st.session_state.block_confirmations = 0
             
             
     if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
-        pass
+        st.write("Current Confirmations: ", st.session_state.block_confirmations)
+        
+        
                 
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:

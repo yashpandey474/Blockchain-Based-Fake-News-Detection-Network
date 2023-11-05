@@ -5,19 +5,19 @@ TRANSACTION_THRESHOLD = 3  # Import or define your TRANSACTION_THRESHOLD here
 
 class TransactionPool:
     def __init__(self):
-        self.partial_transactions = []
+        self.transactions = []
 
     def threshold_reached(self):
-        return len(self.partial_transactions) >= TRANSACTION_THRESHOLD
+        return len(self.transactions) >= TRANSACTION_THRESHOLD
 
     def add_transaction(self, transaction):
-        self.partial_transactions.append(transaction)
-        return len(self.partial_transactions) >= TRANSACTION_THRESHOLD
+        self.transactions.append(transaction)
+        return len(self.transactions) >= TRANSACTION_THRESHOLD
     
     
     def valid_transactions(self):
         valid_txs = []
-        for transaction in self.partial_transactions:
+        for transaction in self.transactions:
             if not Transaction.verify_transaction(transaction):
                 print(f"Invalid signature from {transaction.input['sender']}")
             else:
@@ -28,4 +28,4 @@ class TransactionPool:
         return any(t.id == transaction.id for t in self.transactions)
 
     def clear(self):
-        self.partial_transactions = []
+        self.transactions = []
