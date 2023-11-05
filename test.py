@@ -3,11 +3,6 @@ import datetime
 import time
 import pyblock.config as config
 
-# Set the duration for the popup to appear in seconds
-DURATION_SECONDS = 10  # Example: 120 seconds (2 minutes)
-
-# Function to calculate the seconds until the next check
-
 
 def seconds_until_next_check(start_time, interval):
     current_time = datetime.datetime.now()
@@ -41,10 +36,12 @@ def main():
         while True:
             # Sleep until next check
             time.sleep(seconds_until_next_check(
-                config.START_TIME, DURATION_SECONDS))
+                config.START_TIME, config.BLOCK_VALIDATOR_CHOOSE_INTERVAL))
+            print(int(time.time()))
             st.session_state['show_popup'] = True
             st.experimental_rerun()
 
+#time and previous block hash
 
 if __name__ == "__main__":
     main()

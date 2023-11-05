@@ -1,31 +1,35 @@
+from pyblock.config import TRANSACTION_THRESHOLD
+from typing import List
 from .transaction import Transaction
-
-TRANSACTION_THRESHOLD = 3  # Import or define your TRANSACTION_THRESHOLD here
 
 
 class TransactionPool:
     def __init__(self):
-        self.transactions = []
+        self.transactions = set()
 
     def threshold_reached(self):
         return len(self.transactions) >= TRANSACTION_THRESHOLD
 
     def add_transaction(self, transaction):
-        self.transactions.append(transaction)
+        self.transactions.add(transaction)  # Set uses add instead of append
         return len(self.transactions) >= TRANSACTION_THRESHOLD
-    
-    
+
     def valid_transactions(self):
-        valid_txs = []
+        valid_txs = set()  # Change to a set
         for transaction in self.transactions:
             if not Transaction.verify_transaction(transaction):
                 print(f"Invalid signature from {transaction.input['sender']}")
             else:
-                valid_txs.append(transaction)
+                valid_txs.add(transaction)  # Change to add to a set
         return valid_txs
 
     def transaction_exists(self, transaction):
-        return any(t.id == transaction.id for t in self.transactions)
+        return transaction in self.transactions  # Checking existence in a set
+
+    def remove(self, transactions_to_remove: List[Transaction]):
+        # Using set comprehension to remove transactions based on their ID
+        self.transactions = {tx for tx in self.transactions if tx.id not in {
+            tx_to_remove.id for tx_to_remove in transactions_to_remove}}
 
     def clear(self):
-        self.transactions = []
+        self.transactions.clear()  # Clearing a set

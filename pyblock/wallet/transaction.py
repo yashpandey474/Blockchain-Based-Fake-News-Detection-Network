@@ -16,6 +16,8 @@ class Transaction:
         self.sign = None
         self.votes = None
 
+    
+
     def to_json(self):
         return {
             "id": self.id,
