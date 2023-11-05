@@ -5,14 +5,15 @@ import json
 # Assuming ChainUtil.py exists in the same directory
 from pyblock.chainutil import ChainUtil
 import time
-
+import pyblock.wallet.transaction as Transaction
+from typing import List  # Import Any if the actual type of signature is not known
 
 class Block:
-    def __init__(self, timestamp, lastHash, hash, data, validator, signature):
+    def __init__(self, timestamp, lastHash, hash, transactions:List[Transaction], validator, signature):
         self.timestamp = timestamp
         self.lastHash = lastHash
         self.hash = hash
-        self.data = data
+        self.transactions = transactions
         self.validator = validator
         self.signature = signature
 
