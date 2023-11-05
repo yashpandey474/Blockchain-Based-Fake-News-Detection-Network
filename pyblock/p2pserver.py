@@ -91,7 +91,7 @@ class P2pServer:
                 #VOTE ON THE TRANSACTIONS
                 st.session_state.block_received = True
                 st.session_state.received_block = data["block"]
-        
+                
 
             
             # TODO: Add logic to handle invalid block and penalise the validator
