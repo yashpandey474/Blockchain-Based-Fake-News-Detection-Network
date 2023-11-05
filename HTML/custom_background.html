@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="network"></canvas>
+
+    <script>
+        const canvas = document.getElementById("network");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const numParticles = 100;
+
+        function createParticle(x, y) {
+            return {
+                x,
+                y,
+                radius: Math.random() * 2 + 1,
+                color: "rgba(255, 255, 255, 0.8)",
+                directionX: Math.random() * 2 - 1,
+                directionY: Math.random() * 2 - 1,
+                speed: Math.random() * 2,
+            };
+        }
+
+        function createParticles() {
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(createParticle(Math.random() * canvas.width, Math.random() * canvas.height));
+            }
+        }
+
+        function updateParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                const particle = particles[i];
+                particle.x += particle.directionX * particle.speed;
+                particle.y += particle.directionY * particle.speed;
+
+                if (particle.x > canvas.width || particle.x < 0) {
+                    particle.directionX *= -1;
+                }
+                if (particle.y > canvas.height || particle.y < 0) {
+                    particle.directionY *= -1;
+                }
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const particle = particles[i];
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = particle.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            updateParticles();
+            drawParticles();
+        }
+
+        createParticles();
+        animate();
+    </script>
+</body>
+
+</html>

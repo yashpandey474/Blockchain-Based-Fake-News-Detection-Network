@@ -60,6 +60,7 @@ class P2pServer:
         # Now, attempt to deserialize the decrypted message from JSON
         try:
             data = json.loads(decrypted_message)
+            
         except json.JSONDecodeError:
             print("Failed to decode JSON from decrypted message")
             return
@@ -113,8 +114,6 @@ class P2pServer:
         for address in active_accounts:
             self.send_new_validator(
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
-        # except:
-        #     return False
 
     def send_new_validator(self, socket, public_key: str, stake):
         """

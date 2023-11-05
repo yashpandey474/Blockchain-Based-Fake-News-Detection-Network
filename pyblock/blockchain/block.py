@@ -44,7 +44,7 @@ class Block:
     def create_block(lastBlock, _data, wallet):
         timestamp = time.time()
         lastHash = lastBlock.hash
-        data = [_data]
+        data = _data
         hash = Block.hash(timestamp, lastHash, data)
         validator = wallet.get_public_key()
         signature = Block.sign_block_hash(hash, wallet)

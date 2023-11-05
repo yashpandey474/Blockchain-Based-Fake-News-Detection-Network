@@ -3,12 +3,61 @@ from pyblock.wallet.transaction import PartialTransaction, Transaction
 import streamlit as st
 import crypto_logic
 from pyblock.blockchain.blockchain import Blockchain
+from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
 import pyblock.config as config
 import threading
 from pyblock.blockchain.account import *
+import time
+
+# https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D
+# https://i.pinimg.com/originals/88/15/63/881563d6444b370fa4ceea0c3183bb4c.gif
+
+background_style = '''<style>
+section {
+background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
+background-size: cover;
+background-position: center;
+transition: transform 0.3s ease-in-out;
+width: 100%;
+height: 100vh;
+}
+</style>
+<script>
+        const sections = document.querySelectorAll("section");
+    sections.forEach(section => {
+        section.addEventListener("mousemove", function(e) {
+            const width = section.offsetWidth;
+            const height = section.offsetHeight;
+            const offsetX = 0.5 - e.pageX / width;
+            const offsetY = 0.5 - e.pageY / height;
+            section.style.transform = "perspective(1000px) rotateX(" + (offsetY * 4) + "deg) rotateY(" + (offsetX * 4) + "deg)";
+        });
+        section.addEventListener("mouseleave", function() {
+            this.style.transform = "none";
+        });
+    });
+    </script>
+'''
+
+st.markdown(background_style, unsafe_allow_html=True)
+
+
+# st.markdown(
+#     """
+#     <iframe
+#       src="HTML/custom_background.html"
+#       width="100%"
+#       height="100%"
+#     >
+#     </iframe>
+#     """,
+#     unsafe_allow_html=True,
+# )
+st.title("Fake News Detection System Utilising Blockchain")
+
 
 
 #START LISTENING ON P2P SERVER
@@ -51,7 +100,14 @@ def show_transactions(transaction_pool):
     
 #SHOW ALL NEWS ARTICLES ADDED TO BLOCKCHAIN
 def show_blocks_news():
-    pass
+    for block in st.session_state.blockchain.chain:
+        st.write("### Block", block.index)
+            
+        st.write("TIMESTAMP = ", block.timestamp)
+        
+        st.write("DATA = ", block.data)
+        
+        st.write(" - - - ")
 
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
@@ -60,7 +116,7 @@ def change_screen(input_string):
     
 #STREAMLIT GUI
 def main_page(p2pserver, wallet):
-    st.title("Fake News Detection System Utilising Blockchain")
+    # st.title("Fake News Detection System Utilising Blockchain")
     st.write("Welcome, user.")
         
     if st.button("Upload New News"):
@@ -69,13 +125,13 @@ def main_page(p2pserver, wallet):
 
         if uploaded_file:
                 #CREATE PARTIAL TRANSACTION
-            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = wallet, file = uploaded_file)
+            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = st.session_state.p2pserver.wallet, file = uploaded_file)
                 
-            #CREATE TRANSACTION
-            transaction = Transaction.create_transaction(partial_transaction, wallet)
+            # #CREATE TRANSACTION
+            # transaction = Transaction.create_transaction(partial_transaction, wallet)
             
             #BROADCASE NEWLY CREATED TRANSACTION
-            p2pserver.broadcast_transaction(transaction)
+            st.session_state.p2pserver.broadcast_transaction(partial_transaction)
                 
             
     if st.button("View all Verified News"):
@@ -88,20 +144,88 @@ def main_page(p2pserver, wallet):
         if st.button("View all transactions in mempool"):
             change_screen("show_transac")
             
+        
         if st.button("Become a Validator."):
-            st.session_state.try_be_validator = True
-            current_balance = st.session_state.accounts.get_balance(st.session_state.wallet.public_key)
+
+            if st.session_state.validator:
+                st.write("You are already a validator.")
+                
+            else:
+                current_balance = st.session_state.accounts.get_balance(st.session_state.wallet.public_key)
+                
+                if current_balance < config.MIN_STAKE:
+                    st.write("You don't have enough balance to stake.")
+                    
+                else:
+                    st.session_state.try_be_validator = True
+            
+        if st.session_state.try_be_validator:
             st.write("Please enter an amount to stake.")
             st.write("Minimum Stake Required: ", config.MIN_STAKE)
             st.write("Your Current Balance: ", current_balance)
             st.session_state.numerical_value = st.number_input("Enter a numerical value", min_value = config.MIN_STAKE, max_value = current_balance, value=config.MIN_STAKE, step=1)
             
-        if st.session_state.try_be_validator:
-            if st.button("Check Value"):
+            if st.button("Submit Stake"):
+                st.session_state.p2pserver.broadcast_new_validator(stake = st.session_state.numerical_value)
+                st.write("You are successfully registered as a validator.")
                 st.session_state.validator = True
-                #TO DO: DECREMENT BALANCE IN ACCOUNT, MAKE HIM VALIDATOR AND SEND MESSAGE
-                pass
+                
+                time.sleep(1)
+                st.session_state.try_be_validator = False
+                
+    #IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
+    if st.session_state.validator and st.session_state.block_proposer:
+        #SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
+        table_data = []
+        partial_transactions = st.session_state.p2pserver.transaction_pool
+        for partial_transaction in partial_transactions:
+            table_data.append({
+                "ID": partial_transaction.id,
+                "IPFS Address": partial_transaction.ipfs_address,
+                "Model Score": partial_transaction.model_score,
+                "Sender Reputation": partial_transaction.sender_reputation
+            })
 
+        max_selections = config.BLOCK_TRANSACTION_LIMIT
+        
+        #DISPLAY TABLE OF PARTAL TRANSACS. WITH SELECT BOX
+        selected_partial_transactions = st.multiselect(
+            "Select partial transactions",
+            table_data,
+            default=[],
+            key="transactions",
+        )
+
+        #WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
+        if len(selected_partial_transactions) > max_selections:
+            st.warning(
+                f"Maximum selections allowed: {max_selections}. Please deselect items.")
+
+        #CONFIRM THE SELECTION
+        if st.button("Confirm Selection") and len(selected_partial_transactions) <= max_selections:
+            # selected_ids = [partial_transaction["ID"] for partial_transaction in selected_transactions]
+            selected_transactions_1 = [
+                
+            ]
+            #CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
+            block = Block.create_block(
+                lastBlock = st.session_state.blockchain.chain[-1],
+                _data = transactions,
+                wallet = st.session_state.p2pserver.wallet
+            )
+            
+            #BROADCAST THE BLOCK
+            st.session_state.p2pserver.broadcast_block(block)
+            
+            #CONFIRMATION MESSAGE
+            st.write("The created block was transmitted. Waiting for confirmations.")
+            
+            st.session_state.block_confirmations = 0
+            
+            
+    if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
+        pass
+                
 def initialise(private_key = None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
@@ -115,7 +239,7 @@ def initialise(private_key = None):
         print("P2P SERVER CALLED!")
         
         st.session_state.p2pserver = P2pServer(
-            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, account=st.session_state.accounts
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, accounts=st.session_state.accounts
         )
         
         p2p_thread = threading.Thread(
