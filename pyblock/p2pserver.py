@@ -1,3 +1,4 @@
+import streamlit as st
 import json
 import websocket
 from pyblock.blockchain.blockchain import Blockchain
@@ -82,8 +83,17 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
-                self.broadcast_block(data["block"])
-                self.transaction_pool.clear()
+                # self.broadcast_block(data["block"])
+                
+                #REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
+                self.transaction_pool.remove(data["block"].data)
+                
+                #VOTE ON THE TRANSACTIONS
+                st.session_state.block_received = True
+                st.session_state.received_block = data["block"]
+        
+
+            
             # TODO: Add logic to handle invalid block and penalise the validator
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
@@ -115,6 +125,18 @@ class P2pServer:
             self.send_new_validator(
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
 
+    def broadcast_multiple_votes(block, given_votes):
+            #WHEN ALL VOTING DONE; BROADCAST VOTES
+        pass
+        # TODO: BROADCAST THE VOTES FOR THE TRANSACTIONS IN BLOCK
+        # self.broadcast_multiple_votes(data["block"].data, st.session_state.votes_given)
+        
+                
+                #ADD TO BLOCKCHAIN
+        # for index, votes in enumerate(st.session_state.votes_received):
+                    
+                
+                
     def send_new_validator(self, socket, public_key: str, stake):
         """
         Send a new validator's public key to the specified socket.

@@ -1,6 +1,7 @@
 # from flask import Flask, request, jsonify, redirect
 from pyblock.wallet.transaction import PartialTransaction, Transaction
 import streamlit as st
+import pandas as pd
 import crypto_logic
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.blockchain.block import *
@@ -72,42 +73,53 @@ def run_p2pserver(p2pserver):
     
 
 #SHOW ALL ACCOUNT RELATED INFO
-def show_account_info(wallet, blockchain):
+def show_account_info():
     st.title("ACCOUNT INFORMATION")
-    balance = blockchain.get_balance(wallet.public_key)
-    public_key = wallet.get_public_key()
+    balance = st.session_state.blockchain.get_balance(st.session_state.wallet.public_key)
+    public_key = st.session_state.wallet.get_public_key()
     st.write("BALANCE = ", balance)
     st.write("PUBLIC KEY = ", public_key)
     
 #SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
 def show_transactions(transaction_pool):
     st.title("Current Network Transactions")
+    
     table_data = []
     for transaction in transaction_pool.transactions:
         table_data.append({
-            "ID": transaction.partialTransaction.id,
-            "IPFS Address": transaction.partialTransaction.ipfs_address,
-            "Sender Address": transaction.partialTransaction.sender_address,
-            "Validator Address": transaction.validator_address,
-            "Sign": transaction.sign,
-            "Votes": transaction.votes,
+            "ID": transaction.id,
             "Timestamp": transaction.timestamp,
+            "IPFS Address": transaction.ipfs_address,
+            "Sender Address": transaction.sender_address,
+            "Sender Reputation": transaction.validator_address,
+            "Sign": transaction.sign,
             "Model Score": transaction.model_score
         })
 
-    st.table(table_data)
+    st.dataframe(pd.DataFrame(table_data), height=500)
     
     
 #SHOW ALL NEWS ARTICLES ADDED TO BLOCKCHAIN
 def show_blocks_news():
-    for block in st.session_state.blockchain.chain:
-        st.write("### Block", block.index)
+    chain = st.session_state.p2pserver.blockchain.chain
+    
+    table_data = []
+    
+    for block in chain:
+        for transaction in block.data:
+            table_data.append({
+                "ID": transaction.id,
+                "Transaction Creation Time": transaction.timestamp,
+                "Block Creation Time": block.timestamp,
+                "IPFS Address": transaction.ipfs_address,
+                "Sender Address": transaction.sender_address,
+                "Validator Address": block.validator,
+                "Sender Reputation": transaction.sender_reputation,
+                "Sign of sender": transaction.sign,
+                "Model Score": transaction.model_score
+            })
             
-        st.write("TIMESTAMP = ", block.timestamp)
-        
-        st.write("DATA = ", block.data)
-        
-        st.write(" - - - ")
+    st.dataframe(pd.DataFrame(table_data), height=500)
 
 #CHANGE THE SCREEN OF GUI
 def change_screen(input_string):
@@ -115,7 +127,7 @@ def change_screen(input_string):
     st.rerun()
     
 #STREAMLIT GUI
-def main_page(p2pserver, wallet):
+def main_page():
     # st.title("Fake News Detection System Utilising Blockchain")
     st.write("Welcome, user.")
         
@@ -124,11 +136,8 @@ def main_page(p2pserver, wallet):
         uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
         if uploaded_file:
-                #CREATE PARTIAL TRANSACTION
-            partial_transaction = PartialTransaction.generate_from_file(sender_wallet = st.session_state.p2pserver.wallet, file = uploaded_file)
-                
-            # #CREATE TRANSACTION
-            # transaction = Transaction.create_transaction(partial_transaction, wallet)
+            #CREATE PARTIAL TRANSACTION
+            partial_transaction = Transaction.generate_from_file(sender_wallet = st.session_state.p2pserver.wallet, file = uploaded_file)
             
             #BROADCASE NEWLY CREATED TRANSACTION
             st.session_state.p2pserver.broadcast_transaction(partial_transaction)
@@ -173,8 +182,9 @@ def main_page(p2pserver, wallet):
                 time.sleep(1)
                 st.session_state.try_be_validator = False
                 
+    
     #IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.validator and st.session_state.block_proposer:
+    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.public_key:
         #SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
         transactions = st.session_state.p2pserver.transaction_pool.transactions
@@ -225,9 +235,11 @@ def main_page(p2pserver, wallet):
             #CONFIRMATION MESSAGE
             st.write("The created block was transmitted. Waiting for confirmations.")
             
-            
+
             st.session_state.block_confirmations = 0
-            
+    
+    elif st.session_state.validator:
+        st.write("Current Block Proposer: ", st.session_state.block_proposer)
             
     if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
         st.write("Current Confirmations: ", st.session_state.block_confirmations)
@@ -329,7 +341,7 @@ def main():
             
     if st.session_state.screen == "main_page":
         print("YES. WE TRIED TO CALL THE MAIN PAGE")
-        main_page(st.session_state.p2pserver, st.session_state.wallet)
+        main_page()
             
     if st.session_state.screen == "account_info":
         print("CALL: ACC INFO")
