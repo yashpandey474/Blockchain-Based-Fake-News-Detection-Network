@@ -17,6 +17,7 @@ class Block:
         self.transactions = transactions
         self.validator = validator
         self.signature = signature
+        self.votes = 0
 
     def to_json(self):
         return {
@@ -25,7 +26,8 @@ class Block:
             "hash": self.hash,
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
-            "signature": self.signature.hex() if self.signature else None
+            "signature": self.signature.hex() if self.signature else None,
+            "countofvotes": self.countofvotes
         }
 
     @staticmethod

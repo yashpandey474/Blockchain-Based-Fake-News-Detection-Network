@@ -21,7 +21,8 @@ MESSAGE_TYPE = {
     'new_validator': 'NEW_VALIDATOR',
     'login': 'LOGIN',
     'challenge': 'CHALLENGE',
-    'challenge_response': 'CHALLENGE_RESPONSE'
+    'challenge_response': 'CHALLENGE_RESPONSE',
+    'vote': 'VOTE',
 }
 
 
@@ -61,7 +62,7 @@ class P2pServer:
         # Now, attempt to deserialize the decrypted message from JSON
         try:
             data = json.loads(decrypted_message)
-            
+
         except json.JSONDecodeError:
             print("Failed to decode JSON from decrypted message")
             return
@@ -84,16 +85,14 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 # self.broadcast_block(data["block"])
-                
-                #REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
+
+                # REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
                 self.transaction_pool.remove(data["block"].data)
-                
-                #VOTE ON THE TRANSACTIONS
+
+                # VOTE ON THE TRANSACTIONS
                 st.session_state.block_received = True
                 st.session_state.received_block = data["block"]
-        
 
-            
             # TODO: Add logic to handle invalid block and penalise the validator
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
@@ -105,6 +104,8 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
+        elif data["type"] == MESSAGE_TYPE["vote"]:
+            self.handle_votes(data)
 
     # def initialize_wallet(self, public_key: str, private_key: str):
     #     # """
@@ -112,6 +113,9 @@ class P2pServer:
     #     # """
     #     self.wallet.initialize(public_key, private_key)
     #     self.broadcast_new_validator(public_key)
+    def handle_votes(self, data):
+        # TODO: Implement THIS
+        print("Implementing")
 
     def broadcast_new_validator(self, stake):
         """
@@ -126,17 +130,14 @@ class P2pServer:
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
 
     def broadcast_multiple_votes(block, given_votes):
-            #WHEN ALL VOTING DONE; BROADCAST VOTES
+        # WHEN ALL VOTING DONE; BROADCAST VOTES
         pass
         # TODO: BROADCAST THE VOTES FOR THE TRANSACTIONS IN BLOCK
         # self.broadcast_multiple_votes(data["block"].data, st.session_state.votes_given)
-        
-                
-                #ADD TO BLOCKCHAIN
+
+        # ADD TO BLOCKCHAIN
         # for index, votes in enumerate(st.session_state.votes_received):
-                    
-                
-                
+
     def send_new_validator(self, socket, public_key: str, stake):
         """
         Send a new validator's public key to the specified socket.
@@ -235,6 +236,37 @@ class P2pServer:
             "block": block
         })
         self.sendEncryptedMessage(socket, message)
+
+    def broadcast_votes(self, votes_dict):
+        # Create a list of votes with id and corresponding boolean value as integer
+        votes_list = [{"id": vote_id, "vote": 1 if votes_dict[vote_id] == "True" else 0}
+                      for vote_id in votes_dict]
+
+        # Prepare the message content without the signature
+        message_content = {
+            "type": MESSAGE_TYPE["vote"],
+            "address": self.wallet.get_public_key(),
+            "votes": votes_list
+        }
+
+        # Convert the message content to a JSON string
+        message_json = json.dumps(message_content)
+
+        # Sign the JSON string
+        signature = self.wallet.sign(message_json)
+
+        # Append the signature to the message content
+        message_content['signature'] = signature
+
+        # Convert the full message with signature to JSON
+        message = json.dumps(message_content)
+
+        # Broadcast the message to all active accounts
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            client_socket = active_accounts[address].clientPort
+            self.sendEncryptedMessage(client_socket, message)
+
 
 # if __name__ == "__main__":
 #     blockchain = Blockchain()
