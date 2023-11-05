@@ -1,3 +1,4 @@
+import datetime
 TOTAL_COINS = 1000
 TRANSACTION_THRESHOLD = 5
 FIRST_LEADER = ""
@@ -49,3 +50,4 @@ UwIDAQAB
 P2P_PORT = 5001
 PEERS = ["ws://172.17.22.104:5000"]
 HTTP_PORT = 8000
+START_TIME = datetime.datetime(2009, 1, 3)

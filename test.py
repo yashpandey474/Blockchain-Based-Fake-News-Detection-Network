@@ -1,0 +1,50 @@
+import streamlit as st
+import datetime
+import time
+import pyblock.config as config
+
+# Set the duration for the popup to appear in seconds
+DURATION_SECONDS = 10  # Example: 120 seconds (2 minutes)
+
+# Function to calculate the seconds until the next check
+
+
+def seconds_until_next_check(start_time, interval):
+    current_time = datetime.datetime.now()
+    delta_seconds = (current_time - start_time).total_seconds()
+    seconds_to_next_check = interval - (delta_seconds % interval)
+    if seconds_to_next_check < 5:  # Adding a small buffer
+        seconds_to_next_check += interval
+    return seconds_to_next_check
+
+# Streamlit app main function
+
+
+def main():
+    # Set the start time in session state if not set
+    if 'start_time' not in st.session_state:
+        st.session_state['start_time'] = datetime.datetime.now()
+
+    # Initialize 'show_popup' state
+    if 'show_popup' not in st.session_state:
+        st.session_state['show_popup'] = False
+
+    st.title('Time Check App')
+
+    # Check if we should show the popup
+    if st.session_state['show_popup']:
+        st.balloons()  # Show a celebratory popup
+        st.session_state['show_popup'] = False  # Reset the popup flag
+
+    # Continuously update the session state to check the time
+    with st.empty():
+        while True:
+            # Sleep until next check
+            time.sleep(seconds_until_next_check(
+                config.START_TIME, DURATION_SECONDS))
+            st.session_state['show_popup'] = True
+            st.experimental_rerun()
+
+
+if __name__ == "__main__":
+    main()
