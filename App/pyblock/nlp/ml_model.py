@@ -111,10 +111,12 @@ def calculate_lexical_diversity(text):
     return lexical_diversity
 
 
-
 #ADD COLUMN FOR NUMBER OF WORDS IN TEXT
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_file_path = os.path.join(current_dir, "model_1.pkl")
 
-with open("/Users/kpandey/Desktop/3-1/Blockchain Technology/Project/BlockchainProject2/pyblock/nlp/model_1.pkl", "rb") as file:
+with open(model_file_path, "rb") as file:
     data = pickle.load(file)
     
 model = data["MODEL"]

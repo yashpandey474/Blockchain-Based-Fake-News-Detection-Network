@@ -1,9 +1,11 @@
 import threading
 import time
 import streamlit as st
-from ..pyblock import config
+from pyblock import config
+
+
 def background_task():
-    while True:
+    while st.session_state.validator:
         current_time = int(time.time())
         specified_time = config.START_TIME # Specify your target time here
 

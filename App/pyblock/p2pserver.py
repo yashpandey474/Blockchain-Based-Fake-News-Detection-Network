@@ -90,7 +90,7 @@ class P2pServer:
                 # self.transaction_pool.remove(data["block"].data)
                 
                 #VOTE ON THE TRANSACTIONS
-                st.session_state.block_received = True
+                st.session_state.block_recieved = True
                 st.session_state.received_block = data["block"]
         
         elif data["type"] == MESSAGE_TYPE["new_validator"]:

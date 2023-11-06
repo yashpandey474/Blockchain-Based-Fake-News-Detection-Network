@@ -22,3 +22,8 @@ def sign_up():
         if st.button("Go to main"):
             print("BUTTON CLICKED")
             change_screen("main_page")
+            
+    # GO TO PREVIOUS SCREEN
+    if st.button("Back"):
+        # Set the previous screen in the session state
+        change_screen(st.session_state.previous_screen)

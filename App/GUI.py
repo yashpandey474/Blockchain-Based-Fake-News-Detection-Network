@@ -1,5 +1,5 @@
 import streamlit as st
-from pyblock.blockchain.blockchain import Blockchain
+from pyblock.blockchain.blockchain import *
 from pyblock.blockchain.block import *
 from pyblock.blockchain.account import *
 from login import *
@@ -10,6 +10,7 @@ from show_transactions import *
 from enter import *
 from change_screen import *
 from account_info import *
+
 background_style = '''<style>
 section {
 background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
@@ -70,11 +71,11 @@ def main():
             
     if st.session_state.screen == "account_info":
         print("CALL: ACC INFO")
-        show_account_info(wallet= st.session_state.wallet, blockchain= st.session_state.blockchain)
+        show_account_info()
         
     if st.session_state.screen == "show_transac":
         print("CALL: SHOW TRANSAC")
-        show_transactions(transaction_pool = st.session_state.transaction_pool)
+        show_transactions()
             
     if st.session_state.screen == "show_blocks":
         print("CALL: SHOW BLOCKS")
@@ -97,6 +98,17 @@ if __name__ == "__main__":
         st.session_state.try_be_validator = False
 
         st.session_state.validator = False
+        
+        st.session_state.previous_screen = "enter"
+        
+        st.session_state.try_be_validator = False
+        
+        st.session_state.block_proposer = None
+        
+        st.session_state.block_recieved = False
+        
+        st.session_state.recieved_block = None
+        
         
     main()
         

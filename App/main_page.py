@@ -1,9 +1,10 @@
 # STREAMLIT GUI
 import streamlit as st
 from change_screen import *
-from ..pyblock.wallet.transaction import *
-from ..pyblock import config
-from ..pyblock.blockchain.block import *
+from pyblock.wallet.transaction import *
+from pyblock import config
+from pyblock.blockchain.block import *
+import time
 
 def main_page():
     # st.title("Fake News Detection System Utilising Blockchain")
@@ -122,18 +123,18 @@ def main_page():
     if st.session_state.validator:
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
-    if "block_confirmations" in st.session_state and st.session_state.block_confirmations >= 0:
+    if st.session_state.recieved_block and st.session_state.recieved_block.votes >= 0:
         st.write("Current Confirmations: ",
-                 st.session_state.block_confirmations)
+                 st.session_state.recieved_block.votes)
 
     # IF RECEIVED A BLOCK
-    if st.session_state.block_received:
+    if st.session_state.block_recieved:
         # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
         st.header("Block Info")
         st.write("Validator:", block.validator)
         st.write("Timestamp:", block.timestamp)
         st.header("Vote on Transactions")
-        block = st.session_state.received_block
+        block = st.session_state.recieved_block
         transaction_votes = {}
         table_data = []
 
@@ -164,11 +165,11 @@ def main_page():
 
             time.sleep(1)
 
-            st.session_state.block_received = False
+            st.session_state.block_recieved = False
 
-        # GO TO PREVIOUS SCREEN
-        if st.button("Back"):
+    # GO TO PREVIOUS SCREEN
+    if st.button("Back"):
             # Set the previous screen in the session state
-            change_screen(st.session_state.previous_screen)
+        change_screen(st.session_state.previous_screen)
 
     

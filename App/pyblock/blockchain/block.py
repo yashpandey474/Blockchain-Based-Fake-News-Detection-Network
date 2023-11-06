@@ -33,7 +33,7 @@ class Block:
 
     @staticmethod
     def genesis():
-        return Block("genesis time", "----", "genesis-hash", [], None, None)
+        return Block("genesis time", "----", "genesis-hash", [], None, None, 1)
 
     @staticmethod
     def hash_transactions(transactions):
