@@ -8,7 +8,7 @@ import time
 
 def main_page():
     # st.title("Fake News Detection System Utilising Blockchain")
-    st.write("Welcome, user.")
+    st.write("Welcome, " + st.session_state.name)
 
     if st.button("Upload New News"):
         # GET UPLOADED TEXT FILE
@@ -35,34 +35,8 @@ def main_page():
             change_screen("show_transac")
 
         if st.button("Become a Validator."):
-            if st.session_state.validator:
-                st.write("You are already a validator.")
-
-            else:
-                current_balance = st.session_state.accounts.get_balance(
-                    st.session_state.wallet.public_key)
-
-                if current_balance < config.MIN_STAKE:
-                    st.write("You don't have enough balance to stake.")
-
-                else:
-                    st.session_state.try_be_validator = True
-
-        if st.session_state.try_be_validator:
-            st.write("Please enter an amount to stake.")
-            st.write("Minimum Stake Required: ", config.MIN_STAKE)
-            st.write("Your Current Balance: ", current_balance)
-            st.session_state.numerical_value = st.number_input(
-                "Enter a numerical value", min_value=config.MIN_STAKE, max_value=current_balance, value=config.MIN_STAKE, step=1)
-
-            if st.button("Submit Stake"):
-                st.session_state.p2pserver.broadcast_new_validator(
-                    stake=st.session_state.numerical_value)
-                st.write("You are successfully registered as a validator.")
-                st.session_state.validator = True
-
-                time.sleep(1)
-                st.session_state.try_be_validator = False
+            change_screen("become_validator")
+            
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
     if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.public_key:
@@ -168,8 +142,12 @@ def main_page():
             st.session_state.block_recieved = False
 
     # GO TO PREVIOUS SCREEN
-    if st.button("Back"):
+    if st.button("Go to Enter Page"):
             # Set the previous screen in the session state
-        change_screen(st.session_state.previous_screen)
+        change_screen("enter")
+        
+    # TODO: FIX EXITING
+    if st.button("Exit Application."):
+        st.stop()
 
     

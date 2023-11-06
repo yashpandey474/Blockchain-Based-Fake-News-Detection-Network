@@ -50,6 +50,8 @@ class ChainUtil:
     def decryptWithSoftwareKey(data):
         decrypted_data = config.VM_PRIVATE_KEY.decrypt(data)
         return decrypted_data
+    
+    
 # Example usage, the secret must be provided in config module as VM_PRIVATE_KEY
 # if __name__ == '__main__':
 #     # ... the rest of your example usage

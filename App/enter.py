@@ -35,9 +35,9 @@ def initialise(private_key=None):
             target=run_p2pserver, args=(st.session_state.p2pserver,)
         )
 
+        #DAEMONISE TO ALLOW TERMINATION WITHOUT WAITING
+        p2p_thread.daemon = True
         p2p_thread.start()
-        
-        # Start the background task in a separate thread
         background_thread = threading.Thread(target=background_task)
         background_thread.daemon = True  # Daemonize the thread
         background_thread.start()
@@ -56,7 +56,8 @@ def enter():
 
     if st.button("Enter as a Reader."):
         st.session_state.user_type = "Reader"
-
+        st.session_state.name = "User"
+        st.session_state.email = None
         print("BUTTON CLICKED")
         initialise()
 
