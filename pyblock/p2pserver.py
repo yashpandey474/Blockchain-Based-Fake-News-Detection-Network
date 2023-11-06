@@ -103,18 +103,40 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
+            
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
 
-    # def initialize_wallet(self, public_key: str, private_key: str):
-    #     # """
-    #     # Initialize the wallet with a public key and a private key.
-    #     # """
-    #     self.wallet.initialize(public_key, private_key)
-    #     self.broadcast_new_validator(public_key)
     def handle_votes(self, data):
         # TODO: Implement THIS
-        print("Implementing")
+        '''"address": self.wallet.get_public_key(),
+            "votes": votes_list,
+            "block_index": st.session_state.received_block.index'''
+        # TODO: VERIFY SIGNATURE
+        
+        # IF NOT CURRENT BLOCK
+        if data["block_index"] != st.session_state.received_block.index:
+            print("OLD VOTE RECEIVED")
+            return
+        
+        # INCREMENT NUMBER OF VOTES FOR THE BLOCK
+        st.session_state.received_block.votes += 1
+
+            
+        # INCREMENT VOTES FOR THE TRANSACTIONS
+        transactions_dict = {transaction.id: transaction for transaction in st.session_state.received_block.transactions}
+        for key, value in st.session_state.received_block.transactions:
+            if value == "True":
+                transactions_dict[key].positive_votes += 1
+                
+        #JUST IN CASE OF PASS BY VALUE
+        for index, transaction in enumerate(st.session_state.received_block.transactions):
+            st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
+            
+            
+            
+        
+        
 
     def broadcast_new_validator(self, stake):
         """
@@ -128,15 +150,6 @@ class P2pServer:
             self.send_new_validator(
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
 
-    def broadcast_multiple_votes(block, given_votes):
-        # WHEN ALL VOTING DONE; BROADCAST VOTES
-        pass
-        # TODO: BROADCAST THE VOTES FOR THE TRANSACTIONS IN BLOCK
-        # self.broadcast_multiple_votes(data["block"].data, st.session_state.votes_given)
-
-        # ADD TO BLOCKCHAIN
-        # for index, votes in enumerate(st.session_state.votes_received):
-
     def send_new_validator(self, socket, public_key: str, stake):
         """
         Send a new validator's public key to the specified socket.
@@ -147,22 +160,6 @@ class P2pServer:
             "stake": stake
         })
         self.sendEncryptedMessage(socket, message)
-
-    # def handle_challenge(self,validator_socket, message):
-    #     """
-    #     Handle a received challenge message.
-    #     """
-    #     public_key = message['public_key']
-    #     challenge = message['challenge']
-    #     signature = self.wallet.sign(challenge)
-
-    #     # Send the signature back as a response to the challenge
-    #     message = json.dumps({
-    #         "type": "CHALLENGE_RESPONSE",
-    #         "public_key": public_key,
-    #         "signature": signature
-    #     })
-    #     self.sendEncryptedMessage(validator_socket, message)
 
     def connect_to_peers(self):
         for peer in PEERS:
@@ -238,14 +235,14 @@ class P2pServer:
 
     def broadcast_votes(self, votes_dict):
         # Create a list of votes with id and corresponding boolean value as integer
-        votes_list = [{"id": vote_id, "vote": 1 if votes_dict[vote_id] == "True" else 0}
-                      for vote_id in votes_dict]
+        votes_list = [(key, value) for key, value in votes_dict.items()]
 
         # Prepare the message content without the signature
         message_content = {
             "type": MESSAGE_TYPE["vote"],
             "address": self.wallet.get_public_key(),
-            "votes": votes_list
+            "votes": votes_list,
+            "block_index": st.session_state.received_block.index
         }
 
         # Convert the message content to a JSON string
@@ -256,6 +253,9 @@ class P2pServer:
 
         # Append the signature to the message content
         message_content['signature'] = signature
+        
+        #APPEND THE BLOCK NUMBER
+        
 
         # Convert the full message with signature to JSON
         message = json.dumps(message_content)

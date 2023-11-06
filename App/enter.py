@@ -1,0 +1,63 @@
+import streamlit as st
+from pyblock.blockchain.blockchain import Blockchain
+from pyblock.blockchain.block import *
+from pyblock.wallet.wallet import Wallet
+from pyblock.wallet.transaction_pool import TransactionPool
+from pyblock.p2pserver import P2pServer
+import threading
+from pyblock.blockchain.account import *
+from change_screen import *
+from background import *
+# START LISTENING ON P2P SERVER
+
+
+def run_p2pserver(p2pserver):
+    print("Running p2p server on port: "+str(config.P2P_PORT))
+    p2pserver.listen()
+    
+def initialise(private_key=None):
+    if "blockchain" not in st.session_state:
+        st.session_state.blockchain = Blockchain()
+
+        st.session_state.accounts = st.session_state.blockchain.accounts
+
+        st.session_state.transaction_pool = TransactionPool()
+
+        st.session_state.wallet = Wallet(private_key)
+
+        print("P2P SERVER CALLED!")
+
+        st.session_state.p2pserver = P2pServer(
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, accounts=st.session_state.accounts
+        )
+
+        p2p_thread = threading.Thread(
+            target=run_p2pserver, args=(st.session_state.p2pserver,)
+        )
+
+        p2p_thread.start()
+        
+        # Start the background task in a separate thread
+        background_thread = threading.Thread(target=background_task)
+        background_thread.daemon = True  # Daemonize the thread
+        background_thread.start()
+
+        print("EVERYTHING INITIIALISED")
+
+
+
+def enter():
+    st.title("Choose Role to enter into Network")
+
+    if st.button("Login/Signup as News Auditor"):
+        st.session_state.user_type = "Auditor"
+        print("BUTTON CLICKED")
+        change_screen("login")
+
+    if st.button("Enter as a Reader."):
+        st.session_state.user_type = "Reader"
+
+        print("BUTTON CLICKED")
+        initialise()
+
+        change_screen("main_page")

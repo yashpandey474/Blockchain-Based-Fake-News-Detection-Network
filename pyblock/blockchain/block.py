@@ -10,7 +10,7 @@ from typing import List  # Import Any if the actual type of signature is not kno
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, hash, transactions: List[Transaction], validator, signature):
+    def __init__(self, timestamp, lastHash, hash, transactions: List[Transaction], validator, signature, index):
         self.timestamp = timestamp
         self.lastHash = lastHash
         self.hash = hash
@@ -18,6 +18,7 @@ class Block:
         self.validator = validator
         self.signature = signature
         self.votes = 0
+        self.index = index
 
     def to_json(self):
         return {
@@ -44,7 +45,7 @@ class Block:
         return hashlib.sha256(json.dumps(transactions_for_hashing).encode('utf-8')).hexdigest()
 
     @staticmethod
-    def create_block(last_block, data, wallet):
+    def create_block(last_block, data, wallet, blockchain):
         timestamp = time.time()
         last_hash = last_block.hash
         # Create a deep copy of the data (which are transaction objects) for hashing
@@ -52,7 +53,7 @@ class Block:
         hash = Block.get_hash(timestamp, last_hash, transactions)
         validator = wallet.get_public_key()
         signature = Block.sign_block_hash(hash, wallet)
-        return Block(timestamp, last_hash, hash, data, validator, signature)
+        return Block(timestamp, last_hash, hash, data, validator, signature, len(blockchain.chain) + 1)
 
     @staticmethod
     def get_hash(timestamp, last_hash, transactions):
