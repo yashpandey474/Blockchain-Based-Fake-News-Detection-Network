@@ -13,6 +13,10 @@ def background_task():
         # Check if the time difference is a multiple of 2 minutes (120 seconds)
         if time_difference % 120 == 0:
             st.session_state.validation_time = True
+            
+            #CALL THE FUNCTION TO CHOOSE A BLOCK PROPOSER AND SET AS CURRENT BLOCK PROPOOSER
+            # TODO: FINALISE THE SEED VALUE
+            st.session_state.block_proposer = st.session_state.accounts.choose_validator(seed = current_time)
         else:
             st.session_state.validation_time = False
 
