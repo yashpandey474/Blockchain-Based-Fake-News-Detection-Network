@@ -1,17 +1,17 @@
 import threading
 import time
 import streamlit as st
-
+from ..pyblock import config
 def background_task():
     while True:
         current_time = int(time.time())
-        specified_time = 0 # Specify your target time here
+        specified_time = config.START_TIME # Specify your target time here
 
         # Calculate the difference in seconds
         time_difference = current_time - specified_time
 
         # Check if the time difference is a multiple of 2 minutes (120 seconds)
-        if time_difference % 120 == 0:
+        if time_difference % (60 * config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:
             st.session_state.validation_time = True
             
             #CALL THE FUNCTION TO CHOOSE A BLOCK PROPOSER AND SET AS CURRENT BLOCK PROPOOSER
