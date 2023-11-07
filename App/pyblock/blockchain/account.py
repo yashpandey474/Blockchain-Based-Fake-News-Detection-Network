@@ -83,3 +83,7 @@ class Accounts:
     def get_active_accounts(self):
         # Return a dictionary of accounts that have an active clientPort (i.e., are connected)
         return {address: account for address, account in self.accounts.items() if account.isActive}    
+    
+    def check_if_active(self,address):
+        account = self.get_account(address)
+        return account.isActive if account else False

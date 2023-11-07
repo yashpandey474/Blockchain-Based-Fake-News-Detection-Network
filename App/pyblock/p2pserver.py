@@ -118,8 +118,10 @@ class P2pServer:
         '''"address": self.wallet.get_public_key(),
             "votes": votes_list,
             "block_index": st.session_state.received_block.index'''
-        # TODO: VERIFY SIGNATURE
-
+        # CHECK IF THE VOTE IS VALID
+        if not self.accounts.check_if_active(data["address"]):
+            print("INVALID VOTE")
+            return
         # IF NOT CURRENT BLOCK
         if data["block_index"] != st.session_state.received_block.index:
             print("OLD VOTE RECEIVED")
