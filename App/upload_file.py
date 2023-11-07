@@ -1,6 +1,7 @@
 import streamlit as st
 from pyblock.wallet.transaction import *
 from change_screen import *
+
 def upload_file():
     uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
@@ -13,7 +14,7 @@ def upload_file():
         # BROADCASE NEWLY CREATED TRANSACTION
         st.session_state.p2pserver.broadcast_transaction(
             partial_transaction)
-        
+    
         print("BROADCASTED TRANSACTION")
         
     # GO TO PREVIOUS SCREEN
