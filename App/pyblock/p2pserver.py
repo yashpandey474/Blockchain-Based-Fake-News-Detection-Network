@@ -31,7 +31,6 @@ class P2pServer:
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
-        
         self.accounts = blockchain.accounts
 
     def sendEncryptedMessage(self, socket, message):
@@ -240,7 +239,7 @@ class P2pServer:
     def send_transaction(self, socket, transaction):
         message = json.dumps({
             "type": MESSAGE_TYPE["transaction"],
-            "transaction": transaction
+            "transaction": transaction.to_json()
         })
         self.sendEncryptedMessage(socket, message)
 

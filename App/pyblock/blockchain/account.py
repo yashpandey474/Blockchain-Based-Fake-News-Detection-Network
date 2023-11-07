@@ -5,7 +5,7 @@ import pyblock.config as config
 class Account:
     def __init__(self, balance=config.STARTING_BALANCE, stake=0, clientPort=None):
         self.balance = balance
-        self.isActive = bool(clientPort)
+        self.isActive = True
         self.stake = stake
         self.clientPort = clientPort
 

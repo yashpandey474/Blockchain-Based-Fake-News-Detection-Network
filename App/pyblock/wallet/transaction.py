@@ -20,14 +20,14 @@ class Transaction:
 
     def to_json(self):
         return {
-            "id": self.id,
+            "id": str(self.id),
             "ipfs_address": self.ipfs_address,
             "sender_address": self.sender_address,
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
             # Assuming sign is a byte-like object that needs to be represented as a hex string
             "sign": self.sign.hex() if self.sign else None,
-            "votes": self.votes
+            "votes": self.positive_votes
         }
         
     def get_transaction_score(self):
