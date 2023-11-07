@@ -86,17 +86,19 @@ def main_page():
     if st.session_state.validator:
         
         # IF RECEIVED A BLOCK
-        if st.session_state.block_recieved and st.button("Vote on Recieved Block"):
+        if st.session_state.block_recieved and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300 and st.button("Vote on Recieved Block"):
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")
         
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
-        if st.session_state.recieved_block is not None:
+        if st.session_state.recieved_block is not None and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300:
             st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
+            
+        
         
     # GO TO PREVIOUS SCREEN
-    if st.button("Go to Enter Page"):
+    if st.button("Go back to Enter Page"):
             # Set the previous screen in the session state
         change_screen("enter")
         
