@@ -3,20 +3,27 @@ from pyblock.wallet.transaction import *
 from change_screen import *
 
 def upload_file():
-    uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
+    if not st.session_state.get("upload_file_executed", False):
+        uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
-    if uploaded_file is not None:
-        # CREATE PARTIAL TRANSACTION
-        partial_transaction = Transaction.generate_from_file(
-            sender_wallet=st.session_state.p2pserver.wallet, file=uploaded_file, blockchain = st.session_state.p2pserver.blockchain)
+        if uploaded_file is not None:
+            # CREATE PARTIAL TRANSACTION
+            partial_transaction = Transaction.generate_from_file(
+                sender_wallet=st.session_state.p2pserver.wallet, file=uploaded_file, blockchain = st.session_state.p2pserver.blockchain)
 
-        st.write("UPLOADED FILE: ", uploaded_file.name)
-        # BROADCASE NEWLY CREATED TRANSACTION
-        st.session_state.p2pserver.broadcast_transaction(
-            partial_transaction)
-    
-        print("BROADCASTED TRANSACTION")
+            st.write("UPLOADED FILE: ", uploaded_file.name)
+            # BROADCASE NEWLY CREATED TRANSACTION
+            st.session_state.p2pserver.broadcast_transaction(
+                partial_transaction
+            )
         
+            print("BROADCASTED TRANSACTION")
+            
+            st.session_state.upload_file_executed = True
+            
+        else:
+            st.write("File successfully uploaded.")
+            
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
         # Set the previous screen in the session state

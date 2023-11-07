@@ -12,6 +12,7 @@ def main_page():
 
     if st.button("Upload New News"):
         # GET UPLOADED TEXT FILE
+        st.session_state.upload_file_executed = False
         change_screen("upload_file")
 
     # VIEW NEWS STORED IN BLOCKCHAIN
@@ -30,7 +31,7 @@ def main_page():
             
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.public_key:
+    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.get_public_key():
         st.write("You are the current block proposer.")
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []

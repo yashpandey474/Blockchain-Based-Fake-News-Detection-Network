@@ -48,7 +48,6 @@ def initialise(private_key=None):
         # http_thread.start()
 
         background_thread = threading.Thread(target=background_task)
-        background_thread.daemon = True  # Daemonize the thread
         background_thread.start()
 
         print("EVERYTHING INITIIALISED")

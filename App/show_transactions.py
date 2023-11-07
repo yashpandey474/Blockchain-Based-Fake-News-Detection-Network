@@ -2,6 +2,7 @@
 import streamlit as st
 from change_screen import *
 import pandas as pd
+from datetime import datetime
 
 def show_transactions():
     st.title("Current Network Transactions")
@@ -15,12 +16,13 @@ def show_transactions():
         for transaction in st.session_state.p2pserver.transaction_pool.transactions:
             table_data.append({
                 "ID": transaction.id,
-                "Timestamp": transaction.timestamp,
+                "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                 "IPFS Address": transaction.ipfs_address,
                 "Sender Address": transaction.sender_address,
-                "Sender Reputation": transaction.validator_address,
+                "Sender Reputation": transaction.sender_reputation,
                 "Sign": transaction.sign,
                 "Model Score": transaction.model_score
+
             })
 
         st.dataframe(pd.DataFrame(table_data), height=500)

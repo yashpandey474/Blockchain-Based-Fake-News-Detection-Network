@@ -1,13 +1,14 @@
 from pyblock.wallet.transaction import *
 import streamlit as st
 from change_screen import *
+import binascii
 
 
 def show_account_info():
     st.title("ACCOUNT INFORMATION")
 
-    public_key = st.session_state.wallet.get_public_key()
-    private_key = st.session_state.wallet.private_key.export_key()
+    public_key = st.session_state.p2pserver.wallet.get_public_key()
+    private_key = st.session_state.p2pserver.wallet.get_private_key()
     balance = st.session_state.blockchain.get_balance(
         public_key
     )

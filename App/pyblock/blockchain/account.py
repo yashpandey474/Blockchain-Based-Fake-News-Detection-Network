@@ -92,8 +92,8 @@ class Accounts:
         # Return a dictionary of accounts that have an active clientPort (i.e., are connected)
         active = {address: account for address, account in self.accounts.items(
         ) if account.isActive and address != public_key}
-        print("OWN: ", public_key)
-        print("ACTIVE: ", active.keys())
+        # print("OWN: ", public_key)
+        # print("ACTIVE: ", active.keys())
 
         return active
 

@@ -12,6 +12,7 @@ from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.blockchain.account import Accounts
 from pyblock.blockchain.account import Account
+from pyblock.wallet.transaction import *
 
 
 MESSAGE_TYPE = {
@@ -36,7 +37,8 @@ class P2pServer:
 
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
-            socket, ChainUtil.encryptWithSoftwareKey(message))
+            socket, ChainUtil.encryptWithSoftwareKey(message)
+        )
 
         
 
@@ -73,16 +75,16 @@ class P2pServer:
         self.accounts.clientLeft(clientport=client)
 
     def message_received(self, client, server, message):
-
-        # Assuming that the incoming message is encrypted and then base64-encoded
-        decrypted_message = ChainUtil.decryptWithSoftwareKey(message)
-
-        # Now, attempt to deserialize the decrypted message from JSON
         try:
-            data = json.loads(decrypted_message)
+            data = json.loads(message)
 
         except json.JSONDecodeError:
             print("Failed to decode JSON from decrypted message")
+            return
+        
+        
+        if not ChainUtil.decryptWithSoftwareKey(data):
+            print("Invalid message recieved.")
             return
 
         print("MESSAGE RECIEVED OF TYPE", data["type"])
@@ -92,22 +94,13 @@ class P2pServer:
                 self.blockchain.replace_chain(data["chain"])
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
-            if not self.transaction_pool.transaction_exists(data["transaction"]):
-                self.transaction_pool.add_transaction(data["transaction"])
-                # self.broadcast_transaction(data["transaction"])
-                # if self.transaction_pool.threshold_reached():
-                #     if self.blockchain.get_leader() == self.wallet.get_public_key():
-                #         block = self.blockchain.create_block(
-                #             self.transaction_pool.transactions, self.wallet)
-                #         self.broadcast_block(block)
+            transaction = Transaction.from_json(data["transaction"])
+            if not self.transaction_pool.transaction_exists(transaction):
+                self.transaction_pool.add_transaction(transaction)
+
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
-                # self.broadcast_block(data["block"])
-
-                # #REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
-                # self.transaction_pool.remove(data["block"].data)
-
                 # VOTE ON THE TRANSACTIONS
                 st.session_state.block_recieved = True
                 st.session_state.recieved_block = data["block"]
@@ -158,11 +151,16 @@ class P2pServer:
         """
         Broadcast new node's public key to all to create a new account
         """
-        message = json.dumps({
-            "type": MESSAGE_TYPE["new_node"],
-            "public_key": public_key
-        })
-        self.message_received(None, None, message)
+        # message = json.dumps({
+        #     "type": MESSAGE_TYPE["new_node"],
+        #     "public_key": self.wallet.get_public_key()
+        # })
+        
+        # message = ChainUtil.encryptWithSoftwareKey(message)
+
+        # message = json.dumps(message, cls=CustomJSONEncoder)
+        
+        # self.message_received(None, None, message)
         
         active_accounts = self.accounts.get_active_accounts()
         for address in active_accounts:
@@ -177,11 +175,16 @@ class P2pServer:
         # try:
         # self.accounts.makeAccountValidatorNode(address=self.wallet.get_public_key(),stake=stake)
         # TODO: check if self message works
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["new_validator"],
             "public_key": self.wallet.get_public_key(),
             "stake": stake
-        })
+        }
+        
+        message = ChainUtil.encryptWithSoftwareKey(message)
+
+        message = json.dumps(message, cls=CustomJSONEncoder)
+        
         self.message_received(None, None, message)
         
         
@@ -252,26 +255,35 @@ class P2pServer:
                 self.send_chain(socket)
 
     def broadcast_transaction(self, transaction):
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["transaction"],
             "transaction": transaction.to_json()
-        }, cls=CustomJSONEncoder)
-        self.message_received(None, None, message)
+        }
+        
+        message = ChainUtil.encryptWithSoftwareKey(message)
+        
+        message = json.dumps(message, cls = CustomJSONEncoder)
+        
+        print("MESSAGE SENT TO SELF")
+        self.message_received(
+            None, None, message
+        )
+        
         
         
         active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key())
+            self.wallet.get_public_key()
+        )
+        
+        
         print("ACTIVE ACCOUNTS: ", active_accounts)
 
         for address in active_accounts:
             self.send_transaction(
-                active_accounts[address].clientPort, transaction)
+                active_accounts[address].clientPort,message)
 
-    def send_transaction(self, socket, transaction):
-        message = json.dumps({
-            "type": MESSAGE_TYPE["transaction"],
-            "transaction": transaction.to_json()
-        }, cls=CustomJSONEncoder)
+    def send_transaction(self, socket, message):
+
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
@@ -325,14 +337,6 @@ class P2pServer:
         for address in active_accounts:
             client_socket = active_accounts[address].clientPort
             self.sendEncryptedMessage(client_socket, message)
-
-
-# if __name__ == "__main__":
-#     blockchain = Blockchain()
-#     transaction_pool = TransactionPool()
-#     wallet = Wallet()
-#     p2p_server = P2pServer(blockchain, transaction_pool, wallet)
-#     p2p_server.listen()
 
 
 class CustomJSONEncoder(json.JSONEncoder):

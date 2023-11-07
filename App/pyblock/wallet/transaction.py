@@ -15,6 +15,7 @@ class Transaction:
         self.model_score = None
         self.sign = None
         self.positive_votes = None
+        self.timestamp = int(time.time())
 
     def to_json(self):
         return {
@@ -25,9 +26,27 @@ class Transaction:
             "model_score": self.model_score,
             # Assuming sign is a byte-like object that needs to be represented as a hex string
             "sign": str(self.sign.hex()) if self.sign else "",
-            "positive_votes": self.positive_votes
+            "positive_votes": self.positive_votes,
+            "timestamp": self.timestamp
         }
 
+    @staticmethod
+    def from_json(json_data):
+        transaction = Transaction()
+        transaction.id = json_data["id"]
+        transaction.ipfs_address = json_data["ipfs_address"]
+        transaction.sender_address = json_data["sender_address"]
+        transaction.sender_reputation = json_data["sender_reputation"]
+        transaction.model_score = json_data["model_score"]
+
+        # Assuming the "sign" field is a hexadecimal string representing a byte-like object
+        if "sign" in json_data and json_data["sign"]:
+            transaction.sign = bytes.fromhex(json_data["sign"])
+        else:
+            transaction.sign = None
+        transaction.timestamp = json_data["timestamp"]
+        transaction.positive_votes = json_data["positive_votes"]
+        return transaction
     def get_transaction_score(self):
         content = IPFSHandler.get_from_ipfs(
             self.ipfs_address
@@ -42,11 +61,12 @@ class Transaction:
         transaction = Transaction()
         transaction.timestamp = time.time
         transaction.ipfs_address = ipfs_address
-        transaction.sender_address = sender_wallet.public_key
+        transaction.sender_address = sender_wallet.get_public_key()
         transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
         transaction.sender_reputation = blockchain.get_balance(
-            sender_wallet.public_key)
+            sender_wallet.get_public_key())
         transaction.model_score = transaction.get_transaction_score()
+        transaction.timestamp = int(time.time())
         return transaction
 
     @staticmethod
