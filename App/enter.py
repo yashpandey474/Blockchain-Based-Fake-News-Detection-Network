@@ -15,17 +15,17 @@ from background import *
 def run_p2pserver(p2pserver):
     print("Running p2p server on port: "+str(P2P_PORT))
     p2pserver.listen()
-    
+
+
 def initialise(private_key=None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
-
         st.session_state.transaction_pool = TransactionPool()
 
         st.session_state.wallet = Wallet(
-            private_key = private_key, name = st.session_state.name,
-            email = st.session_state.email
+            private_key=private_key, name=st.session_state.name,
+            email=st.session_state.email
         )
 
         print("P2P SERVER CALLED!")
@@ -38,15 +38,20 @@ def initialise(private_key=None):
             target=run_p2pserver, args=(st.session_state.p2pserver,)
         )
 
-        #DAEMONISE TO ALLOW TERMINATION WITHOUT WAITING
-        p2p_thread.daemon = True
+        # DAEMONISE TO ALLOW TERMINATION WITHOUT WAITING
+        # p2p_thread.daemon = False
         p2p_thread.start()
+        # http_thread.d
+        # http_thread = threading.Thread(
+        #     target=runhttpserver
+        # )
+        # http_thread.start()
+
         background_thread = threading.Thread(target=background_task)
         background_thread.daemon = True  # Daemonize the thread
         background_thread.start()
 
         print("EVERYTHING INITIIALISED")
-
 
 
 def enter():

@@ -38,21 +38,32 @@ class P2pServer:
         self.server.send_message(
             socket, ChainUtil.encryptWithSoftwareKey(message))
 
+        self.message_received(None, None, message)
+
     def listen(self):
         print("Starting p2p server...")
-        self.create_self_account()
         self.server = WebsocketServer(port=P2P_PORT, host="0.0.0.0")
+
         self.server.set_fn_new_client(self.new_client)
+        print(self.server.socket)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
+        self.create_self_account()
+
+        print("CLIENTS: ", self.server.host)
         self.connect_to_peers()
+
         self.server.run_forever()
 
     def create_self_account(self):
         self.accounts.addANewClient(
-            address=self.wallet.public_key, clientPort=None)
+            address=self.wallet.get_public_key(), clientPort=None)
+
+        print("ACCOUNT CREATED")
 
     def new_client(self, client, server):
+        print("IMMMPPPP")
+        print(client)
         print("Socket connected:", client['id'])
         self.send_chain(client)
 
@@ -160,7 +171,8 @@ class P2pServer:
         # try:
         # self.accounts.makeAccountValidatorNode(address=self.wallet.get_public_key(),stake=stake)
         # TODO: check if self message works
-        active_accounts = self.accounts.get_active_accounts()
+        active_accounts = self.accounts.get_active_accounts(
+            self.wallet.get_public_key())
         print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_new_validator(
@@ -216,7 +228,8 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def sync_chain(self):
-        active_accounts = self.accounts.get_active_accounts()
+        active_accounts = self.accounts.get_active_accounts(
+            self.wallet.get_public_key())
         for address, account in active_accounts.items():
             # Assuming the account's clientPort can be used to send messages
             # and there's a method in P2pServer to get the socket by its client port
@@ -225,8 +238,10 @@ class P2pServer:
                 self.send_chain(socket)
 
     def broadcast_transaction(self, transaction):
-        active_accounts = self.accounts.get_active_accounts()
+        active_accounts = self.accounts.get_active_accounts(
+            self.wallet.get_public_key())
         print("ACTIVE ACCOUNTS: ", active_accounts)
+
         for address in active_accounts:
             self.send_transaction(
                 active_accounts[address].clientPort, transaction)
@@ -239,7 +254,8 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
-        active_accounts = self.accounts.get_active_accounts()
+        active_accounts = self.accounts.get_active_accounts(
+            self.wallet.get_public_key())
         for address in active_accounts:
             self.send_block(active_accounts[address].clientPort, block)
 
@@ -277,7 +293,8 @@ class P2pServer:
         message = json.dumps(message_content)
 
         # Broadcast the message to all active accounts
-        active_accounts = self.accounts.get_active_accounts()
+        active_accounts = self.accounts.get_active_accounts(
+            self.wallet.get_public_key())
         for address in active_accounts:
             client_socket = active_accounts[address].clientPort
             self.sendEncryptedMessage(client_socket, message)

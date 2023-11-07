@@ -8,7 +8,7 @@ def become_validator():
 
     else:
         current_balance = st.session_state.p2pserver.accounts.get_balance(
-            st.session_state.wallet.public_key
+            st.session_state.wallet.get_public_key()
         )
 
         if current_balance < config.MIN_STAKE:

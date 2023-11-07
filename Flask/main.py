@@ -6,15 +6,15 @@ from App.pyblock.wallet.transaction_pool import TransactionPool
 from App.pyblock.p2pserver import P2pServer
 import App.pyblock.config as config
 import threading
-
+import streamlit as st
 app = Flask(__name__)
 
 HTTP_PORT = int(config.HTTP_PORT)
 
-blockchain = Blockchain()
+blockchain = st.session_state.p2pserver.blockchain
 # Using current timestamp as seed for wallet
-wallet = Wallet()
-transaction_pool = TransactionPool()
+wallet = st.session_state.p2pserver.wallet
+transaction_pool = st.session_state.p2pserver.transaction_pool
 p2pserver = P2pServer(blockchain, transaction_pool, wallet)
 
 
@@ -60,9 +60,7 @@ def run_p2pserver():
     print("Running p2p server on port: "+str(config.P2P_PORT))
     p2pserver.listen()
 
-
-if __name__ == '__main__':
-    p2p_thread = threading.Thread(target=run_p2pserver)
-    p2p_thread.start()
+def runhttpserver():
+    print("Running http server on port: "+str(HTTP_PORT))
     app.run(port=HTTP_PORT, debug=False, host="0.0.0.0")
 
