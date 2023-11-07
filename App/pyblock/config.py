@@ -47,7 +47,12 @@ WIFVFoCVgzGNkOs8sYXEkVZPrMJ146DO9hxXssRD+TmKoL5Byp+UV4k++QdniWAu
 UwIDAQAB
 -----END PUBLIC KEY-----"""
 
+<<<<<<< HEAD
 
+=======
+P2P_PORT = 5000
+PEERS = ["ws://172.17.52.10:5000", "ws://172.17.29.42:5000"]
+>>>>>>> 5dd03f9 (Modify requirements.txt)
 HTTP_PORT = 8000
 START_TIME = datetime.datetime(2009, 1, 3)
 # 5 MINUTES FOR VALIDATION

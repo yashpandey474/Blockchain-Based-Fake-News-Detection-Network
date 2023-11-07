@@ -32,6 +32,7 @@ class P2pServer:
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
+        
         self.accounts = blockchain.accounts
 
     def sendEncryptedMessage(self, socket, message):
@@ -40,14 +41,17 @@ class P2pServer:
 
     def listen(self):
         print("Starting p2p server...")
+        self.create_self_account()
         self.server = WebsocketServer(port=P2P_PORT, host="0.0.0.0")
         self.server.set_fn_new_client(self.new_client)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
-        self.broadcast_new_node()
         self.server.run_forever()
-
+        
+    def create_self_account(self):
+        self.accounts.addANewClient(address=self.wallet.public_key, clientPort=None)
+        
     def new_client(self, client, server):
         print("Socket connected:", client['id'])
         self.send_chain(client)
