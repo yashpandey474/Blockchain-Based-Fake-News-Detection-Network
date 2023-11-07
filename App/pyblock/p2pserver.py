@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 import json
 import websocket
@@ -7,7 +8,7 @@ from pyblock.wallet.transaction_pool import TransactionPool
 from websocket_server import WebsocketServer
 from typing import Type
 import pyblock.config as config
-import pyblock.chainutil as ChainUtil
+from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.blockchain.account import Accounts
 from pyblock.blockchain.account import Account
@@ -46,10 +47,11 @@ class P2pServer:
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
         self.server.run_forever()
-        
+
     def create_self_account(self):
-        self.accounts.addANewClient(address=self.wallet.public_key, clientPort=None)
-        
+        self.accounts.addANewClient(
+            address=self.wallet.public_key, clientPort=None)
+
     def new_client(self, client, server):
         print("Socket connected:", client['id'])
         self.send_chain(client)
@@ -60,7 +62,7 @@ class P2pServer:
         self.accounts.clientLeft(clientport=client)
 
     def message_received(self, client, server, message):
-        
+
         # Assuming that the incoming message is encrypted and then base64-encoded
         decrypted_message = ChainUtil.decryptWithSoftwareKey(message)
 
@@ -71,7 +73,6 @@ class P2pServer:
         except json.JSONDecodeError:
             print("Failed to decode JSON from decrypted message")
             return
-        
 
         print("MESSAGE RECIEVED OF TYPE", data["type"])
 
@@ -99,7 +100,7 @@ class P2pServer:
                 # VOTE ON THE TRANSACTIONS
                 st.session_state.block_recieved = True
                 st.session_state.recieved_block = data["block"]
-        
+
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
@@ -113,7 +114,6 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
-
 
     def handle_votes(self, data):
         # TODO: Implement THIS
@@ -142,8 +142,7 @@ class P2pServer:
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.received_block.transactions):
             st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
-            
-            
+
     def broadcast_new_node(self):
         """
         Broadcast new node's public key to all to create a new account
@@ -152,9 +151,7 @@ class P2pServer:
         for address in active_accounts:
             self.send_new_node(
                 active_accounts[address].clientPort, self.wallet.get_public_key()
-        )
-        
-        
+            )
 
     def broadcast_new_validator(self, stake):
         """
@@ -179,7 +176,6 @@ class P2pServer:
             "stake": stake
         })
         self.sendEncryptedMessage(socket, message)
-        
 
     def connect_to_peers(self):
         for peer in PEERS:
@@ -200,7 +196,6 @@ class P2pServer:
 
     def on_peer_open(self, ws):
         self.send_new_node(ws, self.wallet.public_key)
-            
 
     def send_new_node(self, ws, public_key: str):
         """
@@ -240,7 +235,7 @@ class P2pServer:
         message = json.dumps({
             "type": MESSAGE_TYPE["transaction"],
             "transaction": transaction.to_json()
-        })
+        }, cls=CustomJSONEncoder)
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
@@ -294,3 +289,12 @@ class P2pServer:
 #     wallet = Wallet()
 #     p2p_server = P2pServer(blockchain, transaction_pool, wallet)
 #     p2p_server.listen()
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, bytes):
+            return o.hex()
+        elif isinstance(o, np.float32):
+            return float(o)
+        return json.JSONEncoder.default(self, o)
