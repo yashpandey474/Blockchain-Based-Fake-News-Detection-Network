@@ -16,8 +16,6 @@ class Transaction:
         self.sign = None
         self.positive_votes = None
 
-    
-
     def to_json(self):
         return {
             "id": str(self.id),
@@ -26,10 +24,10 @@ class Transaction:
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
             # Assuming sign is a byte-like object that needs to be represented as a hex string
-            "sign": self.sign.hex() if self.sign else None,
-            "votes": self.positive_votes
+            "sign": str(self.sign.hex()) if self.sign else "",
+            "positive_votes": self.positive_votes
         }
-        
+
     def get_transaction_score(self):
         content = IPFSHandler.get_from_ipfs(
             self.ipfs_address
@@ -46,7 +44,8 @@ class Transaction:
         transaction.ipfs_address = ipfs_address
         transaction.sender_address = sender_wallet.public_key
         transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
-        transaction.sender_reputation = blockchain.get_balance(sender_wallet.public_key)
+        transaction.sender_reputation = blockchain.get_balance(
+            sender_wallet.public_key)
         transaction.model_score = transaction.get_transaction_score()
         return transaction
 
@@ -56,7 +55,7 @@ class Transaction:
         transaction.sign = None
         transaction_hash = ChainUtil.hash(transaction)
         model_score = transaction.get_transaction_score()
-        
+
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
             return False
