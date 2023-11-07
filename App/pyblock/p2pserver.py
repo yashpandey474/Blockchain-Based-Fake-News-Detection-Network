@@ -165,6 +165,7 @@ class P2pServer:
         # self.accounts.makeAccountValidatorNode(address=self.wallet.get_public_key(),stake=stake)
         # TODO: check if self message works
         active_accounts = self.accounts.get_active_accounts()
+        print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_new_validator(
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
@@ -231,6 +232,7 @@ class P2pServer:
 
     def broadcast_transaction(self, transaction):
         active_accounts = self.accounts.get_active_accounts()
+        print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_transaction(
                 active_accounts[address].clientPort, transaction)

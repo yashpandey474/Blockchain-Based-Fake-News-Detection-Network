@@ -9,10 +9,12 @@ def upload_file():
         partial_transaction = Transaction.generate_from_file(
             sender_wallet=st.session_state.p2pserver.wallet, file=uploaded_file, blockchain = st.session_state.p2pserver.blockchain)
 
-        # st.write("UPLOADED FILE: ", uploaded_file.name)
+        st.write("UPLOADED FILE: ", uploaded_file.name)
         # BROADCASE NEWLY CREATED TRANSACTION
         st.session_state.p2pserver.broadcast_transaction(
             partial_transaction)
+        
+        print("BROADCASTED TRANSACTION")
         
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
