@@ -7,7 +7,7 @@ def become_validator():
         st.write("You are already a validator.")
 
     else:
-        current_balance = st.session_state.accounts.get_balance(
+        current_balance = st.session_state.p2pserver.accounts.get_balance(
             st.session_state.wallet.public_key
         )
 

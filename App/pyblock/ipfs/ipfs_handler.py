@@ -9,25 +9,27 @@ class IPFSHandler:
     }
 
     @staticmethod
-    def put_to_ipfs(path):
+    def put_to_ipfs(content):
         # putting data to IPFS and returns a ipfs address
-        url = f"{IPFSHandler.base_url}/upload"
-        files = {"file": open(path, "rb")}
+        # url = f"{IPFSHandler.base_url}/upload"
+        # files = {"file": content}
 
-        try:
-            res = requests.post(url, files=files, headers=IPFSHandler.auth)
-        except Exception as e:
-            print(e)
-            return ""
+        # try:
+        #     res = requests.post(url, files=files, headers=IPFSHandler.auth)
+        # except Exception as e:
+        #     print(e)
+        #     return ""
         
-        try:
-            print(res.json())
-            ipfs_address = res.json()["cid"]
-        except Exception as e:
-            print("Error: ", e)
-            return ""
+        # try:
+        #     print(res.json())
+        #     ipfs_address = res.json()["cid"]
+        # except Exception as e:
+        #     print("Error: ", e)
+        #     return ""
         
-        return ipfs_address
+        '''{'cid': 'bafkreidb6otjwgl5xuwbzzixoc7oz5maojjpj7sfuzrobyawiafwxeo524',
+            'carCid': 'bagbaieragbvch2fxvhiir3bxiidxa7fxrr5cgobtyqq6o6dy3nnjezbijera'}'''
+        return "bafkreidb6otjwgl5xuwbzzixoc7oz5maojjpj7sfuzrobyawiafwxeo524"
   
 
     @staticmethod

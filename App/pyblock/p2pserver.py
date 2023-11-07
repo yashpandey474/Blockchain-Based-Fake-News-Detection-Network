@@ -8,11 +8,10 @@ from websocket_server import WebsocketServer
 from typing import Type
 import pyblock.config as config
 import pyblock.chainutil as ChainUtil
-import peers
+from pyblock.peers import *
 from pyblock.blockchain.account import Accounts
 from pyblock.blockchain.account import Account
-P2P_PORT = int(peers.P2P_PORT)
-PEERS = peers.PEERS
+
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',
@@ -32,6 +31,7 @@ class P2pServer:
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
+        
         self.accounts = blockchain.accounts
 
     def sendEncryptedMessage(self, socket, message):
@@ -40,14 +40,17 @@ class P2pServer:
 
     def listen(self):
         print("Starting p2p server...")
+        self.create_self_account()
         self.server = WebsocketServer(port=P2P_PORT, host="0.0.0.0")
         self.server.set_fn_new_client(self.new_client)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
-        self.broadcast_new_node()
         self.server.run_forever()
-
+        
+    def create_self_account(self):
+        self.accounts.addANewClient(address=self.wallet.public_key, clientPort=None)
+        
     def new_client(self, client, server):
         print("Socket connected:", client['id'])
         self.send_chain(client)
@@ -162,6 +165,7 @@ class P2pServer:
         # self.accounts.makeAccountValidatorNode(address=self.wallet.get_public_key(),stake=stake)
         # TODO: check if self message works
         active_accounts = self.accounts.get_active_accounts()
+        print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_new_validator(
                 active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
@@ -228,6 +232,7 @@ class P2pServer:
 
     def broadcast_transaction(self, transaction):
         active_accounts = self.accounts.get_active_accounts()
+        print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_transaction(
                 active_accounts[address].clientPort, transaction)
