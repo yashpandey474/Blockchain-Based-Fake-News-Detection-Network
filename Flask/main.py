@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, redirect
 import time
-from pyblock.blockchain.blockchain import Blockchain
-from pyblock.wallet.wallet import Wallet
-from pyblock.wallet.transaction_pool import TransactionPool
-from pyblock.p2pserver import P2pServer
-import pyblock.config as config
+from App.pyblock.blockchain.blockchain import Blockchain
+from App.pyblock.wallet.wallet import Wallet
+from App.pyblock.wallet.transaction_pool import TransactionPool
+from App.pyblock.p2pserver import P2pServer
+import App.pyblock.config as config
 import threading
 
 app = Flask(__name__)

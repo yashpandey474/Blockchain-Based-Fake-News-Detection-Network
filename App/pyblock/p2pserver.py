@@ -8,10 +8,11 @@ from websocket_server import WebsocketServer
 from typing import Type
 import pyblock.config as config
 import pyblock.chainutil as ChainUtil
+import peers
 from pyblock.blockchain.account import Accounts
 from pyblock.blockchain.account import Account
-P2P_PORT = int(config.P2P_PORT)
-PEERS = config.PEERS
+P2P_PORT = int(peers.P2P_PORT)
+PEERS = peers.PEERS
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',
@@ -85,14 +86,14 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
                 # self.broadcast_block(data["block"])
-                
+
                 # #REMOVE INCLUDED TRANSACTIONS FROM THE MEMPOOL
                 # self.transaction_pool.remove(data["block"].data)
-                
-                #VOTE ON THE TRANSACTIONS
+
+                # VOTE ON THE TRANSACTIONS
                 st.session_state.block_recieved = True
                 st.session_state.received_block = data["block"]
-        
+
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
@@ -103,7 +104,7 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
-            
+
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
 
@@ -113,30 +114,25 @@ class P2pServer:
             "votes": votes_list,
             "block_index": st.session_state.received_block.index'''
         # TODO: VERIFY SIGNATURE
-        
+
         # IF NOT CURRENT BLOCK
         if data["block_index"] != st.session_state.received_block.index:
             print("OLD VOTE RECEIVED")
             return
-        
+
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
         st.session_state.received_block.votes += 1
 
-            
         # INCREMENT VOTES FOR THE TRANSACTIONS
-        transactions_dict = {transaction.id: transaction for transaction in st.session_state.received_block.transactions}
+        transactions_dict = {
+            transaction.id: transaction for transaction in st.session_state.received_block.transactions}
         for key, value in st.session_state.received_block.transactions:
             if value == "True":
                 transactions_dict[key].positive_votes += 1
-                
-        #JUST IN CASE OF PASS BY VALUE
+
+        # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.received_block.transactions):
             st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
-            
-            
-            
-        
-        
 
     def broadcast_new_validator(self, stake):
         """
@@ -253,9 +249,8 @@ class P2pServer:
 
         # Append the signature to the message content
         message_content['signature'] = signature
-        
-        #APPEND THE BLOCK NUMBER
-        
+
+        # APPEND THE BLOCK NUMBER
 
         # Convert the full message with signature to JSON
         message = json.dumps(message_content)
