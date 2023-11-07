@@ -4,8 +4,6 @@ from change_screen import *
 import pandas as pd
 
 def show_blocks_news():
-    
-    
     chain = st.session_state.p2pserver.blockchain.chain
     
     

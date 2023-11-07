@@ -19,25 +19,27 @@ def initialise(private_key=None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
-        st.session_state.accounts = st.session_state.blockchain.accounts
 
         st.session_state.transaction_pool = TransactionPool()
 
-        st.session_state.wallet = Wallet(private_key)
+        st.session_state.wallet = Wallet(
+            private_key = private_key, name = st.session_state.name,
+            email = st.session_state.email
+        )
 
         print("P2P SERVER CALLED!")
 
         st.session_state.p2pserver = P2pServer(
-            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, accounts=st.session_state.accounts
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet
         )
 
         p2p_thread = threading.Thread(
             target=run_p2pserver, args=(st.session_state.p2pserver,)
         )
 
+        #DAEMONISE TO ALLOW TERMINATION WITHOUT WAITING
+        p2p_thread.daemon = True
         p2p_thread.start()
-        
-        # Start the background task in a separate thread
         background_thread = threading.Thread(target=background_task)
         background_thread.daemon = True  # Daemonize the thread
         background_thread.start()
@@ -56,7 +58,8 @@ def enter():
 
     if st.button("Enter as a Reader."):
         st.session_state.user_type = "Reader"
-
+        st.session_state.name = "User"
+        st.session_state.email = None
         print("BUTTON CLICKED")
         initialise()
 

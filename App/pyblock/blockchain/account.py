@@ -58,6 +58,7 @@ class Accounts:
         if address in self.accounts:
             if self.accounts[address].isActive:
                 raise ValueError("Client with this address already exists and is active.")
+            
             else:
                 self.accounts[address].isActive=True
                 self.accounts[address].clientPort=clientPort

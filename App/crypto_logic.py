@@ -22,6 +22,9 @@ def gen_sk():
     # return (sk.decode())
     return key
 
+def verify_certificate(certificate_id):
+    return certificate_id[: 4] == "ABCD"
+        
 
 # if __name__ == "__main__":
 #     print(verify("""-----BEGIN RSA PRIVATE KEY-----

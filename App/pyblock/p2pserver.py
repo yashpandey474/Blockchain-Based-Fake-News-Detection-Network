@@ -28,11 +28,11 @@ MESSAGE_TYPE = {
 
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], accounts: Type[Accounts]):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet]):
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
-        self.accounts = accounts
+        self.accounts = blockchain.accounts
 
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
@@ -45,6 +45,7 @@ class P2pServer:
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
+        self.broadcast_new_node()
         self.server.run_forever()
 
     def new_client(self, client, server):
@@ -57,6 +58,7 @@ class P2pServer:
         self.accounts.clientLeft(clientport=client)
 
     def message_received(self, client, server, message):
+        
         # Assuming that the incoming message is encrypted and then base64-encoded
         decrypted_message = ChainUtil.decryptWithSoftwareKey(message)
 
@@ -67,21 +69,23 @@ class P2pServer:
         except json.JSONDecodeError:
             print("Failed to decode JSON from decrypted message")
             return
+        
 
-        print("Received data from peer:", data["type"])
+        print("MESSAGE RECIEVED OF TYPE", data["type"])
 
         if data["type"] == MESSAGE_TYPE["chain"]:
-            self.blockchain.replace_chain(data["chain"])
+            if len(data["chain"]) > len(self.blockchain.chain):
+                self.blockchain.replace_chain(data["chain"])
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             if not self.transaction_pool.transaction_exists(data["transaction"]):
                 self.transaction_pool.add_transaction(data["transaction"])
-                self.broadcast_transaction(data["transaction"])
-                if self.transaction_pool.threshold_reached():
-                    if self.blockchain.get_leader() == self.wallet.get_public_key():
-                        block = self.blockchain.create_block(
-                            self.transaction_pool.transactions, self.wallet)
-                        self.broadcast_block(block)
+                # self.broadcast_transaction(data["transaction"])
+                # if self.transaction_pool.threshold_reached():
+                #     if self.blockchain.get_leader() == self.wallet.get_public_key():
+                #         block = self.blockchain.create_block(
+                #             self.transaction_pool.transactions, self.wallet)
+                #         self.broadcast_block(block)
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             if self.blockchain.is_valid_block(data["block"]):
@@ -92,8 +96,8 @@ class P2pServer:
 
                 # VOTE ON THE TRANSACTIONS
                 st.session_state.block_recieved = True
-                st.session_state.received_block = data["block"]
-
+                st.session_state.recieved_block = data["block"]
+        
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # Assuming the new validator sends their public key with this message
             new_validator_public_key = data["public_key"]
@@ -107,6 +111,7 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
+
 
     def handle_votes(self, data):
         # TODO: Implement THIS
@@ -133,6 +138,19 @@ class P2pServer:
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.received_block.transactions):
             st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
+            
+            
+    def broadcast_new_node(self):
+        """
+        Broadcast new node's public key to all to create a new account
+        """
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            self.send_new_node(
+                active_accounts[address].clientPort, self.wallet.get_public_key()
+        )
+        
+        
 
     def broadcast_new_validator(self, stake):
         """
@@ -156,6 +174,7 @@ class P2pServer:
             "stake": stake
         })
         self.sendEncryptedMessage(socket, message)
+        
 
     def connect_to_peers(self):
         for peer in PEERS:
@@ -176,6 +195,7 @@ class P2pServer:
 
     def on_peer_open(self, ws):
         self.send_new_node(ws, self.wallet.public_key)
+            
 
     def send_new_node(self, ws, public_key: str):
         """

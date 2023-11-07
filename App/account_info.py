@@ -5,9 +5,11 @@ from change_screen import *
 def show_account_info():
     st.title("ACCOUNT INFORMATION")
     balance = st.session_state.blockchain.get_balance(
-        st.session_state.wallet.public_key)
-    public_key = st.session_state.wallet.public_key()
-    private_key = st.session_state.wallet.private_key
+        st.session_state.wallet.public_key
+    )
+    public_key = st.session_state.wallet.public_key
+    private_key = st.session_state.wallet.private_key.export_key()
+    
     st.write("BALANCE = ", balance)
     st.write("PUBLIC KEY = ", public_key)
     st.write("PRIVATE KEY = ", private_key)

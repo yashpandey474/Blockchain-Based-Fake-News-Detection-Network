@@ -10,6 +10,8 @@ from show_transactions import *
 from enter import *
 from change_screen import *
 from account_info import *
+from become_validator import *
+from vote_on_block import *
 
 background_style = '''<style>
 section {
@@ -54,35 +56,27 @@ st.markdown(background_style, unsafe_allow_html=True)
 # )
 st.title("Fake News Detection System Utilising Blockchain")
 
+screen_functions = {
+    "enter": enter,
+    "login": login,
+    "main_page": main_page,
+    "account_info": show_account_info,
+    "show_transac": show_transactions,
+    "show_blocks": show_blocks_news,
+    "sign_up": sign_up,
+    "sign_up_generate": sign_up_generate,
+    "become_validator": become_validator,
+    "vote_on_block": vote_on_block
+}
 
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
-    if st.session_state.screen == "enter":
-        print("CALL: ENTER")
-        enter()
-    if st.session_state.screen == "login":
-        print("CALL: LOGIN")
-        login()
-            
-    if st.session_state.screen == "main_page":
-        print("YES. WE TRIED TO CALL THE MAIN PAGE")
-        main_page()
-            
-    if st.session_state.screen == "account_info":
-        print("CALL: ACC INFO")
-        show_account_info()
-        
-    if st.session_state.screen == "show_transac":
-        print("CALL: SHOW TRANSAC")
-        show_transactions()
-            
-    if st.session_state.screen == "show_blocks":
-        print("CALL: SHOW BLOCKS")
-        show_blocks_news()
-
-    if st.session_state.screen == "sign_up":
-        sign_up()
+    if st.session_state.screen in screen_functions:
+        screen_functions[st.session_state.screen]()
+    
+    else:
+        screen_functions["enter"]()
         
 
 if __name__ == "__main__":
@@ -90,24 +84,22 @@ if __name__ == "__main__":
         
         print("SCREEN INITILIASED")
         st.session_state.initialise = False
-        
-        st.session_state.screen = "enter"
-        
+    
         st.session_state.gen_key_pressed = False
         
-        st.session_state.try_be_validator = False
-
         st.session_state.validator = False
-        
-        st.session_state.previous_screen = "enter"
-        
-        st.session_state.try_be_validator = False
         
         st.session_state.block_proposer = None
         
         st.session_state.block_recieved = False
         
         st.session_state.recieved_block = None
+        
+        st.session_state.verified = False
+        
+        st.session_state.previous_screen = "enter"
+        
+        st.session_state.screen = "enter"
         
         
     main()

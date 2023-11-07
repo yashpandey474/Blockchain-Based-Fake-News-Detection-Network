@@ -1,10 +1,14 @@
 import streamlit as st
 from change_screen import *
+from pyblock.chainutil import *
 from enter import *
 import crypto_logic
-def sign_up():
-    st.title("Sign Up")
 
+
+def sign_up_generate():
+    print("NAME = ", st.session_state.name)
+    print("EMAIL = ", st.session_state.email)
+    
     if st.button("Gen new key"):
         st.write("new key, wont see again, keep for future")
 
@@ -22,6 +26,30 @@ def sign_up():
         if st.button("Go to main"):
             print("BUTTON CLICKED")
             change_screen("main_page")
+            
+    # GO TO PREVIOUS SCREEN
+    if st.button("Back"):
+        # Set the previous screen in the session state
+        change_screen(st.session_state.previous_screen)
+    
+def sign_up():
+    st.title("Sign Up As a News Auditor")
+    
+    name = st.text_input("Enter Your Name")
+    email = st.text_input("Enter Your Professional Email")
+    
+    #NEWS AUDITOR MUST BE AUTHORISED BY A TTP [SAY, INTEL SGX CERTIFICATES
+    # TODO: FINALISE VERIFICATION TECHNIQUE AND WHETHER TO ACTUALLY USE INTEL SGX
+    certificate_id = st.text_area("Enter the SGX Certificate ID")
+    
+    if st.button("Submit Details."):
+        if not crypto_logic.verify_certificate(certificate_id):
+            st.write("Invalid Certificate ID. Not authorised")
+        
+        else:
+            st.session_state.name = name
+            st.session_state.email = email
+            change_screen("sign_up_generate")
             
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):

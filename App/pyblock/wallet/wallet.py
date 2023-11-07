@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 
 class Wallet:
-    def __init__(self, private_key=None):
+    def __init__(self, private_key=None, name = None, email = None):
+        self.name = name
+        self.email = email
         # self.balance = 100
         if not private_key:
             self.private_key = RSA.generate(2048)
