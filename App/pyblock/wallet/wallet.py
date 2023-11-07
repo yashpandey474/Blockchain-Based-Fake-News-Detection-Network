@@ -32,10 +32,7 @@ class Wallet:
 
     def get_public_key(self):
         return self.public_key
-    
-    def initialize(self,public_key,private_key):
-        self.public_key = RSA.import_key(public_key)
-        self.private_key = RSA.import_key(private_key)
+
 
 
 
