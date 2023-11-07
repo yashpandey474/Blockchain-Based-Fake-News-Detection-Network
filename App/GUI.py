@@ -11,6 +11,7 @@ from enter import *
 from change_screen import *
 from account_info import *
 from become_validator import *
+from vote_on_block import *
 
 background_style = '''<style>
 section {
@@ -64,7 +65,8 @@ screen_functions = {
     "show_blocks": show_blocks_news,
     "sign_up": sign_up,
     "sign_up_generate": sign_up_generate,
-    "become_validator": become_validator
+    "become_validator": become_validator,
+    "vote_on_block": vote_on_block
 }
 
 def main():
@@ -85,11 +87,7 @@ if __name__ == "__main__":
     
         st.session_state.gen_key_pressed = False
         
-        st.session_state.try_be_validator = False
-
         st.session_state.validator = False
-        
-        st.session_state.try_be_validator = False
         
         st.session_state.block_proposer = None
         

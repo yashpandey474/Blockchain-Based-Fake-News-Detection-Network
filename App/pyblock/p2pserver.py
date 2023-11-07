@@ -27,11 +27,11 @@ MESSAGE_TYPE = {
 
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], accounts: Type[Accounts]):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet]):
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
-        self.accounts = accounts
+        self.accounts = blockchain.accounts
 
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
@@ -107,6 +107,7 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
 
+
     def handle_votes(self, data):
         # TODO: Implement THIS
         '''"address": self.wallet.get_public_key(),
@@ -134,7 +135,15 @@ class P2pServer:
             st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
             
             
-            
+    def broadcast_new_node(self):
+        """
+        Broadcast new node's public key to all to create a new account
+        """
+        active_accounts = self.accounts.get_active_accounts()
+        for address in active_accounts:
+            self.send_new_node(
+                active_accounts[address].clientPort, self.wallet.get_public_key()
+        )
         
         
 
@@ -160,6 +169,7 @@ class P2pServer:
             "stake": stake
         })
         self.sendEncryptedMessage(socket, message)
+        
 
     def connect_to_peers(self):
         for peer in PEERS:

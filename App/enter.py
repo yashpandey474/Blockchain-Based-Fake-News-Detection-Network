@@ -19,16 +19,18 @@ def initialise(private_key=None):
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
-        st.session_state.accounts = st.session_state.blockchain.accounts
 
         st.session_state.transaction_pool = TransactionPool()
 
-        st.session_state.wallet = Wallet(private_key)
+        st.session_state.wallet = Wallet(
+            private_key = private_key, name = st.session_state.name,
+            email = st.session_state.email
+        )
 
         print("P2P SERVER CALLED!")
 
         st.session_state.p2pserver = P2pServer(
-            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet, accounts=st.session_state.accounts
+            blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet
         )
 
         p2p_thread = threading.Thread(

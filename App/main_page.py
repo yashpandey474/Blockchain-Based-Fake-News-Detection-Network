@@ -40,6 +40,7 @@ def main_page():
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
     if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.public_key:
+        st.write("You are the current block proposer.")
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
         transactions = st.session_state.p2pserver.transaction_pool.transactions
@@ -59,7 +60,7 @@ def main_page():
 
         # DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
         selected_transactions = st.multiselect(
-            "Select transactions",
+            "Select transactions to Include in Block ",
             table_data,
             default=[],
             key="transactions",
@@ -82,65 +83,26 @@ def main_page():
                 lastBlock=st.session_state.blockchain.chain[-1],
                 _data=selected_transaction_objects,
                 wallet=st.session_state.p2pserver.wallet,
-                blockchain=st.session_state.blockchain
+                blockchain=st.session_state.p2pserver.blockchain
             )
 
             # BROADCAST THE BLOCK
             st.session_state.p2pserver.broadcast_block(block)
 
             # CONFIRMATION MESSAGE
-            st.write(
-                "The created block was transmitted. Waiting for confirmations.")
-
-            st.session_state.block_confirmations = 0
+            st.write("The created block was transmitted. Waiting for confirmations.")
 
     if st.session_state.validator:
+        
+        # IF RECEIVED A BLOCK
+        if st.session_state.block_recieved and st.button("Vote on Recieved Block"):
+            # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
+            change_screen("vote_on_block")
+        
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
-    if st.session_state.recieved_block and st.session_state.recieved_block.votes >= 0:
-        st.write("Current Confirmations: ",
-                 st.session_state.recieved_block.votes)
-
-    # IF RECEIVED A BLOCK
-    if st.session_state.block_recieved:
-        # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
-        st.header("Block Info")
-        st.write("Validator:", block.validator)
-        st.write("Timestamp:", block.timestamp)
-        st.header("Vote on Transactions")
-        block = st.session_state.recieved_block
-        transaction_votes = {}
-        table_data = []
-
-        for transaction in block.data:
-            transaction_id = transaction.id
-            vote = st.radio(
-                f"Vote for Transaction {transaction_id}", ("True", "False"))
-            transaction_votes[transaction_id] = vote
-
-            table_data.append({
-                "ID": transaction.id,
-                "IPFS Address": transaction.ipfs_address,
-                "Sender Address": transaction.sender_address,
-                "Sender Reputation": transaction.sender_reputation,
-                "Model Score": transaction.model_score,
-                "Sign of Sender": transaction.sign,
-                "Vote": vote,
-            })
-
-        st.table(table_data)
-
-        if st.button("Submit Votes"):
-            # BROADCAST THE VOTES
-            st.session_state.p2pserver.broadcast_votes(
-                transaction_votes)
-
-            st.write("Votes Submitted. Thank you")
-
-            time.sleep(1)
-
-            st.session_state.block_recieved = False
-
+        st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
+        
     # GO TO PREVIOUS SCREEN
     if st.button("Go to Enter Page"):
             # Set the previous screen in the session state
