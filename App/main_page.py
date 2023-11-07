@@ -92,7 +92,8 @@ def main_page():
         
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
-        st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
+        if st.session_state.recieved_block is not None:
+            st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
         
     # GO TO PREVIOUS SCREEN
     if st.button("Go to Enter Page"):
