@@ -12,16 +12,7 @@ def main_page():
 
     if st.button("Upload New News"):
         # GET UPLOADED TEXT FILE
-        uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
-
-        if uploaded_file:
-            # CREATE PARTIAL TRANSACTION
-            partial_transaction = Transaction.generate_from_file(
-                sender_wallet=st.session_state.p2pserver.wallet, file=uploaded_file)
-
-            # BROADCASE NEWLY CREATED TRANSACTION
-            st.session_state.p2pserver.broadcast_transaction(
-                partial_transaction)
+        change_screen("upload_file")
 
     # VIEW NEWS STORED IN BLOCKCHAIN
     if st.button("View all Verified News"):

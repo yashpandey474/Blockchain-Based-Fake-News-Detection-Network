@@ -8,11 +8,10 @@ from websocket_server import WebsocketServer
 from typing import Type
 import pyblock.config as config
 import pyblock.chainutil as ChainUtil
-import peers
+from pyblock.peers import *
 from pyblock.blockchain.account import Accounts
 from pyblock.blockchain.account import Account
-P2P_PORT = int(peers.P2P_PORT)
-PEERS = peers.PEERS
+
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',

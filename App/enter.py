@@ -4,6 +4,7 @@ from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
+from pyblock.peers import *
 import threading
 from pyblock.blockchain.account import *
 from change_screen import *
@@ -12,7 +13,7 @@ from background import *
 
 
 def run_p2pserver(p2pserver):
-    print("Running p2p server on port: "+str(config.P2P_PORT))
+    print("Running p2p server on port: "+str(P2P_PORT))
     p2pserver.listen()
     
 def initialise(private_key=None):

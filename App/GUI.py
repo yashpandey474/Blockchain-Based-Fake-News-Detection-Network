@@ -12,7 +12,7 @@ from change_screen import *
 from account_info import *
 from become_validator import *
 from vote_on_block import *
-
+from upload_file import *
 background_style = '''<style>
 section {
 background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
@@ -66,7 +66,8 @@ screen_functions = {
     "sign_up": sign_up,
     "sign_up_generate": sign_up_generate,
     "become_validator": become_validator,
-    "vote_on_block": vote_on_block
+    "vote_on_block": vote_on_block,
+    "upload_file": upload_file
 }
 
 def main():
