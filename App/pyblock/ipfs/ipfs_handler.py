@@ -9,10 +9,10 @@ class IPFSHandler:
     }
 
     @staticmethod
-    def put_to_ipfs(path):
+    def put_to_ipfs(content):
         # putting data to IPFS and returns a ipfs address
         url = f"{IPFSHandler.base_url}/upload"
-        files = {"file": open(path, "rb")}
+        files = {"file": content}
 
         try:
             res = requests.post(url, files=files, headers=IPFSHandler.auth)

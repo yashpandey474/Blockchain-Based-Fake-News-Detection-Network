@@ -42,7 +42,7 @@ class Transaction:
         data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         transaction = Transaction()
-        transaction.timestamp = time.tiime
+        transaction.timestamp = time.time
         transaction.ipfs_address = ipfs_address
         transaction.sender_address = sender_wallet.public_key
         transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
