@@ -14,30 +14,14 @@ from become_validator import *
 from vote_on_block import *
 from upload_file import *
 background_style = '''<style>
-section {
+div .appview-container{
 background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
 background-size: cover;
 background-position: center;
-transition: transform 0.3s ease-in-out;
 width: 100%;
 height: 100vh;
 }
 </style>
-<script>
-        const sections = document.querySelectorAll("section");
-    sections.forEach(section => {
-        section.addEventListener("mousemove", function(e) {
-            const width = section.offsetWidth;
-            const height = section.offsetHeight;
-            const offsetX = 0.5 - e.pageX / width;
-            const offsetY = 0.5 - e.pageY / height;
-            section.style.transform = "perspective(1000px) rotateX(" + (offsetY * 4) + "deg) rotateY(" + (offsetX * 4) + "deg)";
-        });
-        section.addEventListener("mouseleave", function() {
-            this.style.transform = "none";
-        });
-    });
-    </script>
 '''
 
 st.markdown(background_style, unsafe_allow_html=True)
