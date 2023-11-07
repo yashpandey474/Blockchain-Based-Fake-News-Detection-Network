@@ -20,6 +20,7 @@ class Wallet:
             self.private_key = RSA.generate(2048)
         else:
             self.private_key = private_key
+            
         self.public_key = self.private_key.publickey().export_key()
         
     def __str__(self):
@@ -31,7 +32,8 @@ class Wallet:
         return signature
 
     def get_public_key(self):
-        return self.public_key
+        return self.public_key.decode()
+    
 
 
 
