@@ -102,12 +102,11 @@ def main_page():
             
         
         
-    # GO TO PREVIOUS SCREEN
-    if st.button("Go back to Enter Page"):
-            # Set the previous screen in the session state
-        change_screen("enter")
+    # # GO TO PREVIOUS SCREEN
+    # if st.button("Go ba ck to Enter Page"):
+    #         # Set the previous screen in the session state
+    #     change_screen("enter")
         
-    # TODO: FIX EXITING
     if st.button("Exit Screen"):
         change_screen("enter")
 
