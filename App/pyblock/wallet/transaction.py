@@ -47,6 +47,8 @@ class Transaction:
         transaction.timestamp = json_data["timestamp"]
         transaction.positive_votes = json_data["positive_votes"]
         return transaction
+    
+    
     def get_transaction_score(self):
         content = IPFSHandler.get_from_ipfs(
             self.ipfs_address

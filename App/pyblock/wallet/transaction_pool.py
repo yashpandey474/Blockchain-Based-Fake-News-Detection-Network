@@ -11,8 +11,7 @@ class TransactionPool:
         return len(self.transactions) >= TRANSACTION_THRESHOLD
 
     def add_transaction(self, transaction):
-        self.transactions.add(transaction)  # Set uses add instead of append
-        return len(self.transactions) >= TRANSACTION_THRESHOLD
+        return self.transactions.add(transaction)
 
     def valid_transactions(self):
         valid_txs = set()  # Change to a set
@@ -22,9 +21,6 @@ class TransactionPool:
             else:
                 valid_txs.add(transaction)  # Change to add to a set
         return valid_txs
-
-    def transaction_exists(self, transaction):
-        return transaction in self.transactions  # Checking existence in a set
 
     def remove(self, transactions_to_remove: List[Transaction]):
         # Using set comprehension to remove transactions based on their ID

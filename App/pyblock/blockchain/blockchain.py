@@ -1,6 +1,7 @@
 from .block import Block
 from .account import *
 from pyblock.wallet.wallet import Wallet
+from pyblock.wallet.transaction_pool import *
 
 secret = "i am the first leader"
 
@@ -15,16 +16,6 @@ class Blockchain:
     def __init__(self):
         self.chain = [Block.genesis()]
         self.accounts = Accounts()
-
-    def add_block(self, data):
-        block = Block.create_block(self.chain[-1], data, Wallet(secret))
-        self.chain.append(block)
-        print("NEW BLOCK ADDED")
-        return block
-
-    def create_block(self, transactions, wallet):
-        block = Block.create_block(self.chain[-1], transactions, wallet)
-        return block
 
     def is_valid_chain(self, chain):
         if str(chain[0]) != str(Block.genesis()):
@@ -48,53 +39,24 @@ class Blockchain:
             return
 
         print("Replacing the current chain with new chain")
-        self.reset_state()
-        self.execute_chain(new_chain)
         self.chain = new_chain
 
     def get_balance(self, public_key):
         return self.accounts.get_balance(public_key)
 
-    def initialize(self, address):
-        self.accounts.initialize(address)
-        self.stakes.initialize(address)
-
     def is_valid_block(self, block):
+        #GET THE LAST BLOCK IN THE BLOCK-CHAIN
         last_block = self.chain[-1]
+        
+        #IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
         if (block.last_hash == last_block.hash and
-            block.hash == Block.block_hash(block) and
             Block.verify_block(block) and
-                Block.verify_leader(block, self.get_leader())):
-            print("block valid")
-            self.add_block(block)
-            self.execute_transactions(block)
+            TransactionPool.verify_transactions_exist(block.transactions)):
+            
             return True
+        
         else:
+            print("Block deemed invalid.")
             return False
 
-# TODO: check
-    def execute_transactions(self, block):
-        for transaction in block.data:
-            t_type = transaction.type
-            if t_type == TRANSACTION_TYPE["transaction"]:
-                self.accounts.update(transaction)
-                self.accounts.transfer_fee(block, transaction)
-            elif t_type == TRANSACTION_TYPE["stake"]:
-                self.stakes.update(transaction)
-                self.accounts.decrement(
-                    transaction.input.from_address, transaction.output.amount)
-                self.accounts.transfer_fee(block, transaction)
-            elif t_type == TRANSACTION_TYPE["validator_fee"]:
-                print("VALIDATOR_FEE")
-                if self.validators.update(transaction):
-                    self.accounts.decrement(
-                        transaction.input.from_address, transaction.output.amount)
-                    self.accounts.transfer_fee(block, transaction)
 
-    def execute_chain(self, chain):
-        for block in chain:
-            self.execute_transactions(block)
-
-    def reset_state(self):
-        self.chain = [Block.genesis()]
-        self.accounts = Account()

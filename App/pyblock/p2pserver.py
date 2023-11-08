@@ -33,6 +33,7 @@ class P2pServer:
         self.accounts = blockchain.accounts
         self.connections = set()
 
+    #SEND SIGNED MESSAGE TO GIVEN SOCKET
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
             socket, ChainUtil.encryptWithSoftwareKey(message)
@@ -48,52 +49,72 @@ class P2pServer:
         self.connect_to_peers()
         self.server.run_forever()
 
+    #CREATE A NEW ACCOUNT FOR OWN-USER
     def create_self_account(self):
         self.accounts.addANewClient(
-            address=self.wallet.get_public_key(), clientPort=None
+            address=self.wallet.get_public_key()
         )
 
         print("ACCOUNT CREATED")
 
+    #FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
     def new_client(self, client, server):
         print("Socket connected:", client)
         
+        #ADD CLIENT TO CONNECTIONS
         self.connections.add(client)
         self.send_chain(client)
-
+        self.send_mempool(client)
+        
+    #FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
     def client_left(self, client, server):
-        print(client)
         print("Client left:", client['id'])
-        self.accounts.clientLeft(clientport=client)
+        
+        #REMOVE CLIENT FROM CONNECTIONS
+        self.connections.remove(client)
+        # self.accounts.clientLeft(clientport=client)
 
+    #FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
     def message_received(self, client, server, message):
+        
         try:
+            #CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
 
         except json.JSONDecodeError:
-            print("Failed to decode JSON from decrypted message")
+            print("Failed to decode JSON")
             return
         
-        
+        #CHECK IF SIGNATURE IS VALID
         if not ChainUtil.decryptWithSoftwareKey(data):
             print("Invalid message recieved.")
             return
 
         print("MESSAGE RECIEVED OF TYPE", data["type"])
 
+        #IF BLOCKCAIN RECIEVED
         if data["type"] == MESSAGE_TYPE["chain"]:
-            if len(data["chain"]) > len(self.blockchain.chain):
-                self.blockchain.replace_chain(data["chain"])
+            #TRY TO REPLACE IF LONGER CHAIN
+            self.blockchain.replace_chain(data["chain"])
 
+        
         elif data["type"] == MESSAGE_TYPE["transaction"]:
+            #CREATE TRANSACTION FROM JSON FORM
             transaction = Transaction.from_json(data["transaction"])
-            if not self.transaction_pool.transaction_exists(transaction):
-                self.transaction_pool.add_transaction(transaction)
+            
+            #IF DOESN'T EXIST; ADD IT [VALIDATED AT TIME OF BLOCK RECIEVED]
+            self.transaction_pool.add_transaction(transaction)
 
 
         elif data["type"] == MESSAGE_TYPE["block"]:
+            # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
+            if st.session_state.block_proposer != data["block"].validator:
+                return
+            
+            #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if self.blockchain.is_valid_block(data["block"]):
-                # VOTE ON THE TRANSACTIONS
+                
+                # SET RECIEVED FLAG TO ALLOW VOTING
                 st.session_state.block_recieved = True
                 st.session_state.recieved_block = data["block"]
 
@@ -104,6 +125,7 @@ class P2pServer:
             self.accounts.makeAccountValidatorNode(
                 address=new_validator_public_key, stake=new_validator_stake)
 
+        # TODO: HOW WILL A NEW NODE SEND MESSAGE TO OTHER CLIENTS?
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
