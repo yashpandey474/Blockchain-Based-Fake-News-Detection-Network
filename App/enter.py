@@ -38,15 +38,7 @@ def initialise(private_key=None):
             target=run_p2pserver, args=(st.session_state.p2pserver,)
         )
 
-        # DAEMONISE TO ALLOW TERMINATION WITHOUT WAITING
-        # p2p_thread.daemon = False
         p2p_thread.start()
-        # http_thread.d
-        # http_thread = threading.Thread(
-        #     target=runhttpserver
-        # )
-        # http_thread.start()
-
         background_thread = threading.Thread(target=background_task)
         background_thread.start()
 
