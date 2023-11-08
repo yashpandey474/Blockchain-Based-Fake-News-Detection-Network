@@ -16,12 +16,9 @@ MESSAGE_TYPE = {
     'chain': 'CHAIN',
     'block': 'BLOCK',
     'transaction': 'TRANSACTION',
-    'clear_transactions': 'CLEAR_TRANSACTIONS',
     'new_validator': 'NEW_VALIDATOR',
-    'login': 'LOGIN',
-    'challenge': 'CHALLENGE',
-    'challenge_response': 'CHALLENGE_RESPONSE',
     'vote': 'VOTE',
+    "block_proposer_address": "BLOCK_PROPOSER_ADDRESS"
 }
 
 
@@ -65,6 +62,17 @@ class P2pServer:
         self.connections.add(client)
         self.send_chain(client)
         self.send_mempool(client)
+        self.send_current_block_proposer(client)
+        
+    #SEND THE CURRENT BLOCK PROPOSER TO A NEWLY JOINED NODE
+    def send_current_block_proposer(self, socket):
+        message = json.dumps({
+            "type": MESSAGE_TYPE["block_proposer_address"],
+            "address": st.session_state.block_proposer
+        })
+
+        self.sendEncryptedMessage(socket, message)
+        
         
     #FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
     def client_left(self, client, server):
@@ -119,23 +127,32 @@ class P2pServer:
                 st.session_state.recieved_block = data["block"]
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
-            # Assuming the new validator sends their public key with this message
+            # NEW VALIDATOR
             new_validator_public_key = data["public_key"]
             new_validator_stake = data["stake"]
+            
+            # CHECK & MAKE THE ACCOUNT A VALIDATOR
             self.accounts.makeAccountValidatorNode(
-                address=new_validator_public_key, stake=new_validator_stake)
+                address=new_validator_public_key, stake=new_validator_stake
+            )
 
         # TODO: HOW WILL A NEW NODE SEND MESSAGE TO OTHER CLIENTS?
         elif data["type"] == MESSAGE_TYPE["new_node"]:
+            
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
-
-            # TODO: WHEN A NEW NODE IS RECIEVED; SEND THEM THE BLOCKCHAIN; MEMPOOL; BLOCK PROPOSER
             self.send_mempool(client)
             self.send_chain(client)
             
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
+            
+        elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
+            #SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
+            st.session_state.block_proposer = data["address"]
+            
+        
+    
 
     def send_mempool(self, socket):
         transaction_list = list(
@@ -317,14 +334,11 @@ class P2pServer:
         
         self.message_received(None, None, message)
         
-        active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key()
-        )
-        
-        for address in active_accounts:
-            self.send_block(, message_data)
+        for client in self.connections:
+            self.send_block(client, message_data)
             self.sendEncryptedMessage(
-                active_accounts[address].clientPort, message)
+                client, message
+            )
 
     def broadcast_votes(self, votes_dict):
         votes_list = [(key, value) for key, value in votes_dict.items()]
@@ -351,12 +365,6 @@ class P2pServer:
         
 
         self.message_received(None, None, message)
-        
-        
-        # Broadcast the message to all active accounts
-        active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key()
-        )
         
         for client in self.connections:
             self.sendEncryptedMessage(client, message)

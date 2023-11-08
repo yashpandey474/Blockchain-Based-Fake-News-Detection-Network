@@ -13,7 +13,6 @@ class Block:
     def __init__(self, timestamp, lastHash, hash, transactions: List[Transaction], validator, signature, index):
         self.timestamp = timestamp
         self.lastHash = lastHash
-        self.hash = hash
         self.transactions = transactions
         self.validator = validator
         self.signature = signature
@@ -75,21 +74,14 @@ class Block:
 
     @staticmethod
     def verify_block(block):
-        
-        #VERIFY HASH OF BLOCK
-        recreated_hash = Block.block_hash(block)
-        if not block.hash == recreated_hash:
-            return False
-        
         #VERIFY ALL THE TRANSACTIONS IN BLOCK
         for transaction in block.transactions:
             if not Transaction.verify_transaction(transaction=transaction):
                 return False
         
-        
         # After confirming the hash matches, verify the signature to ensure it's from the validator
         return ChainUtil.verify_signature(
             block.validator,
             block.signature,
-            recreated_hash  # Verify the signature against the recreated hash
+            block.hash  # Verify the signature against the recreated hash
         )

@@ -10,9 +10,7 @@ def background_task():
         current_time = int(time.time())
         specific_time = config.START_TIME
         
-        print("CURRENT TIME = ", current_time)
         if ((current_time - specific_time ) % 300 ) == 0:
-            
             st.session_state.block_proposer =  st.session_state.p2pserver.accounts.choose_validator()
             print("BLOCK PROPOSER CHOSEN: ", st.session_state.block_proposer)
             

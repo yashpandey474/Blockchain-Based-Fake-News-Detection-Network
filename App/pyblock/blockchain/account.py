@@ -40,22 +40,23 @@ class Accounts:
         return account.stake if account else 0
 
     def makeAccountValidatorNode(self, address, stake):
-
+        #IF ADDRESS IS NOT VALID
         if address not in self.accounts:
             raise ValueError("Account does not exist.")
 
         account = self.accounts[address]
+        
+        #IF NOT ENOUGH BALANCE
         if account.balance < stake:
-            raise ValueError("Insufficient balance to become a validator.")
+            print("Insufficient balance to become a validator.")
+        
+        #IF NOT ENOUGH STAKE
         if stake < config.MIN_STAKE:
-            raise ValueError(
-                f"Stake must be at least {config.MIN_STAKE} to become a validator.")
+            print(f"Stake must be at least {config.MIN_STAKE} to become a validator.")
 
+        #ADJUST BALANCE & STAKE OF ACCOUNT
         account.balance -= stake
         account.stake = stake
-
-    def becomeValidator(self, address, stake):
-        self.makeAccountValidatorNode(address, stake)
 
     def addANewClient(self, address, clientPort):
         if address in self.accounts:
