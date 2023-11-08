@@ -119,9 +119,7 @@ class P2pServer:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
             if st.session_state.block_proposer != data["block"].validator:
                 return
-            
             #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
-            # TODO: CHECK USER HAS ENOUGH BALANCE FOR FEE FOR ALL
             if (self.blockchain.is_valid_block(
                 data["block"], self.transaction_pool, self.accounts)):
                 
