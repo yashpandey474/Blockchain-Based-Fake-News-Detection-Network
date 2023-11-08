@@ -114,13 +114,16 @@ class P2pServer:
             self.transaction_pool.add_transaction(transaction)
 
 
+
         elif data["type"] == MESSAGE_TYPE["block"]:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
             if st.session_state.block_proposer != data["block"].validator:
                 return
             
             #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
-            if self.blockchain.is_valid_block(data["block"]):
+            # TODO: CHECK USER HAS ENOUGH BALANCE FOR FEE FOR ALL
+            if (self.blockchain.is_valid_block(
+                data["block"], self.transaction_pool, self.accounts)):
                 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 st.session_state.block_recieved = True

@@ -23,3 +23,8 @@ class TransactionPool:
         self.transactions = {tx for tx in self.transactions if tx.id not in {
             tx_to_remove.id for tx_to_remove in transactions_to_remove}}
 
+    def verify_transactions_exist(self, transactions):
+        #VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED
+        for transaction in transactions:
+            if transaction not in self.transactions or not Transaction.verify_transaction(transaction):
+                return False

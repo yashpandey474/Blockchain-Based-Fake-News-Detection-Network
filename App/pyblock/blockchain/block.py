@@ -79,7 +79,6 @@ class Block:
             if not Transaction.verify_transaction(transaction=transaction):
                 return False
         
-        # After confirming the hash matches, verify the signature to ensure it's from the validator
         return ChainUtil.verify_signature(
             block.validator,
             block.signature,

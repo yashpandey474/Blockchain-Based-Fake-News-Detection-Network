@@ -16,6 +16,7 @@ class Transaction:
         self.sign = None
         self.positive_votes = None
         self.timestamp = int(time.time())
+        self.fee = 0
 
     def to_json(self):
         return {
@@ -27,7 +28,8 @@ class Transaction:
             # Assuming sign is a byte-like object that needs to be represented as a hex string
             "sign": str(self.sign.hex()) if self.sign else "",
             "positive_votes": self.positive_votes,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
+            "fee": self.fee
         }
 
     @staticmethod
@@ -38,12 +40,13 @@ class Transaction:
         transaction.sender_address = json_data["sender_address"]
         transaction.sender_reputation = json_data["sender_reputation"]
         transaction.model_score = json_data["model_score"]
-
-        # Assuming the "sign" field is a hexadecimal string representing a byte-like object
+        transaction.fee = json_data["fee"]
+    
         if "sign" in json_data and json_data["sign"]:
             transaction.sign = bytes.fromhex(json_data["sign"])
         else:
             transaction.sign = None
+            
         transaction.timestamp = json_data["timestamp"]
         transaction.positive_votes = json_data["positive_votes"]
         return transaction
@@ -57,7 +60,7 @@ class Transaction:
         return get_score(content)
 
     @staticmethod
-    def generate_from_file(sender_wallet: Type[Wallet], file, blockchain):
+    def generate_from_file(sender_wallet: Type[Wallet], file, blockchain, fee):
         data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         transaction = Transaction()
@@ -69,15 +72,18 @@ class Transaction:
             sender_wallet.get_public_key())
         transaction.model_score = transaction.get_transaction_score()
         transaction.timestamp = int(time.time())
+        transaction.fee = fee
         return transaction
 
     @staticmethod
     def verify_transaction(transaction, error_bound: float = 0.01):
         signature = transaction.sign
+        # ? 
         transaction.sign = None
         transaction_hash = ChainUtil.hash(transaction)
         model_score = transaction.get_transaction_score()
-
+        transaction.sign = signature
+        
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
             return False

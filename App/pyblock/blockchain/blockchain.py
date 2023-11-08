@@ -44,19 +44,18 @@ class Blockchain:
     def get_balance(self, public_key):
         return self.accounts.get_balance(public_key)
 
-    def is_valid_block(self, block):
-        #GET THE LAST BLOCK IN THE BLOCK-CHAIN
-        last_block = self.chain[-1]
+    def is_valid_block(self, block, transaction_pool, accounts):
+        
+        #IF ALL TRRANSACTIIONS EXISTS AND ALL ACCOUNTS HAVE THE BALANCE
+        if not (transaction_pool.verify_transactions_exist(block.transactions)
+        and accounts.verify_transactions_balance(block.transactions)):
+            return False
         
         #IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
-        if (block.last_hash == last_block.hash and
-            Block.verify_block(block) and
-            TransactionPool.verify_transactions_exist(block.transactions)):
-            
-            return True
-        
-        else:
-            print("Block deemed invalid.")
+        if not (block.last_hash == self.chain[-1].hash and
+            Block.verify_block(block)):
             return False
+        
+        return True
 
 

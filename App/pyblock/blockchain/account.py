@@ -18,7 +18,14 @@ class Accounts:
         if address not in self.accounts:
             self.accounts[address] = Account(
                 balance=balance, stake=stake, clientPort=clientPort)
-
+            
+    def decrement_ammount(self, address, amount):
+        if (amount > self.accounts[address].balance):
+            return False
+        
+        self.accounts[address].balance -= amount
+        return True
+    
     def clientLeft(self, clientport):
         for address, account in self.accounts.items():
             if account.clientPort == clientport:
@@ -65,7 +72,7 @@ class Accounts:
                     "Client with this address already exists and is active.")
 
             else:
-                self.accounts[address].isActive = True
+                # self.accounts[address].isActive = True
                 self.accounts[address].clientPort = clientPort
 
         self.initialize(address, clientPort=clientPort)
@@ -88,16 +95,11 @@ class Accounts:
             sorted_accounts, weights=weights, k=1)[0]
         return chosen_validator
 
-    def get_active_accounts(self, public_key):
-
-        # Return a dictionary of accounts that have an active clientPort (i.e., are connected)
-        active = {address: account for address, account in self.accounts.items(
-        ) if account.isActive and address != public_key}
-        # print("OWN: ", public_key)
-        # print("ACTIVE: ", active.keys())
-
-        return active
-
-    def check_if_active(self, address):
-        account = self.get_account(address)
-        return account.isActive if account else False
+    #VERIFY EACH TRANSACTION'S SENDER HAS ENOUGH BALANCE FORR THE FEE
+    def verify_transactions_balance(self, transactions):
+        for transaction in transactions:
+            #IF BALANCE NOT ENOUGH FOR FEE; RETURN FALSE
+            if self.accounts[transaction.sender_address].balance < transaction.fee:
+                return False
+            
+        return True
