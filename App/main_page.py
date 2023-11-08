@@ -104,7 +104,7 @@ def main_page():
         change_screen("enter")
         
     # TODO: FIX EXITING
-    if st.button("Exit Application."):
-        st.stop()
+    if st.button("Exit Screen"):
+        change_screen("enter")
 
     
