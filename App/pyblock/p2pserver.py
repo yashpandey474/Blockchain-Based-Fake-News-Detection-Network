@@ -25,6 +25,7 @@ MESSAGE_TYPE = {
     'challenge_response': 'CHALLENGE_RESPONSE',
     'vote': 'VOTE',
 }
+# to handle self.... self.message_received(None, None, message)
 
 
 class P2pServer:
@@ -37,8 +38,6 @@ class P2pServer:
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
             socket, ChainUtil.encryptWithSoftwareKey(message))
-
-        self.message_received(None, None, message)
 
     def listen(self):
         print("Starting p2p server...")
