@@ -18,7 +18,9 @@ def login():
                 change_screen("main_page")
 
             else:
-                st.write(vc[1])
+                st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
+        else:
+            st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
 
     if st.button("Sign up"):
         change_screen("sign_up")
