@@ -3,6 +3,7 @@ from change_screen import *
 from pyblock.chainutil import *
 from enter import *
 import crypto_logic
+import re
 
 
 def sign_up_generate():
@@ -42,14 +43,18 @@ def sign_up():
     certificate_id = st.text_area("Enter the SGX Certificate ID")
     
     if st.button("Submit Details"):
-        
-        if not crypto_logic.verify_certificate(certificate_id):
-            st.markdown('<span style="color:yellow"><b>Invalid Certificate ID</b></span>', unsafe_allow_html=True)
-        
+        pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(pattern, email):
+            st.markdown('<span style="color:yellow"><b>Invalid Email ID</b></span>', unsafe_allow_html=True)
+            
         else:
-            st.session_state.name = name
-            st.session_state.email = email
-            change_screen("sign_up_generate")
+            if not crypto_logic.verify_certificate(certificate_id):
+                st.markdown('<span style="color:yellow"><b>Invalid Certificate ID</b></span>', unsafe_allow_html=True)
+            
+            else:
+                st.session_state.name = name
+                st.session_state.email = email
+                change_screen("sign_up_generate")
             
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
