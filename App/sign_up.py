@@ -29,8 +29,7 @@ def sign_up_generate():
             
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
-        # Set the previous screen in the session state
-        change_screen(st.session_state.previous_screen)
+        change_screen("sign_up")
     
 def sign_up():
     st.title("Sign Up As a News Auditor")
@@ -42,9 +41,10 @@ def sign_up():
     # TODO: FINALISE VERIFICATION TECHNIQUE AND WHETHER TO ACTUALLY USE INTEL SGX
     certificate_id = st.text_area("Enter the SGX Certificate ID")
     
-    if st.button("Submit Details."):
+    if st.button("Submit Details"):
+        
         if not crypto_logic.verify_certificate(certificate_id):
-            st.write("Invalid Certificate ID. Not authorised")
+            st.markdown('<span style="color:yellow"><b>Invalid Certificate ID</b></span>', unsafe_allow_html=True)
         
         else:
             st.session_state.name = name
@@ -53,5 +53,4 @@ def sign_up():
             
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
-        # Set the previous screen in the session state
-        change_screen(st.session_state.previous_screen)
+        change_screen("login")
