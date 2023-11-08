@@ -9,7 +9,7 @@ def login():
 
     user_input = st.text_area("Enter your Private Key")
 
-    if st.button("Continue"):
+    if st.button("Submit key"):
 
         if user_input:
             vc = crypto_logic.verify(user_input)
@@ -25,8 +25,13 @@ def login():
         else:
             st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
 
-    if st.button("Sign up"):
+    b1= st.button("New to app? Sign up instead")
+    b2 = st.button("Exit Screen")
+    
+    if b1:
         change_screen("sign_up")
+    elif b2:
+        change_screen("enter")
 
     # if st.button("Ba ck"):
     #     change_screen(st.session_state.previous_screen)
