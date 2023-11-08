@@ -31,6 +31,7 @@ class P2pServer:
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
         self.accounts = blockchain.accounts
+        self.connections = set()
 
     def sendEncryptedMessage(self, socket, message):
         self.server.send_message(
@@ -55,9 +56,9 @@ class P2pServer:
         print("ACCOUNT CREATED")
 
     def new_client(self, client, server):
-        print("IMMMPPPP")
-        print(client)
-        print("Socket connected:", client['id'])
+        print("Socket connected:", client)
+        
+        self.connections.add(client)
         self.send_chain(client)
 
     def client_left(self, client, server):
@@ -159,9 +160,9 @@ class P2pServer:
         """
         
         active_accounts = self.accounts.get_active_accounts()
-        for address in active_accounts:
+        for client in self.connections:
             self.send_new_node(
-                active_accounts[address].clientPort, self.wallet.get_public_key()
+                client, self.wallet.get_public_key()
             )
 
     def broadcast_new_validator(self, stake):
@@ -188,9 +189,9 @@ class P2pServer:
         )
         
         print("ACTIVE ACCOUNTS: ", active_accounts)
-        for address in active_accounts:
+        for client in self.connections:
             self.send_new_validator(
-                active_accounts[address].clientPort, self.wallet.get_public_key(), stake)
+                client, self.wallet.get_public_key(), stake)
 
     def send_new_validator(self, socket, public_key: str, stake):
         """
@@ -221,7 +222,9 @@ class P2pServer:
         pass
 
     def on_peer_open(self, ws):
-        self.send_new_node(ws, self.wallet.get_public_key())
+        self.send_new_node(
+            ws, self.wallet.get_public_key()
+        )
 
     def send_new_node(self, ws, public_key: str):
         """
@@ -266,30 +269,27 @@ class P2pServer:
             None, None, message
         )
         
-        
-        
         active_accounts = self.accounts.get_active_accounts(
             self.wallet.get_public_key()
         )
         
-        
         print("ACTIVE ACCOUNTS: ", active_accounts)
 
-        for address in active_accounts:
+        for client in self.connections:
             self.send_transaction(
-                active_accounts[address].clientPort,message)
+                client, message
+            )
 
     def send_transaction(self, socket, message):
-
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
-        message = {
+        message_data = {
             "type": MESSAGE_TYPE["block"],
             "block": block
         }
         
-        message = ChainUtil.encryptWithSoftwareKey(message)
+        message = ChainUtil.encryptWithSoftwareKey(message_data)
 
         message = json.dumps(message, cls=CustomJSONEncoder)
         
@@ -300,15 +300,9 @@ class P2pServer:
         )
         
         for address in active_accounts:
-            self.send_block(active_accounts[address].clientPort, block)
-
-    def send_block(self, socket, block):
-        message = json.dumps({
-            "type": MESSAGE_TYPE["block"],
-            "block": block
-        })
-        
-        self.sendEncryptedMessage(socket, message)
+            self.send_block(, message_data)
+            self.sendEncryptedMessage(
+                active_accounts[address].clientPort, message)
 
     def broadcast_votes(self, votes_dict):
         votes_list = [(key, value) for key, value in votes_dict.items()]
@@ -342,9 +336,8 @@ class P2pServer:
             self.wallet.get_public_key()
         )
         
-        for address in active_accounts:
-            client_socket = active_accounts[address].clientPort
-            self.sendEncryptedMessage(client_socket, message)
+        for client in self.connections:
+            self.sendEncryptedMessage(client, message)
 
 
 class CustomJSONEncoder(json.JSONEncoder):
