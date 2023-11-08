@@ -18,13 +18,11 @@ def verify(private_key):
 
 def gen_sk():
     key = RSA.generate(2048)
-    # sk = key.export_key()
-    # return (sk.decode())
     return key
 
 def verify_certificate(certificate_id):
     return certificate_id[: 4] == "ABCD"
         
 
-if __name__ == "__main__":
-    print(gen_sk().export_key().decode())
+# if __name__ == "__main__":
+#     print(gen_sk().export_key().decode())

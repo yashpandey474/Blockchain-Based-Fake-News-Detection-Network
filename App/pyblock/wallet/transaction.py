@@ -25,7 +25,6 @@ class Transaction:
             "sender_address": self.sender_address,
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
-            # Assuming sign is a byte-like object that needs to be represented as a hex string
             "sign": str(self.sign.hex()) if self.sign else "",
             "positive_votes": self.positive_votes,
             "timestamp": self.timestamp,
@@ -46,9 +45,10 @@ class Transaction:
             transaction.sign = bytes.fromhex(json_data["sign"])
         else:
             transaction.sign = None
-            
+    
         transaction.timestamp = json_data["timestamp"]
         transaction.positive_votes = json_data["positive_votes"]
+        
         return transaction
     
     
@@ -78,7 +78,6 @@ class Transaction:
     @staticmethod
     def verify_transaction(transaction, error_bound: float = 0.01):
         signature = transaction.sign
-        # ? 
         transaction.sign = None
         transaction_hash = ChainUtil.hash(transaction)
         model_score = transaction.get_transaction_score()

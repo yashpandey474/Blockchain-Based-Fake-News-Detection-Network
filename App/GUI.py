@@ -71,6 +71,9 @@ if __name__ == "__main__":
     
         st.session_state.gen_key_pressed = False
         
+        st.session_state.name = ""
+        st.session_state.email = ""
+        
         st.session_state.previous_screen = "enter"
         
         st.session_state.screen = "enter"

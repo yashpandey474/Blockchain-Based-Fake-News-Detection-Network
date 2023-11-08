@@ -17,5 +17,4 @@ def show_account_info():
     st.write("PRIVATE KEY = ", private_key)
 
     if st.button("Back"):
-        # Set the previous screen in the session state
         change_screen(st.session_state.previous_screen)

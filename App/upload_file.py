@@ -14,26 +14,28 @@ def upload_file():
                     st.session_state.p2pserver.wallet.get_public_key()
                 )
             )
-
-            partial_transaction = Transaction.generate_from_file(
-                sender_wallet=st.session_state.p2pserver.wallet,
-                file=uploaded_file,
-                blockchain = st.session_state.p2pserver.blockchain,
-                fee = transaction_fee
-            )
-
-            st.write("UPLOADED FILE: ", uploaded_file.name)
-            # BROADCASE NEWLY CREATED TRANSACTION
-            st.session_state.p2pserver.broadcast_transaction(
-                partial_transaction
-            )
-        
-            print("BROADCASTED TRANSACTION")
             
-            st.session_state.upload_file_executed = True
+            if st.button("Submit News"):
+
+                partial_transaction = Transaction.generate_from_file(
+                    sender_wallet=st.session_state.p2pserver.wallet,
+                    file=uploaded_file,
+                    blockchain = st.session_state.p2pserver.blockchain,
+                    fee = transaction_fee
+                )
+
+                st.write("UPLOADED FILE: ", uploaded_file.name)
+                # BROADCASE NEWLY CREATED TRANSACTION
+                st.session_state.p2pserver.broadcast_transaction(
+                    partial_transaction
+                )
             
-        else:
-            st.write("File successfully uploaded.")
+                print("BROADCASTED TRANSACTION")
+                
+                st.session_state.upload_file_executed = True
+            
+    else:
+        st.write("File successfully uploaded.")
             
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):

@@ -89,7 +89,7 @@ def main_page():
     if st.session_state.validator:
         
         # IF RECEIVED A BLOCK
-        if st.session_state.block_recieved and int(time.time) - int(st.session_state.block_recieved.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
+        if st.session_state.block_received and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
             
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")
@@ -97,8 +97,8 @@ def main_page():
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
         
-        if st.session_state.recieved_block is not None and int(time.time) - int(st.session_state.block_recieved.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
-            st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
+        if st.session_state.received_block is not None and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
+            st.write("Current Confirmations on Block: ", st.session_state.received_block.votes)
         
     if st.button("Exit Screen"):
         change_screen("enter")

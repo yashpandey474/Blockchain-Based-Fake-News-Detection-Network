@@ -179,6 +179,10 @@ def get_score(content):
 
     X_scaled = scaler.transform(X)
 
+    
     prediction = model.predict_proba(X_scaled)
+    
+    print("PREDICTION = ", prediction)
+    print("X = ", X)
 
     return prediction[:, 1][0]

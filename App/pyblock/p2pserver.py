@@ -45,6 +45,7 @@ class P2pServer:
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
         self.server.run_forever()
+        self.server.account = self.wallet.get_public_key()
 
     #CREATE A NEW ACCOUNT FOR OWN-USER
     def create_self_account(self):
@@ -124,8 +125,8 @@ class P2pServer:
                 data["block"], self.transaction_pool, self.accounts)):
                 
                 # SET RECIEVED FLAG TO ALLOW VOTING
-                st.session_state.block_recieved = True
-                st.session_state.recieved_block = data["block"]
+                st.session_state.block_received = True
+                st.session_state.received_block = data["block"]
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # NEW VALIDATOR
@@ -224,11 +225,8 @@ class P2pServer:
         
         self.message_received(None, None, message)
         
-        active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key()
-        )
         
-        print("ACTIVE ACCOUNTS: ", active_accounts)
+        print("ACTIVE ACCOUNTS: ", self.connections)
         for client in self.connections:
             self.send_new_validator(
                 client, self.wallet.get_public_key(), stake)
@@ -309,11 +307,11 @@ class P2pServer:
             None, None, message
         )
         
-        active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key()
-        )
+        # active_accounts = self.accounts.get_active_accounts(
+        #     self.wallet.get_public_key()
+        # )
         
-        print("ACTIVE ACCOUNTS: ", active_accounts)
+        print("ACTIVE ACCOUNTS: ", self.connections)
 
         for client in self.connections:
             self.send_transaction(

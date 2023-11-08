@@ -26,7 +26,6 @@ def sign_up_generate():
 
     if st.session_state.gen_key_pressed:
         if st.button("Go to main"):
-            print("BUTTON CLICKED")
             st.session_state.gen_key_pressed = False
             change_screen("main_page")
             
@@ -36,7 +35,7 @@ def sign_up_generate():
     
 def sign_up():
     st.title("Sign Up As a News Auditor")
-    
+
     name = st.text_input("Enter Your Name", st.session_state.name)
     email = st.text_input("Enter Your Professional Email",st.session_state.email)
     

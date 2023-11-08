@@ -22,9 +22,9 @@ def initialise(private_key=None):
 
     st.session_state.block_proposer = None
 
-    st.session_state.block_recieved = False
+    st.session_state.block_received = False
 
-    st.session_state.recieved_block = None
+    st.session_state.received_block = None
     
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
@@ -49,7 +49,7 @@ def initialise(private_key=None):
         p2p_thread.start()
         background_thread = threading.Thread(target=background_task)
         background_thread.start()
-
+        
         print("EVERYTHING INITIIALISED")
 
 

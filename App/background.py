@@ -15,12 +15,13 @@ def background_task():
         current_time = int(time.time())
         specific_time = config.START_TIME
         
+        print(current_time - specific_time)
         if ((current_time - specific_time ) % 300 ) == 0:
             
-            if st.recieved_block and can_add_block(st.recieved_block):
-                st.session_state.p2pserver.blockchain.chain.append(st.recieved_block)
+            if "recieved_block" in st.session_state and st.session_state.received_block and can_add_block(st.session_state.received_block):
+                st.session_state.p2pserver.blockchain.chain.append(st.session_state.received_block)
             
-            st.recieved_block = None
+            st.session_state.receved_block = None
             st.session_state.block_proposer =  st.session_state.p2pserver.accounts.choose_validator()
             print("BLOCK PROPOSER CHOSEN: ", st.session_state.block_proposer)
             

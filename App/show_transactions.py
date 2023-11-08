@@ -3,7 +3,7 @@ import streamlit as st
 from change_screen import *
 import pandas as pd
 from datetime import datetime
-
+from pyblock.ipfs.ipfs_handler import *
 def show_transactions():
     st.title("Current Network Transactions")
     transac_pool = st.session_state.p2pserver.transaction_pool.transactions
@@ -14,16 +14,16 @@ def show_transactions():
     else:
         table_data = []
         for transaction in st.session_state.p2pserver.transaction_pool.transactions:
+            content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
             table_data.append({
                 "Model Score": transaction.model_score,
                 "Sender Reputation": transaction.sender_reputation,
                 "Transaction Fee": transaction.fee,
                 "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
-                "ID": transaction.id,
-                "IPFS Address": transaction.ipfs_address,
+                "Title": content.split("\n")[0],
+                "Text": " ".join(content.split("\n")[1: ]),
                 "Sender Address": transaction.sender_address,
-                "Sign": transaction.sign
-
+                "ID": transaction.id
             })
 
         st.dataframe(pd.DataFrame(table_data), height=500)

@@ -13,7 +13,7 @@ def vote_on_block():
         st.write("Timestamp:", block.timestamp)
         
         
-        block = st.session_state.recieved_block
+        block = st.session_state.received_block
         transaction_votes = {}
         table_data = []
 
