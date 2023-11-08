@@ -18,8 +18,6 @@ def sign_up_generate():
 
         private_key = crypto_logic.gen_sk()
 
-        st.session_state.initialise = True
-
         initialise(private_key)
 
         st.write(private_key.export_key().decode())

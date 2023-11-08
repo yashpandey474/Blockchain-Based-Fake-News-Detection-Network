@@ -49,7 +49,7 @@ class P2pServer:
     #CREATE A NEW ACCOUNT FOR OWN-USER
     def create_self_account(self):
         self.accounts.addANewClient(
-            address=self.wallet.get_public_key()
+            address=self.wallet.get_public_key(), clientPort = None
         )
 
         print("ACCOUNT CREATED")

@@ -18,6 +18,14 @@ def run_p2pserver(p2pserver):
 
 
 def initialise(private_key=None):
+    st.session_state.validator = False
+
+    st.session_state.block_proposer = None
+
+    st.session_state.block_recieved = False
+
+    st.session_state.recieved_block = None
+    
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
 
