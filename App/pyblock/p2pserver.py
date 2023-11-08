@@ -7,11 +7,8 @@ from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from websocket_server import WebsocketServer
 from typing import Type
-import pyblock.config as config
 from pyblock.chainutil import *
 from pyblock.peers import *
-from pyblock.blockchain.account import Accounts
-from pyblock.blockchain.account import Account
 from pyblock.wallet.transaction import *
 
 
@@ -40,20 +37,14 @@ class P2pServer:
             socket, ChainUtil.encryptWithSoftwareKey(message)
         )
 
-        
-
     def listen(self):
         print("Starting p2p server...")
         self.create_self_account()
         self.server = WebsocketServer(port=P2P_PORT, host="0.0.0.0")
-
         self.server.set_fn_new_client(self.new_client)
-        print(self.server.socket)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
-        
         self.connect_to_peers()
-
         self.server.run_forever()
 
     def create_self_account(self):
@@ -116,18 +107,31 @@ class P2pServer:
             public_key = data["public_key"]
             self.accounts.addANewClient(address=public_key, clientPort=client)
 
+            # TODO: WHEN A NEW NODE IS RECIEVED; SEND THEM THE BLOCKCHAIN; MEMPOOL; BLOCK PROPOSER
+            self.send_mempool(client)
+            self.send_chain(client)
+            
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
 
+    def send_mempool(self, socket):
+        transaction_list = list(
+            self.transaction_pool.transactions
+        )
+        
+        message = json.dumps({
+            "type": MESSAGE_TYPE["chain"],
+            "chain": transaction_list
+        })
+        
+        self.sendEncryptedMessage(socket, message)
+        
     def handle_votes(self, data):
-        # TODO: Implement THIS
-        '''"address": self.wallet.get_public_key(),
-            "votes": votes_list,
-            "block_index": st.session_state.received_block.index'''
         # CHECK IF THE VOTE IS VALID
         if not self.accounts.check_if_active(data["address"]):
             print("INVALID VOTE")
             return
+        
         # IF NOT CURRENT BLOCK
         if data["block_index"] != st.session_state.received_block.index:
             print("OLD VOTE RECEIVED")
@@ -138,7 +142,9 @@ class P2pServer:
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
-            transaction.id: transaction for transaction in st.session_state.received_block.transactions}
+            transaction.id: transaction for transaction in st.session_state.received_block.transactions
+        }
+        
         for key, value in st.session_state.received_block.transactions:
             if value == "True":
                 transactions_dict[key].positive_votes += 1
@@ -151,16 +157,6 @@ class P2pServer:
         """
         Broadcast new node's public key to all to create a new account
         """
-        # message = json.dumps({
-        #     "type": MESSAGE_TYPE["new_node"],
-        #     "public_key": self.wallet.get_public_key()
-        # })
-        
-        # message = ChainUtil.encryptWithSoftwareKey(message)
-
-        # message = json.dumps(message, cls=CustomJSONEncoder)
-        
-        # self.message_received(None, None, message)
         
         active_accounts = self.accounts.get_active_accounts()
         for address in active_accounts:
@@ -187,9 +183,10 @@ class P2pServer:
         
         self.message_received(None, None, message)
         
-        
         active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key())
+            self.wallet.get_public_key()
+        )
+        
         print("ACTIVE ACCOUNTS: ", active_accounts)
         for address in active_accounts:
             self.send_new_validator(
@@ -224,7 +221,7 @@ class P2pServer:
         pass
 
     def on_peer_open(self, ws):
-        self.send_new_node(ws, self.wallet.public_key)
+        self.send_new_node(ws, self.wallet.get_public_key())
 
     def send_new_node(self, ws, public_key: str):
         """
@@ -287,13 +284,21 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_block(self, block):
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["block"],
             "block": block
-        })
+        }
+        
+        message = ChainUtil.encryptWithSoftwareKey(message)
+
+        message = json.dumps(message, cls=CustomJSONEncoder)
+        
         self.message_received(None, None, message)
+        
         active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key())
+            self.wallet.get_public_key()
+        )
+        
         for address in active_accounts:
             self.send_block(active_accounts[address].clientPort, block)
 
@@ -302,10 +307,10 @@ class P2pServer:
             "type": MESSAGE_TYPE["block"],
             "block": block
         })
+        
         self.sendEncryptedMessage(socket, message)
 
     def broadcast_votes(self, votes_dict):
-        # Create a list of votes with id and corresponding boolean value as integer
         votes_list = [(key, value) for key, value in votes_dict.items()]
 
         # Prepare the message content without the signature
@@ -316,7 +321,7 @@ class P2pServer:
             "block_index": st.session_state.received_block.index
         }
 
-        # Convert the message content to a JSON string
+        # # Convert the message content to a JSON string
         message_json = json.dumps(message_content)
 
         # Sign the JSON string
@@ -325,15 +330,18 @@ class P2pServer:
         # Append the signature to the message content
         message_content['signature'] = signature
 
-        # APPEND THE BLOCK NUMBER
-
         # Convert the full message with signature to JSON
         message = json.dumps(message_content, cls=CustomJSONEncoder)
+        
 
         self.message_received(None, None, message)
+        
+        
         # Broadcast the message to all active accounts
         active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key())
+            self.wallet.get_public_key()
+        )
+        
         for address in active_accounts:
             client_socket = active_accounts[address].clientPort
             self.sendEncryptedMessage(client_socket, message)

@@ -33,6 +33,7 @@ def main_page():
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
     if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.get_public_key():
         st.write("You are the current block proposer.")
+        
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
         transactions = st.session_state.p2pserver.transaction_pool.transactions
@@ -40,6 +41,7 @@ def main_page():
             transaction.id: transaction for transaction in transactions
         }
 
+        
         for transaction in transactions:
             table_data.append({
                 "ID": transaction.id,
@@ -88,11 +90,13 @@ def main_page():
         
         # IF RECEIVED A BLOCK
         if st.session_state.block_recieved and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300 and st.button("Vote on Recieved Block"):
+            
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")
         
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
+        
         if st.session_state.recieved_block is not None and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300:
             st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
             
