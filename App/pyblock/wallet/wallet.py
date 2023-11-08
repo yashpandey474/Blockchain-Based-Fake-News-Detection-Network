@@ -12,30 +12,26 @@ if TYPE_CHECKING:
 
 
 class Wallet:
-    def __init__(self, private_key=None, name = None, email = None):
+    def __init__(self, private_key=None, name=None, email=None):
         self.name = name
         self.email = email
-        # self.balance = 100
         if not private_key:
-            self.private_key = RSA.generate(2048)
+            self.__private_key = RSA.generate(2048)
         else:
-            self.private_key = private_key
-            
-        self.public_key = self.private_key.publickey().export_key()
-        
+            self.__private_key = private_key
+
+        self.__public_key = self.__private_key.publickey()
+
     def __str__(self):
-        return f"Wallet -\n\tpublicKey: {self.public_key}\n\tbalance: {self.balance}"
+        return f"Wallet -\n\tpublicKey: {self.get_public_key()}\n\tbalance: {self.balance}"
 
     def sign(self, data):
         data_hash = SHA256.new(data.encode())
-        signature = pkcs1_15.new(self.private_key).sign(data_hash)
+        signature = pkcs1_15.new(self.__private_key).sign(data_hash)
         return signature
 
     def get_public_key(self):
-        return self.public_key.decode()
-    
+        return self.__public_key.export_key().decode()
 
-
-
-
-
+    def get_private_key(self):
+        return self.__private_key.export_key().decode()

@@ -13,7 +13,6 @@ class Block:
     def __init__(self, timestamp, lastHash, hash, transactions: List[Transaction], validator, signature, index):
         self.timestamp = timestamp
         self.lastHash = lastHash
-        self.hash = hash
         self.transactions = transactions
         self.validator = validator
         self.signature = signature
@@ -41,6 +40,7 @@ class Block:
         transactions_for_hashing = [
             {**transaction.to_json(), "votes": None} for transaction in transactions
         ]
+        
         # Hash the modified list of transactions
         return hashlib.sha256(json.dumps(transactions_for_hashing).encode('utf-8')).hexdigest()
 
@@ -48,7 +48,6 @@ class Block:
     def create_block(last_block, data, wallet, blockchain):
         timestamp = time.time()
         last_hash = last_block.hash
-        # Create a deep copy of the data (which are transaction objects) for hashing
         transactions = [Transaction(**tx.to_json()) for tx in data]
         hash = Block.get_hash(timestamp, last_hash, transactions)
         validator = wallet.get_public_key()
@@ -75,14 +74,13 @@ class Block:
 
     @staticmethod
     def verify_block(block):
-        # First, recreate the hash from the block's transactions and compare it to the stored hash
-        recreated_hash = Block.block_hash(block)
-        if block.hash != recreated_hash:
-            return False  # The data has been tampered with if the hashes don't match
-
-        # After confirming the hash matches, verify the signature to ensure it's from the validator
+        #VERIFY ALL THE TRANSACTIONS IN BLOCK
+        for transaction in block.transactions:
+            if not Transaction.verify_transaction(transaction=transaction):
+                return False
+        
         return ChainUtil.verify_signature(
             block.validator,
             block.signature,
-            recreated_hash  # Verify the signature against the recreated hash
+            block.hash  # Verify the signature against the recreated hash
         )

@@ -15,6 +15,8 @@ class Transaction:
         self.model_score = None
         self.sign = None
         self.positive_votes = None
+        self.timestamp = int(time.time())
+        self.fee = 0
 
     def to_json(self):
         return {
@@ -23,11 +25,33 @@ class Transaction:
             "sender_address": self.sender_address,
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
-            # Assuming sign is a byte-like object that needs to be represented as a hex string
             "sign": str(self.sign.hex()) if self.sign else "",
-            "positive_votes": self.positive_votes
+            "positive_votes": self.positive_votes,
+            "timestamp": self.timestamp,
+            "fee": self.fee
         }
 
+    @staticmethod
+    def from_json(json_data):
+        transaction = Transaction()
+        transaction.id = json_data["id"]
+        transaction.ipfs_address = json_data["ipfs_address"]
+        transaction.sender_address = json_data["sender_address"]
+        transaction.sender_reputation = json_data["sender_reputation"]
+        transaction.model_score = json_data["model_score"]
+        transaction.fee = json_data["fee"]
+    
+        if "sign" in json_data and json_data["sign"]:
+            transaction.sign = bytes.fromhex(json_data["sign"])
+        else:
+            transaction.sign = None
+    
+        transaction.timestamp = json_data["timestamp"]
+        transaction.positive_votes = json_data["positive_votes"]
+        
+        return transaction
+    
+    
     def get_transaction_score(self):
         content = IPFSHandler.get_from_ipfs(
             self.ipfs_address
@@ -36,17 +60,19 @@ class Transaction:
         return get_score(content)
 
     @staticmethod
-    def generate_from_file(sender_wallet: Type[Wallet], file, blockchain):
+    def generate_from_file(sender_wallet: Type[Wallet], file, blockchain, fee):
         data = file.read()
         ipfs_address = IPFSHandler.put_to_ipfs(data)
         transaction = Transaction()
         transaction.timestamp = time.time
         transaction.ipfs_address = ipfs_address
-        transaction.sender_address = sender_wallet.public_key
+        transaction.sender_address = sender_wallet.get_public_key()
         transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
         transaction.sender_reputation = blockchain.get_balance(
-            sender_wallet.public_key)
+            sender_wallet.get_public_key())
         transaction.model_score = transaction.get_transaction_score()
+        transaction.timestamp = int(time.time())
+        transaction.fee = fee
         return transaction
 
     @staticmethod
@@ -55,7 +81,8 @@ class Transaction:
         transaction.sign = None
         transaction_hash = ChainUtil.hash(transaction)
         model_score = transaction.get_transaction_score()
-
+        transaction.sign = signature
+        
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
             return False

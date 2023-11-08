@@ -13,14 +13,16 @@ def vote_on_block():
         st.write("Timestamp:", block.timestamp)
         
         
-        block = st.session_state.recieved_block
+        block = st.session_state.received_block
         transaction_votes = {}
         table_data = []
 
         for transaction in block.data:
             transaction_id = transaction.id
             vote = st.radio(
-                    f"Vote for Transaction {transaction_id}", ("True", "False"))
+                    f"Vote for Transaction {transaction_id}", ("True", "False")
+            )
+            
             transaction_votes[transaction_id] = vote
 
             table_data.append({

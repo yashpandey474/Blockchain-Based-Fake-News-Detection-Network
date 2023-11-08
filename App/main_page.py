@@ -12,6 +12,7 @@ def main_page():
 
     if st.button("Upload New News"):
         # GET UPLOADED TEXT FILE
+        st.session_state.upload_file_executed = False
         change_screen("upload_file")
 
     # VIEW NEWS STORED IN BLOCKCHAIN
@@ -30,8 +31,9 @@ def main_page():
             
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.public_key:
+    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.get_public_key():
         st.write("You are the current block proposer.")
+        
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
         table_data = []
         transactions = st.session_state.p2pserver.transaction_pool.transactions
@@ -39,6 +41,7 @@ def main_page():
             transaction.id: transaction for transaction in transactions
         }
 
+        
         for transaction in transactions:
             table_data.append({
                 "ID": transaction.id,
@@ -81,29 +84,23 @@ def main_page():
             st.session_state.p2pserver.broadcast_block(block)
 
             # CONFIRMATION MESSAGE
-            st.write("The created block was transmitted. Waiting for confirmations.")
+            st.write("The created block was transmitted.")
 
     if st.session_state.validator:
         
         # IF RECEIVED A BLOCK
-        if st.session_state.block_recieved and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300 and st.button("Vote on Recieved Block"):
+        if st.session_state.block_received and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
+            
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")
         
         st.write("Current Block Proposer: ", st.session_state.block_proposer)
 
-        if st.session_state.recieved_block is not None and int(time.time) - int(st.session_state.block_recieved.timestamp) <= 300:
-            st.write("Current Confirmations on Block: ", st.session_state.recieved_block.votes)
-            
         
+        if st.session_state.received_block is not None and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
+            st.write("Current Confirmations on Block: ", st.session_state.received_block.votes)
         
-    # GO TO PREVIOUS SCREEN
-    if st.button("Go back to Enter Page"):
-            # Set the previous screen in the session state
+    if st.button("Exit Screen"):
         change_screen("enter")
-        
-    # TODO: FIX EXITING
-    if st.button("Exit Application."):
-        st.stop()
 
     

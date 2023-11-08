@@ -7,12 +7,8 @@ class TransactionPool:
     def __init__(self):
         self.transactions = set()
 
-    def threshold_reached(self):
-        return len(self.transactions) >= TRANSACTION_THRESHOLD
-
     def add_transaction(self, transaction):
-        self.transactions.add(transaction)  # Set uses add instead of append
-        return len(self.transactions) >= TRANSACTION_THRESHOLD
+        return self.transactions.add(transaction)
 
     def valid_transactions(self):
         valid_txs = set()  # Change to a set
@@ -23,13 +19,12 @@ class TransactionPool:
                 valid_txs.add(transaction)  # Change to add to a set
         return valid_txs
 
-    def transaction_exists(self, transaction):
-        return transaction in self.transactions  # Checking existence in a set
-
     def remove(self, transactions_to_remove: List[Transaction]):
-        # Using set comprehension to remove transactions based on their ID
         self.transactions = {tx for tx in self.transactions if tx.id not in {
             tx_to_remove.id for tx_to_remove in transactions_to_remove}}
 
-    def clear(self):
-        self.transactions.clear()  # Clearing a set
+    def verify_transactions_exist(self, transactions):
+        #VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED
+        for transaction in transactions:
+            if transaction not in self.transactions or not Transaction.verify_transaction(transaction):
+                return False

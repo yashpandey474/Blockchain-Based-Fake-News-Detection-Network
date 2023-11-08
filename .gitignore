@@ -7,3 +7,4 @@ wallet/__pycache__
 WELFake_Dataset.csv
 temp.txt
 App/pyblock/peers.py
+App/pyblock/ipfs/nan.txt

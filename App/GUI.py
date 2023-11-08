@@ -68,19 +68,11 @@ if __name__ == "__main__":
     if "screen" not in st.session_state:
         
         print("SCREEN INITILIASED")
-        st.session_state.initialise = False
     
         st.session_state.gen_key_pressed = False
         
-        st.session_state.validator = False
-        
-        st.session_state.block_proposer = None
-        
-        st.session_state.block_recieved = False
-        
-        st.session_state.recieved_block = None
-        
-        st.session_state.verified = False
+        st.session_state.name = ""
+        st.session_state.email = ""
         
         st.session_state.previous_screen = "enter"
         

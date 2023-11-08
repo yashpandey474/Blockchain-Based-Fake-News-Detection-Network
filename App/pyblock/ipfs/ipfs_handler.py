@@ -35,21 +35,26 @@ class IPFSHandler:
     @staticmethod
     def get_from_ipfs(ipfs_address):
         # fetching from IPFS and returns data
-        try:
-            res = requests.get(f"https://{ipfs_address}.ipfs.dweb.link", headers=IPFSHandler.auth)
-        except Exception as e:
-            print(e)
-            return ""
+        # try:
+        #     res = requests.get(f"https://{ipfs_address}.ipfs.dweb.link", headers=IPFSHandler.auth)
+        # except Exception as e:
+        #     print(e)
+        #     return ""
         
-        # filename = f"article_{uuid.uuid4()}.txt"
-        # with open(f"{filename}", "w") as f:
-        #     f.write(res.content.decode("utf-8"))
+        # return res.text
+        
+        #RETURN DEMO TEXT
+        # with open("nan.txt", "r") as file:
+        #     file_content = file.read()
+        #     return file_content
+        
+        return """nan
+Did they post their votes for Hillary already?"""
+        
 
-        return res.text
     
 
 if __name__=="__main__":
-    # testing
     ipfs_address = 'bafkreig5stfj2plvltwxi7cl3hbknde2a2nyuf5kpheinzkcmiid43mutq'
     print(ipfs_address)
     print(IPFSHandler.get_from_ipfs(ipfs_address))
