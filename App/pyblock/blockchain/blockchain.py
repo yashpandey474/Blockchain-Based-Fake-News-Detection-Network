@@ -57,5 +57,13 @@ class Blockchain:
             return False
         
         return True
+    
+    def append_block(self, block, transaction_pool, accounts):
+        if self.is_valid_block(block, transaction_pool, accounts):
+            accounts.update_accounts(block)
+            transaction_pool.remove(block.transactions)
+            self.chain.append(block)
+            return True
+        return False
 
 

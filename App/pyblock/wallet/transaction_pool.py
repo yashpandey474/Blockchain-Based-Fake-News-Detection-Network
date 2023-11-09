@@ -28,3 +28,5 @@ class TransactionPool:
         for transaction in transactions:
             if transaction not in self.transactions or not Transaction.verify_transaction(transaction):
                 return False
+            
+            
