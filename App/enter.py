@@ -22,9 +22,6 @@ def run_background_task(background):
     
 def initialise(private_key=None):
     st.session_state.validator = False
-    st.session_state.p2pserver.block_proposer = None
-    st.session_state.p2pserver.block_received = False
-    st.session_state.p2pserver.received_block = None
 
     if not st.session_state.initialise:
         st.session_state.blockchain = Blockchain()
@@ -53,7 +50,7 @@ def initialise(private_key=None):
         )
 
         background_thread = threading.Thread(
-            target=run_background_task, args=(st.session_state.background)
+            target=run_background_task, args=(st.session_state.background,)
         )
         
 

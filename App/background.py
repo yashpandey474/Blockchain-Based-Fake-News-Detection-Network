@@ -22,9 +22,14 @@ class Background:
     
     def run_forever(self):
         while True:
+            print("BACKGROUND TASK IS RUNNING")
             current_time = int(time.time())
+            print((current_time - START_TIME.timestamp()) %
+                  BLOCK_VALIDATOR_CHOOSE_INTERVAL)
+            
             
             if ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:
+                print("TRUE")
                 if self.p2pserver.received_block:
                     if self.can_add_block(self.p2pserver.received_block):
                         self.p2pserver.blockchain.append_block(
