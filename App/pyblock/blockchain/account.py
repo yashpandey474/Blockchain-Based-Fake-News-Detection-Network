@@ -8,6 +8,7 @@ class Account:
         self.isActive = True
         self.stake = stake
         self.clientPort = clientPort
+        self.sent_transactions = set()
 
 
 class Accounts:
@@ -19,14 +20,14 @@ class Accounts:
             self.accounts[address] = Account(
                 balance=balance, stake=stake, clientPort=clientPort)
 
-    def decrement_ammount(self, address, amount):
+    def decrement_amount(self, address, amount):
         if (amount > self.accounts[address].balance):
             return False
 
         self.accounts[address].balance -= amount
         return True
 
-    def send_ammount(self, fromaddress, toaddress, amount):
+    def send_amount(self, fromaddress, toaddress, amount):
         if (amount > self.accounts[fromaddress].balance):
             return False
         self.accounts[fromaddress].balance -= amount
@@ -35,8 +36,12 @@ class Accounts:
 
     def update_accounts(self, block):
         for transaction in block.transactions:
-            self.send_amount(transaction.sender_address,
-                             block.validator, transaction.amount)
+            #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
+            self.send_amount(
+                transaction.sender_address,
+                block.validator,
+                transaction.fee
+            )
 
     def clientLeft(self, clientport):
         for address, account in self.accounts.items():
@@ -58,6 +63,13 @@ class Accounts:
         account = self.get_account(address)
         return account.stake if account else 0
 
+    def get_sent_transactions(self, address):
+        account = self.get_account(address)
+        return account.sent_transactions if account else []
+    
+    def add_transaction(self, transaction):
+        self.accounts[transaction.sender_address].sent_transactions.add(transaction)
+        
     def makeAccountValidatorNode(self, address, stake):
         # IF ADDRESS IS NOT VALID
         if address not in self.accounts:
@@ -75,7 +87,8 @@ class Accounts:
                 f"Stake must be at least {config.MIN_STAKE} to become a validator.")
 
         # ADJUST BALANCE & STAKE OF ACCOUNT
-        account.balance -= stake
+        
+        account.balance = account.balance - stake + account.stake
         account.stake = stake
 
     def addANewClient(self, address, clientPort):
@@ -85,7 +98,7 @@ class Accounts:
                     "Client with this address already exists and is active.")
 
             else:
-                # self.accounts[address].isActive = True
+                self.accounts[address].isActive = True
                 self.accounts[address].clientPort = clientPort
 
         self.initialize(address, clientPort=clientPort)

@@ -114,6 +114,9 @@ class P2pServer:
             
             #IF DOESN'T EXIST; ADD IT [VALIDATED AT TIME OF BLOCK RECIEVED]
             self.transaction_pool.add_transaction(transaction)
+            
+            #ADD TO TRANSACTIONS SENT BY A USER TO VIEW
+            self.accounts.add_transaction(transaction)
 
 
 
@@ -304,13 +307,10 @@ class P2pServer:
         message = json.dumps(message, cls = CustomJSONEncoder)
         
         print("MESSAGE SENT TO SELF")
+        
         self.message_received(
             None, None, message
         )
-        
-        # active_accounts = self.accounts.get_active_accounts(
-        #     self.wallet.get_public_key()
-        # )
         
         print("ACTIVE ACCOUNTS: ", self.connections)
 

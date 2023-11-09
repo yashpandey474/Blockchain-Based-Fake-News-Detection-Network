@@ -6,6 +6,7 @@ import pandas as pd
 def show_blocks_news():
     chain = st.session_state.p2pserver.blockchain.chain
     
+    st.title("View All Verified News.")
     
     if len(chain) < 2:
         st.write("The current ledger holds no news. Please return later")

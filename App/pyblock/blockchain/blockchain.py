@@ -43,6 +43,9 @@ class Blockchain:
 
     def get_balance(self, public_key):
         return self.accounts.get_balance(public_key)
+    
+    def get_stake(self, public_key):
+        return self.accounts.get_stake(public_key)
 
     def is_valid_block(self, block, transaction_pool, accounts):
         
@@ -59,11 +62,18 @@ class Blockchain:
         return True
     
     def append_block(self, block, transaction_pool, accounts):
-        if self.is_valid_block(block, transaction_pool, accounts):
-            accounts.update_accounts(block)
-            transaction_pool.remove(block.transactions)
-            self.chain.append(block)
-            return True
-        return False
+        #ALREADY CHECKED IF VALID WHEN BLOCK RECIEVED
+        
+        #UPDATE THE BALANCE OF SENDER
+        accounts.update_accounts(block)
+        
+        #UPDATE THE TRANSACTION POOL
+        transaction_pool.remove(block.transactions)
+        
+        #APPEND THE BLOCK TO CURRENT CHAIN
+        self.chain.append(block)
+        
+        #BLOCK SUCCESSFULLY ADDED
+        return True
 
 

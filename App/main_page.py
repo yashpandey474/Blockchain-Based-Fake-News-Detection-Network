@@ -22,11 +22,16 @@ def main_page():
     if st.button("View Account Information"):
         change_screen("account_info")
 
+    if st.button("View Sent News/Transactions"):
+        change_screen("view_sent_news")
     if st.session_state.user_type == "Auditor":
         if st.button("View all transactions in mempool"):
             change_screen("show_transac")
 
-        if st.button("Become a Validator."):
+        if not st.session_state.validator and st.button("Become a Validator"):
+            change_screen("become_validator")
+            
+        if st.session_state.validator and st.button("Modify Your Stake in Network"):
             change_screen("become_validator")
             
 

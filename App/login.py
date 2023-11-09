@@ -5,12 +5,16 @@ import crypto_logic
 import time
 
 def login():
-    st.title("Login")
+    
+    st.title("Login as a " + st.session_state.user_type)
 
+    #GET PRIVATE KEY OF USER
     user_input = st.text_area("Enter your Private Key")
 
+    #SUBMIT
     if st.button("Submit key"):
-
+        
+        #IF PRIVATE KEY ENTERED
         if user_input:
             vc = crypto_logic.verify(user_input)
 

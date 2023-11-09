@@ -1,19 +1,21 @@
-# SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
 import streamlit as st
 from change_screen import *
 import pandas as pd
 from datetime import datetime
 from pyblock.ipfs.ipfs_handler import *
-def show_transactions():
-    st.title("Current Network Transactions")
-    transac_pool = st.session_state.p2pserver.transaction_pool.transactions
-    
-    if len(transac_pool) < 1:
-        st.write("The network doesn't have any mempool transactions currently. Please come back later.")
-    
+def view_sent_news():
+    st.title("News/Transactions broadcasted by you.")
+    sent_transactions = st.session_state.p2pserver.accounts.get_sent_transactions(
+        st.session_state.p2pserver.wallet.get_public_key()
+    )
+
+    if len(sent_transactions) < 1:
+        st.write(
+            "You haven't broadcasted any news in the network yet.")
+
     else:
         table_data = []
-        for transaction in transac_pool:
+        for transaction in sent_transactions:
             content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
             table_data.append({
                 "Model Score": transaction.model_score,
@@ -21,7 +23,7 @@ def show_transactions():
                 "Transaction Fee": transaction.fee,
                 "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                 "Title": content.split("\n")[0],
-                "Text": " ".join(content.split("\n")[1: ]),
+                "Text": " ".join(content.split("\n")[1:]),
                 "Sender Address": transaction.sender_address,
                 "ID": transaction.id
             })
@@ -30,3 +32,6 @@ def show_transactions():
 
     if st.button("Back"):
         change_screen(st.session_state.previous_screen)
+
+    
+    

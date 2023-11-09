@@ -12,7 +12,10 @@ def show_account_info():
     balance = st.session_state.blockchain.get_balance(
         public_key
     )
-    st.write("BALANCE = ", balance)
+    stake = st.session_state.blockchain.get_stake(public_key)
+    st.write("Current Balance = ", balance)
+    if st.session_state.validator:
+        st.write("Currrent Stake in Network = ", stake)
     st.write("PUBLIC KEY = ", public_key)
     st.write("PRIVATE KEY = ", private_key)
 
