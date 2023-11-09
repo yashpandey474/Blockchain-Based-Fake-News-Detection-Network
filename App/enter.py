@@ -16,12 +16,15 @@ def run_p2pserver(p2pserver):
     print("Running p2p server on port: "+str(P2P_PORT))
     p2pserver.listen()
 
-
+def run_background_task(background):
+    print("Running background block proposer updation")
+    background.run_forever()
+    
 def initialise(private_key=None):
     st.session_state.validator = False
-    st.session_state.block_proposer = None
-    st.session_state.block_received = False
-    st.session_state.received_block = None
+    st.session_state.p2pserver.block_proposer = None
+    st.session_state.p2pserver.block_received = False
+    st.session_state.p2pserver.received_block = None
 
     if not st.session_state.initialise:
         st.session_state.blockchain = Blockchain()
@@ -33,16 +36,28 @@ def initialise(private_key=None):
         
         print("P2P SERVER CALLED!")
         
-        st.session_state.p2pserver = P2pServer(
+        p2pserver = P2pServer(
             blockchain=st.session_state.blockchain, transaction_pool=st.session_state.transaction_pool, wallet=st.session_state.wallet
         )
+        
+        background_task = Background(
+            p2pserver=p2pserver
+        )
+        
+        
+        st.session_state.p2pserver = p2pserver
+        st.session_state.background = background_task
 
         p2p_thread = threading.Thread(
             target=run_p2pserver, args=(st.session_state.p2pserver,)
         )
 
+        background_thread = threading.Thread(
+            target=run_background_task, args=(st.session_state.background)
+        )
+        
+
         p2p_thread.start()
-        background_thread = threading.Thread(target=background_task)
         background_thread.start()
 
         st.session_state.initialise = True

@@ -13,10 +13,9 @@ from pyblock.blockchain.block import *
 
 
 class Background:
-    def __init__(self):
+    def __init__(self, p2pserver):
         self.time = None
-        self.received_block = None
-        self.block_proposer = None
+        self.p2pserver = p2pserver
         
     def can_add_block(block):
         return block.votes >= (0.5 * len(PEERS))
@@ -24,15 +23,18 @@ class Background:
     def run_forever(self):
         while True:
             current_time = int(time.time())
+            
             if ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:
-                if self.received_block:
-                    if self.can_add_block(self.received_block):
-                        st.session_state.p2pserver.blockchain.append_block(
-                            st.session_state.received_block, st.session_state.p2pserver.transaction_pool, st.session_state.p2pserver.accounts)
-                    self.received_block = None
-
-                    self.block_proposer = st.session_state.p2pserver.accounts.choose_validator()
-                    print("BLOCK PROPOSER CHOSEN: ", st.session_state.block_proposer)
+                if self.p2pserver.received_block:
+                    if self.can_add_block(self.p2pserver.received_block):
+                        self.p2pserver.blockchain.append_block(
+                            st.session_state.p2pserver.received_block, self.p2pserver.transaction_pool,
+                            self.p2pserver.accounts
+                    )
+                        
+                    self.p2pserver.received_block = None
+                    self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator()
+                    print("BLOCK PROPOSER CHOSEN: ", self.p2pserver.block_proposer)
 
                 time.sleep(BLOCK_VALIDATOR_CHOOSE_INTERVAL -
                         ((current_time - START_TIME) % BLOCK_VALIDATOR_CHOOSE_INTERVAL))

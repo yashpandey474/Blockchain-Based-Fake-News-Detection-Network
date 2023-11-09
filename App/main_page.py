@@ -36,7 +36,7 @@ def main_page():
             
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.validator and st.session_state.block_proposer == st.session_state.wallet.get_public_key():
+    if st.session_state.validator and st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
         st.write("You are the current block proposer.")
         
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
@@ -94,16 +94,16 @@ def main_page():
     if st.session_state.validator:
         
         # IF RECEIVED A BLOCK
-        if st.session_state.block_received and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
+        if st.session_state.p2pserver.block_received and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
             
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")
         
-        st.write("Current Block Proposer: ", st.session_state.block_proposer)
+        st.write("Current Block Proposer: ", st.session_state.p2pserver.block_proposer)
 
         
-        if st.session_state.received_block is not None and int(time.time) - int(st.session_state.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
-            st.write("Current Confirmations on Block: ", st.session_state.received_block.votes)
+        if st.session_state.p2pserver.received_block is not None and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
+            st.write("Current Confirmations on Block: ", st.session_state.p2pserver.received_block.votes)
         
     if st.button("Exit Screen"):
         change_screen("enter")

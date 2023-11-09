@@ -30,6 +30,9 @@ class P2pServer:
         self.wallet = wallet  # assuming initialised wallet
         self.accounts = blockchain.accounts
         self.connections = set()
+        self.received_block = None
+        self.block_received = None
+        self.block_proposer = None
 
     #SEND SIGNED MESSAGE TO GIVEN SOCKET
     def sendEncryptedMessage(self, socket, message):
@@ -70,7 +73,7 @@ class P2pServer:
     def send_current_block_proposer(self, socket):
         message = json.dumps({
             "type": MESSAGE_TYPE["block_proposer_address"],
-            "address": st.session_state.block_proposer
+            "address": st.session_state.p2pserver.block_proposer
         })
 
         self.sendEncryptedMessage(socket, message)
@@ -122,15 +125,15 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
-            if st.session_state.block_proposer != data["block"].validator:
+            if st.session_state.p2pserver.block_proposer != data["block"].validator:
                 return
             #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
                 data["block"], self.transaction_pool, self.accounts)):
                 
                 # SET RECIEVED FLAG TO ALLOW VOTING
-                st.session_state.block_received = True
-                st.session_state.received_block = data["block"]
+                st.session_state.p2pserver.block_received = True
+                st.session_state.p2pserver.received_block = data["block"]
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # NEW VALIDATOR
@@ -155,7 +158,7 @@ class P2pServer:
             
         elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
             #SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
-            st.session_state.block_proposer = data["address"]
+            st.session_state.p2pserver.block_proposer = data["address"]
             
         
     
@@ -179,25 +182,25 @@ class P2pServer:
             return
         
         # IF NOT CURRENT BLOCK
-        if data["block_index"] != st.session_state.received_block.index:
+        if data["block_index"] != st.session_state.p2pserver.received_block.index:
             print("OLD VOTE RECEIVED")
             return
 
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
-        st.session_state.received_block.votes += 1
+        st.session_state.p2pserver.received_block.votes += 1
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
-            transaction.id: transaction for transaction in st.session_state.received_block.transactions
+            transaction.id: transaction for transaction in st.session_state.p2pserver.received_block.transactions
         }
         
-        for key, value in st.session_state.received_block.transactions:
+        for key, value in st.session_state.p2pserver.received_block.transactions:
             if value == "True":
                 transactions_dict[key].positive_votes += 1
 
         # JUST IN CASE OF PASS BY VALUE
-        for index, transaction in enumerate(st.session_state.received_block.transactions):
-            st.session_state.received_block.transactions[index] = transactions_dict[transaction.id]
+        for index, transaction in enumerate(st.session_state.p2pserver.received_block.transactions):
+            st.session_state.p2pserver.received_block.transactions[index] = transactions_dict[transaction.id]
 
     def broadcast_new_node(self):
         """
@@ -348,7 +351,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["vote"],
             "address": self.wallet.get_public_key(),
             "votes": votes_list,
-            "block_index": st.session_state.received_block.index
+            "block_index": st.session_state.p2pserver.received_block.index
         }
 
         # # Convert the message content to a JSON string
