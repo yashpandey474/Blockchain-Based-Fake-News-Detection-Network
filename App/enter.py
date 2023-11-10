@@ -59,6 +59,9 @@ def initialise(private_key=None):
 
         st.session_state.initialise = True
         print("EVERYTHING INITIIALISED")
+        
+    else:
+        print("Already initialized")
 
 
 def enter():
