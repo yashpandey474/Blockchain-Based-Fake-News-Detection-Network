@@ -10,7 +10,7 @@ from typing import List  # Import Any if the actual type of signature is not kno
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, signature, index):
+    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, signature, index:int):
         #TIME OF BLOCK CREATION
         self.timestamp = timestamp
         #HASH OF PREVIOUS BLOCK
@@ -22,7 +22,7 @@ class Block:
         #SIGNATURE BY VALIDATOR
         self.signature = signature
         #SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
-        self.votes = set(validator)
+        self.votes = set(validator) if validator else set()
         #INDEX OF BLOCK IN CHAIN 
         self.index = index
 
@@ -41,7 +41,7 @@ class Block:
     #CREATE THE INITIAL BLOCK
     @staticmethod
     def genesis():
-        return Block("genesis time", "----", "genesis-hash", [], None, None, 1)
+        return Block("genesis time", "genesis-hash", [], None, None, 1)
 
     #HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
     @staticmethod
