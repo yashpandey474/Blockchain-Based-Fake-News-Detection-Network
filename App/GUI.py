@@ -14,6 +14,8 @@ from vote_on_block import *
 from upload_file import *
 from view_sent_news import *
 from sign_up import *
+from vote_on_block import *
+
 background_style = '''<style>
 div .appview-container{
 background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
@@ -40,7 +42,8 @@ screen_functions = {
     "become_validator": become_validator,
     "vote_on_block": vote_on_block,
     "upload_file": upload_file,
-    "view_sent_news": view_sent_news
+    "view_sent_news": view_sent_news,
+    "vote_on_block": vote_on_block
 }
 
 def main():
