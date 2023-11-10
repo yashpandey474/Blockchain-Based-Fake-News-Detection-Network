@@ -132,8 +132,8 @@ class P2pServer:
                 data["block"], self.transaction_pool, self.accounts)):
                 
                 # SET RECIEVED FLAG TO ALLOW VOTING
-                st.session_state.p2pserver.block_received = True
-                st.session_state.p2pserver.received_block = data["block"]
+                self.block_received = True
+                self.received_block = data["block"]
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # NEW VALIDATOR
