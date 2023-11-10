@@ -24,5 +24,5 @@ def verify_certificate(certificate_id):
     return certificate_id[: 4] == "ABCD"
         
 
-# if __name__ == "__main__":
-#     print(gen_sk().export_key().decode())
+if __name__ == "__main__":
+    print(gen_sk().export_key().decode())
