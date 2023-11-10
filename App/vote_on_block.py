@@ -12,8 +12,9 @@ def vote_on_block():
         st.header("Block Info")
         st.write("Validator:", block.validator)
         st.write("Timestamp:", block.timestamp)
-        
-        
+        st.write("Validator Repuation: ", 
+                 st.session_state.p2pserver.blockchain.get_balance() + 
+                 st.session_state.p2pserver.blockchain.get_stake())        
         block = st.session_state.p2pserver.received_block
         transaction_votes = {}
         table_data = []

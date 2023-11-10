@@ -34,67 +34,12 @@ def main_page():
             
         if st.session_state.validator and st.button("Modify Your Stake in Network"):
             change_screen("become_validator")
-            
+    
+    if (st.session_state.validator
+    and st.button("View Current Received Block Status")):
+        change_screen("view_block_status")
 
-    # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
-        st.write("You are the current block proposer.")
-        
-        # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
-        table_data = []
-        transactions = st.session_state.p2pserver.transaction_pool.transactions
-        transaction_dict = {
-            transaction.id: transaction for transaction in transactions
-        }
-
-        
-        for transaction in transactions:
-            table_data.append({
-                "ID": transaction.id,
-                "IPFS Address": transaction.ipfs_address,
-                "Model Score": transaction.model_score,
-                "Sender Reputation": transaction.sender_reputation
-            })
-
-        max_selections = config.BLOCK_TRANSACTION_LIMIT
-
-        # DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
-        selected_transactions = st.multiselect(
-            "Select transactions to Include in Block ",
-            table_data,
-            default=[],
-            key="transactions",
-        )
-
-        # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
-        if len(selected_transactions) > max_selections:
-            st.warning(
-                f"Maximum selections allowed: {max_selections}. Please deselect items."
-            )
-
-        # CONFIRM THE SELECTION
-        if st.button("Confirm Selection") and len(selected_transactions) <= max_selections:
-            selected_transaction_objects = [
-                transaction_dict[transaction["ID"]] for transaction in selected_transactions
-            ]
-
-            # CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
-            block = Block.create_block(
-                lastBlock=st.session_state.blockchain.chain[-1],
-                _data=selected_transaction_objects,
-                wallet=st.session_state.p2pserver.wallet,
-                blockchain=st.session_state.p2pserver.blockchain
-            )
-
-            # BROADCAST THE BLOCK
-            st.session_state.p2pserver.broadcast_block(block)
-
-            # CONFIRMATION MESSAGE
-            st.write("The created block was transmitted.")
-
-    if st.session_state.validator and st.button("Vote on Received Block"):
-        change_screen("vote_on_block")
-
+    
     if st.button("Exit Screen"):
         change_screen("enter")
 

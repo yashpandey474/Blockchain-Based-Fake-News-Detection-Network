@@ -45,7 +45,13 @@ class ChainUtil:
         data_hash = SHA256.new(data_str.encode())
         signature = pkcs1_15.new(private_key).sign(data_hash)
         return signature
-
+    
+    @staticmethod
+    def sign_hashed_data(private_key, data_hash):
+        private_key_1 = RSA.import_key(private_key)
+        signature = pkcs1_15.new(private_key_1).sign(data_hash)
+        return signature
+    
     @staticmethod
     def verify_signature(signature, data):
         public_key = RSA.import_key(config.VM_PUBLIC_KEY)

@@ -68,8 +68,8 @@ class Transaction:
         transaction.ipfs_address = ipfs_address
         transaction.sender_address = sender_wallet.get_public_key()
         transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
-        transaction.sender_reputation = blockchain.get_balance(
-            sender_wallet.get_public_key())
+        transaction.sender_reputation = (blockchain.get_balance(sender_wallet.get_public_key())
+                            + blockchain.get_stake(sender_wallet.get_public_key()))
         transaction.model_score = transaction.get_transaction_score()
         transaction.timestamp = int(time.time())
         transaction.fee = fee

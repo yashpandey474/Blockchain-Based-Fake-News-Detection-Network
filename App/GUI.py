@@ -14,7 +14,7 @@ from vote_on_block import *
 from upload_file import *
 from view_sent_news import *
 from sign_up import *
-from vote_on_block import *
+from view_block_status import *
 
 background_style = '''<style>
 div .appview-container{
@@ -43,7 +43,9 @@ screen_functions = {
     "vote_on_block": vote_on_block,
     "upload_file": upload_file,
     "view_sent_news": view_sent_news,
-    "vote_on_block": vote_on_block
+    "vote_on_block": vote_on_block,
+    "view_block_status": view_block_status,
+    "propose_block": propose_block
 }
 
 def main():

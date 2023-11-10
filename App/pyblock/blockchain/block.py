@@ -10,17 +10,24 @@ from typing import List  # Import Any if the actual type of signature is not kno
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, signature, index:int):
+    def __init__(self, timestamp, lastBlock, transactions: List[Transaction], validator, index: int, signature = None):
         #TIME OF BLOCK CREATION
         self.timestamp = timestamp
         #HASH OF PREVIOUS BLOCK
-        self.lastHash = lastHash
+        
+        #GENESIS BLOCK
+        if index == 1:
+            self.lastHash = "0000"
+        else:
+            self.lastHash = Block.block_hash(lastBlock)
+            
         #LIST OF TRANSACTIONS
         self.transactions = transactions
         #VALIDATOR PUBLIC KEY
         self.validator = validator
         #SIGNATURE BY VALIDATOR
         self.signature = signature
+        
         #SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
         self.votes = set()
         #INDEX OF BLOCK IN CHAIN 
@@ -41,7 +48,12 @@ class Block:
     #CREATE THE INITIAL BLOCK
     @staticmethod
     def genesis():
-        return Block(int(time.time()), "00000", [], "Creators", None, 1)
+        return Block(timestamp = int(time.time()), 
+                     lastBlock=None, 
+                     transactions=[],
+                     validator="Creators",
+                     signature = None, 
+                     index = 1)
 
     #HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
     @staticmethod
@@ -55,11 +67,11 @@ class Block:
         return hashlib.sha256(json.dumps(transactions_for_hashing).encode('utf-8')).hexdigest()
 
     @staticmethod
-    def create_block(last_block, data, wallet, blockchain):
+    def create_block(lastBlock, data, wallet, blockchain):
         #SET THE TIMESTAMP
         timestamp = time.time()
         #SET PREVIOUS BLOCK'S HASH
-        last_hash = Block.hash(last_block)
+        last_hash = Block.hash(lastBlock)
         #CONVERT THE TRANSACTIOONS TO JSON 
         transactions = [Transaction(**tx.to_json()) for tx in data]
         #GENERATE HASH FOR SIGNING
