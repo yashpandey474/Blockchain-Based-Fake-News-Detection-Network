@@ -3,26 +3,7 @@ from change_screen import *
 
 def vote_on_block():
     st.title("Vote on Recieved Block News.")
-            # IF RECEIVED A BLOCK
-        if (st.session_state.p2pserver.block_received
-            # VALIDATION PERIODD HAS NOT EXPIRED
-            and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (
-                60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL)
-            #CLICKS ON BUTTON
-            and st.button("Vote on Recieved Block")
-            #THE BLOCK PROPOSER CANNOT VOTE ON OWN BLOCK
-            and st.session_state.p2pserver.block_proposer != st.session_state.p2pserver.wallet.get_public_key()
-            ):
-            
-            # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
-            change_screen("vote_on_block")
-        
-        st.write("Current Block Proposer: ", st.session_state.p2pserver.block_proposer)
-
-        
-        if st.session_state.p2pserver.received_block is not None and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
-            st.write("Current Confirmations on Block: ", len(st.session_state.p2pserver.received_block.votes))
-        
+            # IF RECEIVED A BLOCK 
         
     if st.session_state.voted:
         st.write("You have already voted on the current proposed block.")
