@@ -29,6 +29,10 @@ class Wallet:
         data_hash = SHA256.new(data.encode())
         signature = pkcs1_15.new(self.__private_key).sign(data_hash)
         return signature
+    
+    def sign_hashed_data(self, data_hash):
+        signature = pkcs1_15.new(self.__private_key).sign(data_hash)
+        return signature
 
     def get_public_key(self):
         return self.__public_key.export_key().decode()

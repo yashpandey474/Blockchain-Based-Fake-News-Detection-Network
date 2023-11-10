@@ -104,21 +104,25 @@ class Accounts:
         self.initialize(address, clientPort=clientPort)
 
     def choose_validator(self, seed):
-        # Filter out accounts with a stake less than the minimum stake
-        eligible_accounts = {address: acc for address, acc in self.accounts.items(
-        ) if acc.stake and acc.stake >= config.MIN_STAKE}
+        eligible_accounts = {address: acc for address, acc in self.accounts.items()}
 
         if not eligible_accounts:
             return None
 
         sorted_accounts = sorted(eligible_accounts, key=lambda address: (
             eligible_accounts[address].stake, address))
+        
         stakes = [eligible_accounts[address].stake for address in sorted_accounts]
+        
         total_stake = sum(stakes)
+        
         weights = [stake / total_stake for stake in stakes]
+        
         random_generator = random.Random(seed)
+        
         chosen_validator = random_generator.choices(
             sorted_accounts, weights=weights, k=1)[0]
+        
         return chosen_validator
 
     # VERIFY EACH TRANSACTION'S SENDER HAS ENOUGH BALANCE FORR THE FEE

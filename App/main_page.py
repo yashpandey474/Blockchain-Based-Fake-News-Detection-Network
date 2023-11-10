@@ -24,6 +24,7 @@ def main_page():
 
     if st.button("View Sent News/Transactions"):
         change_screen("view_sent_news")
+        
     if st.session_state.user_type == "Auditor":
         if st.button("View all transactions in mempool"):
             change_screen("show_transac")
@@ -94,7 +95,15 @@ def main_page():
     if st.session_state.validator:
         
         # IF RECEIVED A BLOCK
-        if st.session_state.p2pserver.block_received and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL) and st.button("Vote on Recieved Block"):
+        if (st.session_state.p2pserver.block_received
+            # VALIDATION PERIODD HAS NOT EXPIRED
+            and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (
+                60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL)
+            #CLICKS ON BUTTON
+            and st.button("Vote on Recieved Block")
+            #THE BLOCK PROPOSER CANNOT VOTE ON OWN BLOCK
+            and st.session_state.p2pserver.block_proposer != st.session_state.p2pserver.wallet.get_public_key()
+            ):
             
             # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
             change_screen("vote_on_block")

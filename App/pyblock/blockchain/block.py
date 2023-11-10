@@ -10,15 +10,23 @@ from typing import List  # Import Any if the actual type of signature is not kno
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, hash, transactions: List[Transaction], validator, signature, index):
+    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, signature, index):
+        #TIME OF BLOCK CREATION
         self.timestamp = timestamp
+        #HASH OF PREVIOUS BLOCK
         self.lastHash = lastHash
+        #LIST OF TRANSACTIONS
         self.transactions = transactions
+        #VALIDATOR PUBLIC KEY
         self.validator = validator
+        #SIGNATURE BY VALIDATOR
         self.signature = signature
-        self.votes = set()
+        #SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
+        self.votes = set(validator)
+        #INDEX OF BLOCK IN CHAIN 
         self.index = index
 
+    #FUNCTION TO CONVERT BLOCK TO JSON
     def to_json(self):
         return {
             "timestamp": self.timestamp,
@@ -27,13 +35,15 @@ class Block:
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
             "signature": self.signature.hex() if self.signature else None,
-            "countofvotes": self.countofvotes
+            "countofvotes": len(self.votes)
         }
 
+    #CREATE THE INITIAL BLOCK
     @staticmethod
     def genesis():
         return Block("genesis time", "----", "genesis-hash", [], None, None, 1)
 
+    #HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
     @staticmethod
     def hash_transactions(transactions):
         # Create a new list of transactions with votes set to None
@@ -46,13 +56,20 @@ class Block:
 
     @staticmethod
     def create_block(last_block, data, wallet, blockchain):
+        #SET THE TIMESTAMP
         timestamp = time.time()
-        last_hash = last_block.hash
+        #SET PREVIOUS BLOCK'S HASH
+        last_hash = Block.hash(last_block)
+        #CONVERT THE TRANSACTIOONS TO JSON 
         transactions = [Transaction(**tx.to_json()) for tx in data]
-        hash = Block.get_hash(timestamp, last_hash, transactions)
+        #GENERATE HASH FOR SIGNING
+        data_hash = Block.get_hash(timestamp, last_hash, transactions)
+        #GET THE VALIDATOR'S PUBLIC KEY
         validator = wallet.get_public_key()
-        signature = Block.sign_block_hash(hash, wallet)
-        return Block(timestamp, last_hash, hash, data, validator, signature, len(blockchain.chain) + 1)
+        #SIGN THE BLOCK WITH VALIDATOR'S PRIVATE KEY
+        signature = wallet.sign_hashed_data(data_hash)
+        #RETURN THE CREATED BLOCK
+        return Block(timestamp, last_hash, data, validator, signature, len(blockchain.chain) + 1)
 
     @staticmethod
     def get_hash(timestamp, last_hash, transactions):
@@ -68,9 +85,6 @@ class Block:
         # Use the new helper method to hash transactions within the block
         return Block.get_hash(block.timestamp, block.last_hash, block.transactions)
 
-    @staticmethod
-    def sign_block_hash(hash, wallet):
-        return wallet.sign(hash)
 
     @staticmethod
     def verify_block(block):
