@@ -103,7 +103,7 @@ class Accounts:
 
         self.initialize(address, clientPort=clientPort)
 
-    def choose_validator(self, seed):
+    def choose_validator(self, seed=None):
         eligible_accounts = {address: acc for address, acc in self.accounts.items()}
 
         if not eligible_accounts:
@@ -111,7 +111,7 @@ class Accounts:
 
         sorted_accounts = sorted(eligible_accounts, key=lambda address: (
             eligible_accounts[address].stake, address))
-        
+
         stakes = [eligible_accounts[address].stake for address in sorted_accounts]
         
         total_stake = sum(stakes)
