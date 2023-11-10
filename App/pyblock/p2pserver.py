@@ -125,7 +125,7 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
-            if st.session_state.p2pserver.block_proposer != data["block"].validator:
+            if self.block_proposer != data["block"].validator:
                 return
             #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
@@ -158,7 +158,7 @@ class P2pServer:
             
         elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
             #SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
-            st.session_state.p2pserver.block_proposer = data["address"]
+            self.block_proposer = data["address"]
             
         
     
@@ -187,27 +187,27 @@ class P2pServer:
             return
 
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
-        st.session_state.p2pserver.received_block.votes += 1
+        self.received_block.votes += 1
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
             transaction.id: transaction for transaction in st.session_state.p2pserver.received_block.transactions
         }
         
-        for key, value in st.session_state.p2pserver.received_block.transactions:
+        for key, value in self.received_block.transactions:
             if value == "True":
                 transactions_dict[key].positive_votes += 1
 
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.p2pserver.received_block.transactions):
-            st.session_state.p2pserver.received_block.transactions[index] = transactions_dict[transaction.id]
+            self.received_block.transactions[index] = transactions_dict[transaction.id]
 
     def broadcast_new_node(self):
         """
         Broadcast new node's public key to all to create a new account
         """
         
-        active_accounts = self.accounts.get_active_accounts()
+        # active_accounts = self.accounts.get_active_accounts()
         for client in self.connections:
             self.send_new_node(
                 client, self.wallet.get_public_key()
@@ -290,14 +290,14 @@ class P2pServer:
         self.sendEncryptedMessage(socket, message)
 
     def sync_chain(self):
-        active_accounts = self.accounts.get_active_accounts(
+        # active_accounts = self.accounts.get_active_accounts(
             self.wallet.get_public_key())
-        for address, account in active_accounts.items():
-            # Assuming the account's clientPort can be used to send messages
+        for client in  self.connections:
+            #Assuming the account's clientPort can be used to send messages
             # and there's a method in P2pServer to get the socket by its client port
-            socket = self.get_socket_by_client_port(account.clientPort)
+            # socket = self.get_socket_by_client_port(account.clientPort)
             if socket:
-                self.send_chain(socket)
+                self.send_chain(client)
 
     def broadcast_transaction(self, transaction):
         message = {
@@ -339,9 +339,6 @@ class P2pServer:
         
         for client in self.connections:
             self.send_block(client, message_data)
-            self.sendEncryptedMessage(
-                client, message
-            )
 
     def broadcast_votes(self, votes_dict):
         votes_list = [(key, value) for key, value in votes_dict.items()]
