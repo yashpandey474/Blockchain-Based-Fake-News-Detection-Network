@@ -22,7 +22,7 @@ class Block:
         #SIGNATURE BY VALIDATOR
         self.signature = signature
         #SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
-        self.votes = set(validator) if validator else set()
+        self.votes = set()
         #INDEX OF BLOCK IN CHAIN 
         self.index = index
 
@@ -41,7 +41,7 @@ class Block:
     #CREATE THE INITIAL BLOCK
     @staticmethod
     def genesis():
-        return Block("genesis time", "genesis-hash", [], None, None, 1)
+        return Block(int(time.time()), "00000", [], "Creators", None, 1)
 
     #HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
     @staticmethod
@@ -92,9 +92,9 @@ class Block:
         for transaction in block.transactions:
             if not Transaction.verify_transaction(transaction=transaction):
                 return False
-        
-        return ChainUtil.verify_signature(
+        #VERIFY THE SIGNATURE OF THE BLOCK
+        return ChainUtil.verify_hashed_signature(
             block.validator,
             block.signature,
-            block.hash  # Verify the signature against the recreated hash
+            Block.block_hash(block)  # Verify the signature against the recreated hash
         )
