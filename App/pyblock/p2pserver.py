@@ -48,9 +48,9 @@ class P2pServer:
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
         self.connect_to_peers()
-        self.server.run_forever()
         self.server.account = self.wallet.get_public_key()
-
+        self.server.run_forever()
+        
     #CREATE A NEW ACCOUNT FOR OWN-USER
     def create_self_account(self):
         self.accounts.addANewClient(
