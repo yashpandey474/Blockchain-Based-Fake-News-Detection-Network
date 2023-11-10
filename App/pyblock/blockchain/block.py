@@ -16,7 +16,7 @@ class Block:
         self.transactions = transactions
         self.validator = validator
         self.signature = signature
-        self.votes = 0
+        self.votes = set()
         self.index = index
 
     def to_json(self):

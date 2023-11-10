@@ -103,7 +103,7 @@ def main_page():
 
         
         if st.session_state.p2pserver.received_block is not None and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
-            st.write("Current Confirmations on Block: ", st.session_state.p2pserver.received_block.votes)
+            st.write("Current Confirmations on Block: ", len(st.session_state.p2pserver.received_block.votes))
         
     if st.button("Exit Screen"):
         change_screen("enter")

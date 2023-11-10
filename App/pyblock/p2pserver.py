@@ -187,7 +187,7 @@ class P2pServer:
             return
 
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
-        self.received_block.votes += 1
+        self.received_block.votes.add(data["address"])
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
@@ -291,13 +291,13 @@ class P2pServer:
 
     def sync_chain(self):
         # active_accounts = self.accounts.get_active_accounts(
-            self.wallet.get_public_key())
+        # self.wallet.get_public_key())
         for client in  self.connections:
             #Assuming the account's clientPort can be used to send messages
             # and there's a method in P2pServer to get the socket by its client port
             # socket = self.get_socket_by_client_port(account.clientPort)
-            if socket:
-                self.send_chain(client)
+            # if socket:
+            self.send_chain(client)
 
     def broadcast_transaction(self, transaction):
         message = {
