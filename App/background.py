@@ -29,14 +29,14 @@ class Background:
                 if self.p2pserver.received_block:
                     if self.can_add_block(self.p2pserver.received_block):
                         self.p2pserver.blockchain.append_block(
-                            st.session_state.p2pserver.received_block, self.p2pserver.transaction_pool,
+                            self.p2pserver.received_block, 
+                            self.p2pserver.transaction_pool,
                             self.p2pserver.accounts
                         )
 
-                    self.p2pserver.received_block = None
-                    self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator()
-                    print("BLOCK PROPOSER CHOSEN: ",
-                          self.p2pserver.block_proposer)
+                self.p2pserver.received_block = None
+                self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator()
+                print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
 
-                time.sleep(BLOCK_VALIDATOR_CHOOSE_INTERVAL -
-                           ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL))
+                # time.sleep(BLOCK_VALIDATOR_CHOOSE_INTERVAL -
+                         #  ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL))
