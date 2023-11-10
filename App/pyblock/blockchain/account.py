@@ -9,6 +9,7 @@ class Account:
         self.stake = stake
         self.clientPort = clientPort
         self.sent_transactions = set()
+        self.sent_blocks = set()
 
 
 class Accounts:
@@ -33,7 +34,10 @@ class Accounts:
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
-
+    
+    def add_sent_block(self, address, block):
+        self.accounts[address].sent_blocks.add(block)
+        
     def update_accounts(self, block):
         for transaction in block.transactions:
             #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR

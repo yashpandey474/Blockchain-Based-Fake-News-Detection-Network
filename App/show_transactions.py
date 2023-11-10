@@ -18,6 +18,8 @@ def show_transactions():
             table_data.append({
                 "Model Score": transaction.model_score,
                 "Sender Reputation": transaction.sender_reputation,
+                "Sender Stake": st.session_state.p2pserver.blockchain.get_stake(transaction.sender_address),
+                # "Is Auditor": 
                 "Transaction Fee": transaction.fee,
                 "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                 "Title": content.split("\n")[0],

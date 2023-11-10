@@ -32,6 +32,7 @@ class Block:
         self.votes = set()
         #INDEX OF BLOCK IN CHAIN 
         self.index = index
+ 
 
     #FUNCTION TO CONVERT BLOCK TO JSON
     def to_json(self):

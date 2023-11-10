@@ -24,7 +24,7 @@ class Background:
             print("BACKGROUND TASK IS RUNNING")
             current_time = int(time.time())
 
-            if ((current_time - START_TIME.timestamp()) % 30) == 0:
+            if ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:
                 print("TRUE")
                 if self.p2pserver.received_block:
                     if self.can_add_block(self.p2pserver.received_block):

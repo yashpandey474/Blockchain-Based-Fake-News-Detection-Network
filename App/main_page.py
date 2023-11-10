@@ -36,7 +36,7 @@ def main_page():
             change_screen("become_validator")
     
     if (st.session_state.validator
-    and st.button("View Current Received Block Status")):
+    and st.button("View Current Block Status")):
         change_screen("view_block_status")
 
     

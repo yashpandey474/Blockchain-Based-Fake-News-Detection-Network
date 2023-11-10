@@ -134,6 +134,7 @@ class P2pServer:
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
                 self.received_block = data["block"]
+                self.accounts.add_sent_block(data["address"], data["block"])
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # NEW VALIDATOR
