@@ -13,24 +13,25 @@ def sign_up_generate():
 
     #GENERATE A NEW PRIVATE KEY FOR USER
     if st.button("Click to generate a new private key"):
+        st.session_state.gen_key_pressed = True
+
         st.markdown(
-            "<span style='font-style: italic; color: #FF5733;'><b>New key - store it for future use, as it won't be displayed again.</b></span>",
+            "<span style='font-style: italic; color: #FF5733;'><b>Generating New key <br> store it for future use</b></span>",
             unsafe_allow_html=True
         )
 
         private_key = crypto_logic.gen_sk()
-
+        
         #INITIALISE ACCOUNT & WALLET OF SESSION
         initialise(private_key)
 
         #PRINT THE PRIVATE KEY
         st.write(private_key.export_key().decode())
 
-        st.session_state.gen_key_pressed = True
 
     if st.session_state.gen_key_pressed:
         if st.button("Go to main"):
-            st.session_state.gen_key_pressed = False
+            # st.session_state.gen_key_pressed = False
             change_screen("main_page")
             
     else:
