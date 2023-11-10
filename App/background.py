@@ -35,8 +35,13 @@ class Background:
                         )
 
                 self.p2pserver.received_block = None
-                self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator()
-                print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
+                self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(current_time)
+                
+                #IF WAS ABLE TO CHOOSE A BLOCK PROPOSER
+                if self.p2pserver.block_proposer:
+                    print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
+                else:
+                    print("NO BLOCK PROPOSER CHOSEN.")
 
                 # time.sleep(BLOCK_VALIDATOR_CHOOSE_INTERVAL -
                          #  ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL))

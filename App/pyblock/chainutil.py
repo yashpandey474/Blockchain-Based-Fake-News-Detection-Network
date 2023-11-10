@@ -56,7 +56,17 @@ class ChainUtil:
             return True  # Signature is valid
         except (ValueError, TypeError):
             return False  # Signature is invalid
-
+    @staticmethod
+    def verify_hashed_signature(public_key, signature, data_hash):
+        public_key_1 = RSA.import_key(public_key)
+        
+        try:
+            pkcs1_15.new(public_key_1).verify(data_hash, signature)
+            return True 
+        
+        except (ValueError, TypeError):
+            return False
+        
     # @staticmethod
     def encryptWithSoftwareKey(data):
         signature = ChainUtil.sign(data)

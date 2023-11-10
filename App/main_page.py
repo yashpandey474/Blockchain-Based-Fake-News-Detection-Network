@@ -37,7 +37,7 @@ def main_page():
             
 
     # IF THE USER IS A VALIDATOR AND CURRENT BLOCK PROPOSER
-    if st.session_state.validator and st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
+    if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
         st.write("You are the current block proposer.")
         
         # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
@@ -92,28 +92,9 @@ def main_page():
             # CONFIRMATION MESSAGE
             st.write("The created block was transmitted.")
 
-    if st.session_state.validator:
-        
-        # IF RECEIVED A BLOCK
-        if (st.session_state.p2pserver.block_received
-            # VALIDATION PERIODD HAS NOT EXPIRED
-            and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (
-                60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL)
-            #CLICKS ON BUTTON
-            and st.button("Vote on Recieved Block")
-            #THE BLOCK PROPOSER CANNOT VOTE ON OWN BLOCK
-            and st.session_state.p2pserver.block_proposer != st.session_state.p2pserver.wallet.get_public_key()
-            ):
-            
-            # SHOW THE BLOCK'S TRANSACTIONS AND ASK FOR VOTES
-            change_screen("vote_on_block")
-        
-        st.write("Current Block Proposer: ", st.session_state.p2pserver.block_proposer)
+    if st.session_state.validator and st.button("Vote on Received Block"):
+        change_screen("vote_on_block")
 
-        
-        if st.session_state.p2pserver.received_block is not None and int(time.time) - int(st.session_state.p2pserver.block_received.timestamp) <= (60*config.BLOCK_VALIDATOR_CHOOSE_INTERVAL):
-            st.write("Current Confirmations on Block: ", len(st.session_state.p2pserver.received_block.votes))
-        
     if st.button("Exit Screen"):
         change_screen("enter")
 

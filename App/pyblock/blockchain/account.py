@@ -104,7 +104,8 @@ class Accounts:
         self.initialize(address, clientPort=clientPort)
 
     def choose_validator(self, seed=None):
-        eligible_accounts = {address: acc for address, acc in self.accounts.items()}
+        eligible_accounts = {address: acc for address, acc in self.accounts.items()
+                             if acc.stake >= config.MIN_STAKE}
 
         if not eligible_accounts:
             return None

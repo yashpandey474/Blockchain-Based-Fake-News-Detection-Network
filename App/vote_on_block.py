@@ -3,7 +3,8 @@ from change_screen import *
 
 def vote_on_block():
     st.title("Vote on Recieved Block News.")
-    
+            # IF RECEIVED A BLOCK 
+        
     if st.session_state.voted:
         st.write("You have already voted on the current proposed block.")
         

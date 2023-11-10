@@ -87,7 +87,7 @@ class Transaction:
         if abs(model_score - transaction.model_score) > error_bound:
             return False
 
-        return ChainUtil.verify_signature(
+        return ChainUtil.verify_hashed_signature(
             transaction.sender_address,  # Public key
             signature,  # Signature to verify
             transaction_hash  # Hash of the content that was signed
