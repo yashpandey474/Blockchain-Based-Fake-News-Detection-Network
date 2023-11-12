@@ -54,7 +54,8 @@ class P2pServer:
     #CREATE A NEW ACCOUNT FOR OWN-USER
     def create_self_account(self):
         self.accounts.addANewClient(
-            address=self.wallet.get_public_key(), clientPort = None
+            address=self.wallet.get_public_key(), clientPort = None,
+            userType = st.session_state.user_type
         )
 
         print("ACCOUNT CREATED")

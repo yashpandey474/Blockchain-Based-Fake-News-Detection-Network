@@ -182,7 +182,7 @@ def get_score(content):
     
     prediction = model.predict_proba(X_scaled)
     
-    print("PREDICTION = ", prediction)
-    print("X = ", X)
+    # print("PREDICTION = ", prediction)
+    # print("X = ", X)
 
     return prediction[:, 1][0]

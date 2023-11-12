@@ -18,6 +18,7 @@ def show_account_info():
     st.write("Current Balance = ", balance)
     if st.session_state.validator:
         st.write("Currrent Stake in Network = ", stake)
+    st.write("Current Reputation = ", balance + stake)
     st.write("PUBLIC KEY = ", public_key)
     st.write("PRIVATE KEY = ", private_key)
 

@@ -95,7 +95,7 @@ class Accounts:
         account.balance = account.balance - stake + account.stake
         account.stake = stake
 
-    def addANewClient(self, address, clientPort):
+    def addANewClient(self, address, clientPort, user_type):
         if address in self.accounts:
             if self.accounts[address].isActive:
                 raise ValueError(
@@ -105,7 +105,7 @@ class Accounts:
                 self.accounts[address].isActive = True
                 self.accounts[address].clientPort = clientPort
 
-        self.initialize(address, clientPort=clientPort)
+        self.initialize(address, clientPort=clientPort, balance = config.DEFAULT_BALANCE[user_type])
 
     def choose_validator(self, seed=None):
         eligible_accounts = {address: acc for address, acc in self.accounts.items()
