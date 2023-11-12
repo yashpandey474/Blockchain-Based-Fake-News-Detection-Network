@@ -52,13 +52,16 @@ def propose_block():
 
     # CONFIRM THE SELECTION AND VOTES
     if st.button("Create Block") and len(selected_transactions) <= max_selections:
-        selected_transaction_objects = [
-            transaction_dict[transaction["ID"]] for transaction in selected_transactions if transaction["Include"] == "True"
-        ]
-
-        # ADDITIONAL LOGIC TO HANDLE VOTES (Modify as per your use case)
-        for transaction in selected_transaction_objects:
-            vote = transaction["Vote"]
+        selected_transaction_objects = []
+    
+        for transaction in selected_transaction:
+            if transaction["Include"] == True:
+                transaction_object = transaction_dict[transaction["ID"]
+                if transaction["Vote"] == "True":
+                    transaction.positive_votes+=1
+                    
+                selected_transaction_objects.append(transaction_object)
+        
             # Implement your logic to handle the votes for each transaction
 
         # CREATE A BLOCK WITH TRANSACTIONS (PASSED AS LIST)
