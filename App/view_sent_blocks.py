@@ -18,7 +18,6 @@ def view_sent_blocks():
         for block in blocks:
             table_data.append({
                 "Timestamp":  datetime.fromtimestamp(block.timestamp).strftime("%I:%M %p on %d %B, %Y"),
-                "Validator": block.validator,
                 "Number of Votes": len(block.votes),
                 "Status": ("Yet to be verified" if block not in st.session_state.p2pserver.blockchain.chain else "Added to Chain")
             })

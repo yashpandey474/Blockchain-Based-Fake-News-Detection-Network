@@ -70,6 +70,7 @@ if __name__ == "__main__":
         st.session_state.validator = False
         st.session_state.previous_screen = "enter"
         st.session_state.screen = "enter"
+         
         
         
     main()

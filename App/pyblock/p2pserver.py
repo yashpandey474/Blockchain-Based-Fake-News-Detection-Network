@@ -24,11 +24,12 @@ MESSAGE_TYPE = {
 
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet]):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], user_type = "Reader"):
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
         self.accounts = blockchain.accounts
+        self.user_type = user_type
         self.connections = set()
         self.received_block = None
         self.block_received = None
@@ -55,7 +56,7 @@ class P2pServer:
     def create_self_account(self):
         self.accounts.addANewClient(
             address=self.wallet.get_public_key(), clientPort = None,
-            userType = st.session_state.user_type
+            userType = self.user_type
         )
 
         print("ACCOUNT CREATED")

@@ -22,7 +22,10 @@ def sign_up_generate():
 
         private_key = crypto_logic.gen_sk()
         
+        # TODO: FIX V. TIME CONSUMING GENERATION
         print("GENERATED PRIVATE KEY")
+        
+        
         # PRINT THE PRIVATE KEY
         st.write(private_key.export_key().decode())
         
