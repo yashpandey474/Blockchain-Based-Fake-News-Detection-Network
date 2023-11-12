@@ -22,6 +22,7 @@ def sign_up_generate():
 
         private_key = crypto_logic.gen_sk()
         
+        print("GENERATED PRIVATE KEY")
         # PRINT THE PRIVATE KEY
         st.write(private_key.export_key().decode())
         

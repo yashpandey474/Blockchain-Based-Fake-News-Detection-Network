@@ -10,10 +10,10 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import spacy
 import pickle
 import nltk
-nlp = spacy.load('en_core_web_sm')
-stemmer = PorterStemmer()
-stop_words = nlp.Defaults.stop_words
-nltk.download('vader_lexicon')
+import streamlit as st
+
+
+
 
 
 def preprocess_text(text):
@@ -39,14 +39,12 @@ def add_text_length(df):
 
 def add_vader_text_sentiment_score(df):
 
-    sid = SentimentIntensityAnalyzer()
-
     df['TEXT SENTIMENT SCORE'] = df['NEWS TEXT'].apply(
         lambda d: sid.polarity_scores(d)['compound'])
 
 
 def add_vader_title_sentiment_score(df):
-    sid = SentimentIntensityAnalyzer()
+    
 
     df['TITLE SENTIMENT SCORE'] = df['NEWS TITLE'].apply(
         lambda d: sid.polarity_scores(d)['compound'])
@@ -127,18 +125,36 @@ def calculate_lexical_diversity(text):
 
 
 # ADD COLUMN FOR NUMBER OF WORDS IN TEXT
-current_dir = os.path.dirname(os.path.abspath(__file__))
-model_file_path = os.path.join(current_dir, "model_1.pkl")
+@st.cache
+def enter():
+    global model
+    global scaler
+    global stemmer
+    global nlp
+    global stop_words
+    global sid
+    
+    nlp = spacy.load('en_core_web_sm')
+    stemmer = PorterStemmer()
+    stop_words = nlp.Defaults.stop_words
+    sid = SentimentIntensityAnalyzer()
+    # nltk.download('vader_lexicon')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_file_path = os.path.join(current_dir, "model_1.pkl")
 
-with open(model_file_path, "rb") as file:
-    data = pickle.load(file)
+    with open(model_file_path, "rb") as file:
+        data = pickle.load(file)
 
-model = data["MODEL"]
-scaler = data["SCALER"]
+    model = data["MODEL"]
+    scaler = data["SCALER"]
+    st.session_state.model_initialise = True
 
 
 def get_score(content):
     # Generate a random double value between 0 and 1
+    if "model_initialise" not in st.session_state:
+        enter()
+    
     data = {
         'NEWS TITLE': [content.split("\n")[0]],
         'NEWS TEXT': [" ".join(content.split("\n")[1:])]
@@ -176,13 +192,6 @@ def get_score(content):
         'TEXT CAPITAL CHARS', 'TEXT PUNCTUATION COUNT']
 
     X = df1[features_numeric]
-
     X_scaled = scaler.transform(X)
-
-    
     prediction = model.predict_proba(X_scaled)
-    
-    # print("PREDICTION = ", prediction)
-    # print("X = ", X)
-
     return prediction[:, 1][0]
