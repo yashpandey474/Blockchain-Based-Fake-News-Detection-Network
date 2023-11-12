@@ -28,6 +28,8 @@ def upload_file():
                 )
 
                 st.write("UPLOADED FILE: ", uploaded_file.name)
+                st.session_state.upload_file_executed = True
+                
                 # BROADCASE NEWLY CREATED TRANSACTION
                 st.session_state.p2pserver.broadcast_transaction(
                     transaction
@@ -35,7 +37,7 @@ def upload_file():
 
                 print("BROADCASTED TRANSACTION")
 
-                st.session_state.upload_file_executed = True
+                
 
     else:
         st.write("File successfully uploaded.")

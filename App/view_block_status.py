@@ -1,3 +1,4 @@
+from your_module import Block, config  # Import necessary modules
 import streamlit as st
 from change_screen import *
 import pyblock.config as config
@@ -19,40 +20,48 @@ def propose_block():
         transaction.id: transaction for transaction in transactions}
 
     for transaction in transactions:
-        include_value = st.radio(f"Include Transaction {transaction.id}?", [
+        st.subheader(f"Transaction {transaction.id}")
+        include_value = st.radio("Include in Block?", [
                                  "False", "True"], key=f"include_{transaction.id}")
+        vote_value = st.radio("Vote on this Transaction?", [
+                              "False", "True"], key=f"vote_{transaction.id}")
         table_data.append({
             "ID": transaction.id,
             "IPFS Address": transaction.ipfs_address,
             "Model Score": transaction.model_score,
             "Sender Reputation": transaction.sender_reputation,
-            "Include": include_value
+            "Include": include_value,
+            "Vote": vote_value
         })
 
-    max_selections = config.BLOCK_TRANSACTION_LIMIT
-
-    # DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
+    # DISPLAY TABLE OF TRANSACTIONS WITH SELECT AND VOTE BUTTONS
+    st.write("Choose transactions and vote on them:")
     selected_transactions = st.multiselect(
         "Select transactions to Include in Block",
         table_data,
         default=[],
         key="transactions",
-        # Display transaction IDs in the multiselect
         format_func=lambda transaction: transaction["ID"]
     )
 
     # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
+    max_selections = config.BLOCK_TRANSACTION_LIMIT
     if len(selected_transactions) > max_selections:
         st.warning(
             f"Maximum selections allowed: {max_selections}. Please deselect items.")
 
-    # CONFIRM THE SELECTION
-    if st.button("Confirm Selection") and len(selected_transactions) <= max_selections:
+    # CONFIRM THE SELECTION AND VOTES
+    if st.button("Create Block") and len(selected_transactions) <= max_selections:
         selected_transaction_objects = [
             transaction_dict[transaction["ID"]] for transaction in selected_transactions if transaction["Include"] == "True"
         ]
 
-        # CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
+        # ADDITIONAL LOGIC TO HANDLE VOTES (Modify as per your use case)
+        for transaction in selected_transaction_objects:
+            vote = transaction["Vote"]
+            # Implement your logic to handle the votes for each transaction
+
+        # CREATE A BLOCK WITH TRANSACTIONS (PASSED AS LIST)
         block = Block.create_block(
             lastBlock=st.session_state.blockchain.chain[-1],
             data=selected_transaction_objects,
@@ -64,7 +73,7 @@ def propose_block():
         st.session_state.p2pserver.broadcast_block(block)
 
         # CONFIRMATION MESSAGE
-        st.write("The created block was transmitted.")
+        st.success("The created block was transmitted.")
 
     if st.button("Back"):
         change_screen(st.session_state.previous_screen)
