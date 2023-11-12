@@ -24,7 +24,7 @@ def vote_on_block():
         for transaction in block.data:
             transaction_id = transaction.id
             vote = st.radio(
-                    f"Vote for Transaction {transaction_id}", ("True", "False")
+                    f"Vote for Transaction", ("True", "False")
             )
             
             transaction_votes[transaction_id] = vote
