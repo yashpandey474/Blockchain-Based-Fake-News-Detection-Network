@@ -72,7 +72,7 @@ class Block:
         #SET THE TIMESTAMP
         timestamp = time.time()
         #SET PREVIOUS BLOCK'S HASH
-        last_hash = Block.hash(lastBlock)
+        last_hash = Block.block_hash(lastBlock)
         #CONVERT THE TRANSACTIOONS TO JSON 
         transactions = [Transaction(**tx.to_json()) for tx in data]
         #GENERATE HASH FOR SIGNING

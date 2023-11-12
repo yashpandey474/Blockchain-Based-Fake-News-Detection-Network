@@ -21,7 +21,7 @@ class Background:
 
     def run_forever(self):
         while True:
-            print("BACKGROUND TASK IS RUNNING")
+            # print("BACKGROUND TASK IS RUNNING")
             current_time = int(time.time())
 
             if ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:

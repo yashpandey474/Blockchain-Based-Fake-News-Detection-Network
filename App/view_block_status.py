@@ -7,62 +7,68 @@ import time
 def block_valid():
     return int(time.time()) - st.session_state.p2pserver.received_block.timestamp <= config.BLOCK_VALIDATOR_CHOOSE_INTERVAL
 
+
 def propose_block():
     st.title("Create A Block")
     st.write("You are the current block proposer.")
 
-    # SHOW TRANSACTION POOL AND ASK TO CHOOOSE TRANSACTIONS
+    # SHOW TRANSACTION POOL AND ASK TO CHOOSE TRANSACTIONS
     table_data = []
     transactions = st.session_state.p2pserver.transaction_pool.transactions
     transaction_dict = {
-           transaction.id: transaction for transaction in transactions
-           }
+        transaction.id: transaction for transaction in transactions}
 
     for transaction in transactions:
+        include_value = st.radio(f"Include Transaction {transaction.id}?", [
+                                 "False", "True"], key=f"include_{transaction.id}")
         table_data.append({
-                "ID": transaction.id,
-                "IPFS Address": transaction.ipfs_address,
-                "Model Score": transaction.model_score,
-                "Sender Reputation": transaction.sender_reputation
-            })
+            "ID": transaction.id,
+            "IPFS Address": transaction.ipfs_address,
+            "Model Score": transaction.model_score,
+            "Sender Reputation": transaction.sender_reputation,
+            "Include": include_value
+        })
 
     max_selections = config.BLOCK_TRANSACTION_LIMIT
 
-        # DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
+    # DISPLAY TABLE OF TRANSACS. WITH SELECT BOX
     selected_transactions = st.multiselect(
-            "Select transactions to Include in Block ",
-            table_data,
-            default=[],
-            key="transactions",
-        )
+        "Select transactions to Include in Block",
+        table_data,
+        default=[],
+        key="transactions",
+        # Display transaction IDs in the multiselect
+        format_func=lambda transaction: transaction["ID"]
+    )
 
-        # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
+    # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
     if len(selected_transactions) > max_selections:
         st.warning(
-                f"Maximum selections allowed: {max_selections}. Please deselect items."
-            )
+            f"Maximum selections allowed: {max_selections}. Please deselect items.")
 
-        # CONFIRM THE SELECTION
+    # CONFIRM THE SELECTION
     if st.button("Confirm Selection") and len(selected_transactions) <= max_selections:
         selected_transaction_objects = [
-                transaction_dict[transaction["ID"]] for transaction in selected_transactions
+            transaction_dict[transaction["ID"]] for transaction in selected_transactions if transaction["Include"] == "True"
         ]
 
-            # CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
+        # CREATE A BLOCK WITH TRANSACTIONS [PASSED AS LIST]
         block = Block.create_block(
-                lastBlock=st.session_state.blockchain.chain[-1],
-                data=selected_transaction_objects,
-                wallet=st.session_state.p2pserver.wallet,
-                blockchain=st.session_state.p2pserver.blockchain
-            )
-        
+            lastBlock=st.session_state.blockchain.chain[-1],
+            data=selected_transaction_objects,
+            wallet=st.session_state.p2pserver.wallet,
+            blockchain=st.session_state.p2pserver.blockchain
+        )
 
-            # BROADCAST THE BLOCK
+        # BROADCAST THE BLOCK
         st.session_state.p2pserver.broadcast_block(block)
 
-            # CONFIRMATION MESSAGE
+        # CONFIRMATION MESSAGE
         st.write("The created block was transmitted.")
-    
+
+    if st.button("Back"):
+        change_screen(st.session_state.previous_screen)
+
     
 def view_block_status():
 
@@ -82,5 +88,8 @@ def view_block_status():
         st.write("Current Confirmations on Receieved Block: ", len(st.session_state.p2pserver.received_block.votes))
     else:
         st.write("No Valid Block Received yet.")
+        
+    if st.button("Back"):
+        change_screen(st.session_state.previous_screen)
             
     

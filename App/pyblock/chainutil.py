@@ -77,7 +77,7 @@ class ChainUtil:
     def encryptWithSoftwareKey(data):
         signature = ChainUtil.sign(data)
         signature_hex = binascii.hexlify(signature).decode('utf-8')
-        print("SIGNATURE = ", signature, "DATA = ", data)
+        # print("SIGNATURE = ", signature, "DATA = ", data)
         data["VM_signature"] = signature
         return data
 
@@ -87,7 +87,7 @@ class ChainUtil:
         signature = binascii.unhexlify(signature_hex)
         del data["VM_signature"]
         
-        print("SIGNATURE  = ", signature, "DATA = ", data)
+        # print("SIGNATURE  = ", signature, "DATA = ", data)
         if ChainUtil.verify_signature(signature, data):
             return data
         

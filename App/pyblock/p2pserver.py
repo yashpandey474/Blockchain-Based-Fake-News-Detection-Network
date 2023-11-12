@@ -262,10 +262,10 @@ class P2pServer:
                 print(f"Failed to connect to peer {peer}. Error: {e}")
 
     def on_peer_message(self, ws, message):
-        self.message_received(ws, None, message)
+        self.message_received(ws, self.server, message)
 
     def on_peer_close(self, ws, *args):
-        pass
+        self.connections.remove(ws)
 
     def on_peer_open(self, ws):
         self.send_new_node(
@@ -294,10 +294,6 @@ class P2pServer:
         # active_accounts = self.accounts.get_active_accounts(
         # self.wallet.get_public_key())
         for client in  self.connections:
-            #Assuming the account's clientPort can be used to send messages
-            # and there's a method in P2pServer to get the socket by its client port
-            # socket = self.get_socket_by_client_port(account.clientPort)
-            # if socket:
             self.send_chain(client)
 
     def broadcast_transaction(self, transaction):

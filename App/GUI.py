@@ -66,8 +66,7 @@ if __name__ == "__main__":
         st.session_state.name = ""
         st.session_state.email = ""
         st.session_state.initialise = False
-        
-        print("SCREEN INITILIASED")
+        st.session_state.validator = False
         st.session_state.previous_screen = "enter"
         st.session_state.screen = "enter"
         

@@ -6,13 +6,15 @@ import binascii
 
 def show_account_info():
     st.title("ACCOUNT INFORMATION")
-
+    #GET USER'S DETAILS
     public_key = st.session_state.p2pserver.wallet.get_public_key()
     private_key = st.session_state.p2pserver.wallet.get_private_key()
     balance = st.session_state.blockchain.get_balance(
         public_key
     )
     stake = st.session_state.blockchain.get_stake(public_key)
+    
+    #DISPLAY THE DETAILS
     st.write("Current Balance = ", balance)
     if st.session_state.validator:
         st.write("Currrent Stake in Network = ", stake)

@@ -22,11 +22,13 @@ def sign_up_generate():
 
         private_key = crypto_logic.gen_sk()
         
+        # PRINT THE PRIVATE KEY
+        st.write(private_key.export_key().decode())
+        
         #INITIALISE ACCOUNT & WALLET OF SESSION
         initialise(private_key)
 
-        #PRINT THE PRIVATE KEY
-        st.write(private_key.export_key().decode())
+        
 
 
     if st.session_state.gen_key_pressed:
