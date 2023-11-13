@@ -21,27 +21,36 @@ class Background:
 
     def run_forever(self):
         while True:
-            # print("BACKGROUND TASK IS RUNNING")
             current_time = int(time.time())
+            time_elapsed = current_time - START_TIME.timestamp()
+            sleep_time = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
 
-            if ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL) == 0:
-                print("TRUE")
-                if self.p2pserver.received_block:
-                    if self.can_add_block(self.p2pserver.received_block):
-                        self.p2pserver.blockchain.append_block(
-                            self.p2pserver.received_block, 
-                            self.p2pserver.transaction_pool,
-                            self.p2pserver.accounts
-                        )
+            print("Sleeping for {} seconds".format(sleep_time))
+            time.sleep(sleep_time)
 
-                self.p2pserver.received_block = None
-                self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(current_time)
+
+            #CHOOSE THE BLOCK PROPOSER AT THE START TO NOT HAVE DELAY BECAUSE OF APPENDING
+            self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(
+                current_time)
+            
+            #IF THERE WAS A RECEIVED BLOCK FROM PREVIOUS BLOCK PROPOSERR
+            if self.p2pserver.received_block:
                 
-                #IF WAS ABLE TO CHOOSE A BLOCK PROPOSER
-                if self.p2pserver.block_proposer:
-                    print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
-                else:
-                    print("NO BLOCK PROPOSER CHOSEN.")
+                #IF THE BLOCK HAD VOTES FROM MAJORITY
+                if self.can_add_block(self.p2pserver.received_block):
+                    #ADD THE BLOCK TO THE BLOCKCHAIN
+                    self.p2pserver.blockchain.append_block(
+                        self.p2pserver.received_block,
+                        self.p2pserver.transaction_pool,
+                        self.p2pserver.accounts
+                    )
 
-                # time.sleep(BLOCK_VALIDATOR_CHOOSE_INTERVAL -
-                         #  ((current_time - START_TIME.timestamp()) % BLOCK_VALIDATOR_CHOOSE_INTERVAL))
+            #SET THE RECEIVED BLOCK TO NONE
+            self.p2pserver.received_block = None
+            
+
+            # IF WAS ABLE TO CHOOSE A BLOCK PROPOSER
+            if self.p2pserver.block_proposer:
+                print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
+            else:
+                print("NO BLOCK PROPOSER CHOSEN.")

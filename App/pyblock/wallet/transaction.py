@@ -14,7 +14,9 @@ class Transaction:
         self.sender_reputation = None
         self.model_score = None
         self.sign = None
-        self.positive_votes = None
+        self.positive_votes = set()
+        #ADD SO THAT USERS WHO DID NOT VOTE CORRECTLY CAN BE PENALISED [POSITVE (TRUE) OR NEGATIVE (FAKE)]
+        self.negative_votes = set()
         self.timestamp = int(time.time())
         self.fee = 0
 
@@ -26,7 +28,8 @@ class Transaction:
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
             "sign": str(self.sign.hex()) if self.sign else "",
-            "positive_votes": self.positive_votes,
+            "positive_votes": list(self.positive_votes),
+            "negative_votes": list(self.negative_votes),
             "timestamp": self.timestamp,
             "fee": self.fee
         }
@@ -47,7 +50,8 @@ class Transaction:
             transaction.sign = None
     
         transaction.timestamp = json_data["timestamp"]
-        transaction.positive_votes = json_data["positive_votes"]
+        transaction.positive_votes = set(json_data["positive_votes"])
+        transaction.negative_votes = set(json_data["negative_votes"])
         
         return transaction
     

@@ -15,6 +15,7 @@ class Account:
 class Accounts:
     def __init__(self):
         self.accounts = {}  # This will store address: Account mappings
+        # self.accounts[config.VM_PUBLIC_KEY] = Account(balance=50, stake = 0, clientPort=None)
 
     def initialize(self, address, balance=config.STARTING_BALANCE, stake=0, clientPort=None):
         if address not in self.accounts:
@@ -39,6 +40,7 @@ class Accounts:
         self.accounts[address].sent_blocks.add(block)
         
     def update_accounts(self, block):
+        
         for transaction in block.transactions:
             #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
             self.send_amount(
@@ -46,6 +48,31 @@ class Accounts:
                 block.validator,
                 transaction.fee
             )
+            
+        # CREATE TRANSACTIONS FOR REPUTATION CHANGE
+        for news_transaction in block.transactions:
+            #IF MAJORITY VOTED "TRUE"
+            if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
+                #IF MODEL AGREED WITH MAJORITY
+                if news_transaction.model_score < 0.5:
+                    #FOR THOSE THAT VOTED NEGATIVELY
+                    for public_key in news_transaction.negative_votes:
+                        #PENALISE BY % OF STAKE
+                        self.accounts[public_key].stake -= (
+                            self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100)
+                        
+            # IF MAJORITY VOTED "FAKE"
+            if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
+                # IF MODEL AGREED WITH MAJORITY
+                if news_transaction.model_score >= 0.5:
+                    # FOR THOSE THAT VOTED POSITIVELY
+                    for public_key in news_transaction.positive_votes:
+                        # PENALISE BY % OF STAKE
+                        self.accounts[public_key].stake -= (
+                            self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100)
+
+
+                
 
     def clientLeft(self, clientport):
         for address, account in self.accounts.items():

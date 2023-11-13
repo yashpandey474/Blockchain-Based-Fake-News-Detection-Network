@@ -72,12 +72,12 @@ class Blockchain:
     
     #MAKE CHANGES IN ACCOUNTS AND TRANSACTION POOL
     def append_block(self, block, transaction_pool, accounts):
-
-        #UPDATE THE BALANCE OF SENDER
-        accounts.update_accounts(block)
         
         #UPDATE THE TRANSACTION POOL
         transaction_pool.remove(block.transactions)
+        
+        # UPDATE THE BALANCE OF SENDER & THE VALIDATORS
+        accounts.update_accounts(block)
         
         #APPEND THE BLOCK TO CURRENT CHAIN
         self.chain.append(block)

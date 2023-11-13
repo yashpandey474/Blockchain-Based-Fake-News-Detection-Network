@@ -199,7 +199,9 @@ class P2pServer:
         
         for key, value in self.received_block.transactions:
             if value == "True":
-                transactions_dict[key].positive_votes += 1
+                transactions_dict[key].positive_votes.add(data["address"])
+            else:
+                transactions_dict[key].negative_votes.add(data["address"])
 
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.p2pserver.received_block.transactions):

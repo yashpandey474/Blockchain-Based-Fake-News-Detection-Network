@@ -3,8 +3,6 @@ from pyblock import config
 from change_screen import *
 
 def become_validator():
-
-    st.session_state.stake_submitted = False
         
     if st.session_state.validator:
         st.write("You are already a validator.")
@@ -29,8 +27,8 @@ def become_validator():
             st.write("Your Current Stake: ", st.session_state.stake)
             
             #GET VALUE TO STAKE
-        if not st.session_state.stake_submitted:
-            stake = st.number_input(
+
+        stake = st.number_input(
                     "Amount to stake in VRC",
                     min_value=config.MIN_STAKE, 
                     max_value=st.session_state.balance+st.session_state.stake,
@@ -42,22 +40,21 @@ def become_validator():
         if st.button("Submit Stake"):
             old_stake = st.session_state.stake
             st.session_state.stake = stake
-            
-            #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
+                
+                #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
             if old_stake != st.session_state.stake:
                 st.session_state.p2pserver.broadcast_new_validator(
-                            stake = st.session_state.stake
-                )
-                
+                                stake = st.session_state.stake
+                    )
+                    
             if not st.session_state.validator:
                 st.write("You are successfully registered as a validator with stake: ", st.session_state.stake)
                 st.session_state.validator = True
-                    
+                        
             else:
                 st.write("Your stake has been successfully modified to: ", st.session_state.stake)
-                    
-            st.session_state.stake_submitted = True
-    
+                        
+        
     
     #GO BACK TO MAIN SCREEN
     if st.button("Back"):

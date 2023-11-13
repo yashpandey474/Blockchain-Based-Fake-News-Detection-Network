@@ -4,6 +4,8 @@ from change_screen import *
 import pandas as pd
 from datetime import datetime
 from pyblock.ipfs.ipfs_handler import *
+
+
 def show_transactions():
     st.title("Current Network Transactions")
     transac_pool = st.session_state.p2pserver.transaction_pool.transactions
