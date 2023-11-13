@@ -41,16 +41,24 @@ class Accounts:
         
     def update_accounts(self, block):
         
-        for transaction in block.transactions:
+        for news_transaction in block.transactions:
             #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
             self.send_amount(
-                transaction.sender_address,
+                news_transaction.sender_address,
                 block.validator,
-                transaction.fee
+                news_transaction.fee
             )
-            
-        # CREATE TRANSACTIONS FOR REPUTATION CHANGE
-        for news_transaction in block.transactions:
+            #IF NEWS WAS TRUE; REWARD SENDER
+            if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
+                self.accounts[news_transaction.sender_address].balance += config.SENDER_REWARD
+                
+            else:
+                # TODO: MAYBE AUDITORS GET PENALISED MORE? MAYBE PENALISE A PERCENTAGE OF BALANCE?
+                # PERCENTAGE TO STOP RICH GETTING RICHER
+                self.accounts[news_transaction.sender_address].balance -= (
+                    self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT
+                )
+        
             #IF MAJORITY VOTED "TRUE"
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
                 #IF MODEL AGREED WITH MAJORITY
