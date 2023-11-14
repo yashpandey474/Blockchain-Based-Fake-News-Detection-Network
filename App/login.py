@@ -20,7 +20,6 @@ def login():
 
             if vc[0]:
                 st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
-                time.sleep(1)
                 initialise(vc[2])
                 change_screen("main_page")
 
