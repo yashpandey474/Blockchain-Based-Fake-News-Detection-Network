@@ -75,15 +75,6 @@ class ChainUtil:
         
     @staticmethod
     def encryptWithSoftwareKey(data):
-        
-        if "block" in data:
-            data_block = {
-                "timestamp": data.timestamp,
-                "lastHash": data.lastHash,
-                "transactions": [transaction.to_json() for transaction in data.transactions],
-                "validator": data.validator
-            }
-        
         signature = ChainUtil.sign(config.VM_PRIVATE_KEY, data)
         data["VM_signature"] = signature
         return data

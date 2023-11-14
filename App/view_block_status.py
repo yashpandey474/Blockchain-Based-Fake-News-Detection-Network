@@ -95,7 +95,7 @@ def propose_block():
         st.success("The created block was transmitted.")
 
     if st.button("Back"):
-        change_screen(st.session_state.previous_screen)
+        change_screen("main_page")
 
     
 def view_block_status():
@@ -118,6 +118,6 @@ def view_block_status():
         st.write("No Valid Block Received yet.")
         
     if st.button("Back"):
-        change_screen(st.session_state.previous_screen)
+        change_screen("main_page")
             
     

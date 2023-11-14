@@ -128,16 +128,17 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
-            if self.block_proposer != data["block"].validator:
+            block =  Block.from_json(data["block"])
+            if self.block_proposer != block.validator:
                 return
             #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
-                data["block"], self.transaction_pool, self.accounts)):
+                block, self.transaction_pool, self.accounts)):
                 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
-                self.received_block = data["block"]
-                self.accounts.add_sent_block(data["address"], data["block"])
+                self.received_block = block
+                self.accounts.add_sent_block(data["address"], block)
 
         elif data["type"] == MESSAGE_TYPE["new_validator"]:
             # NEW VALIDATOR
@@ -330,7 +331,7 @@ class P2pServer:
     def broadcast_block(self, block):
         message_data = {
             "type": MESSAGE_TYPE["block"],
-            "block": Block.to_json(block)
+            "block": block.to_json()
         }
         message = ChainUtil.encryptWithSoftwareKey(message_data)
 

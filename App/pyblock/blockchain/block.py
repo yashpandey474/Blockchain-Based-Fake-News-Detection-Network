@@ -11,17 +11,19 @@ from typing import List  # Import Any if the actual type of signature is not kno
 
 
 class Block:
-    def __init__(self, timestamp, lastBlock, transactions: List[Transaction], validator, index: int, signature = None):
+    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, index: int, signature = None):
         #TIME OF BLOCK CREATION
         self.timestamp = timestamp
         #HASH OF PREVIOUS BLOCK
         
         #GENESIS BLOCK
-        if index == 1:
-            self.lastHash = "0000"
-        else:
-            self.lastHash = Block.block_hash(lastBlock)
+        # if index == 1:
+        #     self.lastHash = "0000"
+        # else:
+        #     self.lastHash = Block.block_hash(lastBlock)
             
+        self.lastHash = lastHash
+        
         #LIST OF TRANSACTIONS
         self.transactions = transactions
         #VALIDATOR PUBLIC KEY
@@ -38,22 +40,37 @@ class Block:
     #FUNCTION TO CONVERT BLOCK TO JSON
     def to_json(self):
         return {
+            "index": self.index,
             "timestamp": self.timestamp,
             "lastHash": self.lastHash,
-            "hash": self.hash,
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
             "signature": self.signature.hex() if self.signature else None,
-            "countofvotes": len(self.votes)
+            "countofvotes": list(self.votes)
         }
         
 
-
+    @staticmethod
+    def from_json(data_json):
+        block =  Block(
+            index = data_json["index"],
+            timestamp=data_json["timestamp"],
+            lastHash=data_json["lastHash"],
+            transactions=[Transaction.from_json(
+                transaction_data) for transaction_data in data_json["transactions"]],
+            validator=data_json["validator"],
+            signature=bytes.fromhex(
+                data_json["signature"]) if data_json["signature"] else None
+        )
+        
+        block.votes = set(data_json["countofvotes"])
+        
+        return block
     #CREATE THE INITIAL BLOCK
     @staticmethod
     def genesis():
         return Block(timestamp = int(time.time()), 
-                     lastBlock=None, 
+                     lastHash = "0000", 
                      transactions=[],
                      validator="Creators",
                      signature = None, 
@@ -96,7 +113,7 @@ class Block:
         #RETURN THE CREATED BLOCK
         return Block(
             timestamp = timestamp,
-            lastBlock = lastBlock,
+            lastHash = lastHash,
             transactions = data,
             validator = validator,
             signature = signature,
