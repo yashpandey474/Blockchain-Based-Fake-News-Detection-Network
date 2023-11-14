@@ -17,7 +17,7 @@ def become_validator():
 
         #IF NOT ENOUGH BALANCE
     if st.session_state.balance  + st.session_state.stake < config.MIN_STAKE:
-        st.write("You don't have enough balance to stake. Minimum Stake Required: ", config.MIN_STAKE)
+        st.error("You don't have enough balance to stake. Minimum Stake Required: ", config.MIN_STAKE)
 
     else:
         st.write("Minimum Stake Required: ", config.MIN_STAKE)
@@ -48,11 +48,11 @@ def become_validator():
                     )
                     
             if not st.session_state.validator:
-                st.write("You are successfully registered as a validator with stake: ", st.session_state.stake)
+                st.success(f"You are successfully registered as a validator with stake: {st.session_state.stake}")
                 st.session_state.validator = True
                         
             else:
-                st.write("Your stake has been successfully modified to: ", st.session_state.stake)
+                st.success("Your stake has been successfully modified to: ", st.session_state.stake)
                         
         
     

@@ -15,15 +15,14 @@ def sign_up_generate():
     if st.button("Click to generate a new private key"):
         st.session_state.gen_key_pressed = True
 
-        st.markdown(
-            "<span style='font-style: italic; color: #FF5733;'><b>Generating New key <br> store it for future use</b></span>",
-            unsafe_allow_html=True
-        )
+        # st.markdown(
+        #     "<span style='font-style: italic; color: #FF5733;'><b>Generating New key <br> store it for future use</b></span>",
+        #     unsafe_allow_html=True
+        # )
 
         private_key = crypto_logic.gen_sk()
         
-        # TODO: FIX V. TIME CONSUMING GENERATION
-        print("GENERATED PRIVATE KEY")
+        st.success("Generated Private key. Please store it safely.")
         
         
         # PRINT THE PRIVATE KEY
@@ -59,12 +58,12 @@ def sign_up():
     if st.button("Submit Details"):
         pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         if not re.match(pattern, email):
-            st.markdown('<span style="color:yellow"><b>Invalid Email ID</b></span>', unsafe_allow_html=True)
-
+            # st.markdown('<span style="color:yellow"><b>Invalid Email ID</b></span>', unsafe_allow_html=True)
+            st.warning("Invalid Email ID")
         else:
             if st.session_state.user_type == "Auditor" and not crypto_logic.verify_certificate(certificate_id):
-                st.markdown('<span style="color:yellow"><b>Invalid Certificate ID</b></span>', unsafe_allow_html=True)
-            
+                # st.markdown('<span style="color:yellow"><b>Invalid Certificate ID</b></span>', unsafe_allow_html=True)
+                st.warning("Invalid Certificate ID")
             else:
                 st.session_state.name = name
                 st.session_state.email = email

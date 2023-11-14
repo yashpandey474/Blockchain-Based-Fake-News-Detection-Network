@@ -10,89 +10,76 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
-    st.title("Create A Block")
-    st.write("You are the current block proposer.")
+    st.title("You are the current block proposer.")
 
-    #TABLE DATA TO SHOW TRANSACTIONS
-    table_data = []
+    if "created_block" in st.session_state and st.session_state.created_block == True:
+        st.write("You have already transmitted the block")
+        st.write("Current Confirmations on Block: ", len(
+            st.session_state.p2pserver.received_block.votes))
     
-    #GET CURRENT MEMPOOL TRANSACTIONS
-    transactions = st.session_state.p2pserver.transaction_pool.transactions
-    
-    #DICTIONARY MAPPING ID TO TRANSACTION
-    transaction_dict = {
-        transaction.id: transaction for transaction in transactions}
-
-    #FOR EACH TRANSACTION
-    for transaction in transactions:
-        st.subheader(f"Transaction {transaction.id}")
+    else:
+        #TABLE DATA TO SHOW TRANSACTIONS
+        table_data = []
+        selected_transactions = []
+        votes = {}
+        public_key = st.session_state.p2pserver.wallet.get_public_key()
         
-        #WHETHER TO INCLUDE IN BLOCK OR NOT
-        include_value = st.radio("Include in Block?", [
-                                 "False", "True"], key=f"include_{transaction.id}")
+        #GET CURRENT MEMPOOL TRANSACTIONS
+        transactions = st.session_state.p2pserver.transaction_pool.transactions
+
+        #FOR EACH TRANSACTION
+        for transaction in transactions:
+            st.subheader(f"Transaction {transaction.id}")
+            
+            #WHETHER TO INCLUDE IN BLOCK OR NOT
+            include_value = st.radio("Include in Block?", [
+                                    "False", "True"], key=f"include_{transaction.id}")
+            
+            #WHETHER NEWS IS FAKE OR TRUE
+            vote_value = st.radio("Vote on this Transaction?", [
+                                "False", "True"], key=f"vote_{transaction.id}")
+            
+            if include_value == "True":
+                selected_transactions.append(transaction)
+                votes[transaction.id] = vote_value
+
+
+        # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
+        print(selected_transactions)
+        print(len(selected_transactions))
+        max_selections = config.BLOCK_TRANSACTION_LIMIT
         
-        #WHETHER NEWS IS FAKE OR TRUE
-        vote_value = st.radio("Vote on this Transaction?", [
-                              "False", "True"], key=f"vote_{transaction.id}")
-        
-        #CREATE THE TABLE
-        table_data.append({
-            "ID": transaction.id,
-            "IPFS Address": transaction.ipfs_address,
-            "Model Score": transaction.model_score,
-            "Sender Reputation": transaction.sender_reputation,
-            "Include": include_value,
-            "Vote": vote_value
-        })
+        if len(selected_transactions) > max_selections:
+            st.warning(
+                f"Maximum selections allowed: {max_selections}. Please deselect items.")
 
-    # DISPLAY TABLE OF TRANSACTIONS WITH SELECT AND VOTE BUTTONS
-    st.write("Choose transactions and vote on them:")
-    
-    #THE SELECTED TRANSACTIONS
-    selected_transactions = st.multiselect(
-        "Select transactions to Include in Block",
-        table_data,
-        default=[],
-        key="transactions",
-        format_func=lambda transaction: transaction["ID"]
-    )
-
-    # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
-    max_selections = config.BLOCK_TRANSACTION_LIMIT
-    if len(selected_transactions) > max_selections:
-        st.warning(
-            f"Maximum selections allowed: {max_selections}. Please deselect items.")
-
-    # CONFIRM THE SELECTION AND VOTES
-    if st.button("Create Block") and len(selected_transactions) <= max_selections:
-        selected_transaction_objects = []
-    
-        for transaction in selected_transactions:
-            if transaction["Include"] == True:
-                transaction_object = transaction_dict[transaction["ID"]]
-                if transaction["Vote"] == "True":
-                    transaction.positive_votes.add(st.session_state.p2pserver.wallet.get_public_key())
-                    
+        # CONFIRM THE SELECTION AND VOTES
+        if st.button("Create Block") and 1 <= len(selected_transactions) <= max_selections:
+            print("BLOCK BEING CREATED")
+            for transaction in selected_transactions:
+                if votes[transaction.id] == "True":
+                    transaction.positive_votes.add(public_key)
                 else:
                     transaction.negative_votes.add(
-                        st.session_state.p2pserver.wallet.get_public_key())
+                        public_key)
+            
+            # CREATE A BLOCK WITH TRANSACTIONS (PASSED AS LIST)
+            block = Block.create_block(
+                lastBlock=st.session_state.blockchain.chain[-1],
+                data=selected_transactions,
+                wallet=st.session_state.p2pserver.wallet,
+                blockchain=st.session_state.p2pserver.blockchain
+            )
+            
+            print(block.transactions)
 
-                    
-                selected_transaction_objects.append(transaction_object)
-        
-        # CREATE A BLOCK WITH TRANSACTIONS (PASSED AS LIST)
-        block = Block.create_block(
-            lastBlock=st.session_state.blockchain.chain[-1],
-            data=selected_transaction_objects,
-            wallet=st.session_state.p2pserver.wallet,
-            blockchain=st.session_state.p2pserver.blockchain
-        )
+            # BROADCAST THE BLOCK
+            st.session_state.p2pserver.broadcast_block(block)
 
-        # BROADCAST THE BLOCK
-        st.session_state.p2pserver.broadcast_block(block)
-
-        # CONFIRMATION MESSAGE
-        st.success("The created block was transmitted.")
+            # CONFIRMATION MESSAGE
+            st.success("The created block was transmitted.")
+            
+            # st.session_state.created_block = True
 
     if st.button("Back"):
         change_screen("main_page")

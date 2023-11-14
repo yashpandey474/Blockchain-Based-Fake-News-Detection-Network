@@ -18,11 +18,18 @@ class TransactionPool:
             tx_to_remove.id for tx_to_remove in transactions_to_remove}}
         
         return True
+    
     def verify_transactions_exist(self, transactions):
         #VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED
         for transaction in transactions:
-            #IF NOT IN MEMPOOL OR NOT VALIDI
-            if transaction not in self.transactions or not Transaction.verify_transaction(transaction):
+            #IF NOT IN MEMPOOL OR NOT VALID
+            if transaction.id not in set(t.id for t in self.transactions):
+                print("TRANSACTION NOT IN SET")
+                return False
+                
+            if not Transaction.verify_transaction(transaction):
+                # print(Transaction.verify_transaction(transaction))
+                print("VERIFICATION OF TRANSACTION FAILED")
                 return False
             
             

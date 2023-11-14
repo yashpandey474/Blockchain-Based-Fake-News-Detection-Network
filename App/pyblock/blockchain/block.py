@@ -94,7 +94,8 @@ class Block:
         #SET PREVIOUS BLOCK'S HASH
         lastHash = Block.block_hash(lastBlock)
         #CONVERT THE TRANSACTIOONS TO JSON 
-        transactions = [Transaction(**tx.to_json()) for tx in data]
+        # transactions = [Transaction(**tx.to_json()) for tx in data]
+        transactions = data
         #GET THE VALIDATOR'S PUBLIC KEY
         validator = wallet.get_public_key()
         

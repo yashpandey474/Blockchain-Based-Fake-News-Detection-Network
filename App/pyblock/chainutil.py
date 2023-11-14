@@ -53,21 +53,24 @@ class ChainUtil:
     
     @staticmethod
     def verify_signature(public_key, signature, data):
-        public_key = RSA.import_key(public_key)
+        public_key_RSA = RSA.import_key(public_key)
         data_str = json.dumps(data, cls = CustomJSONEncoder)
         data_hash = SHA256.new(data_str.encode())
+        
         try:
-            pkcs1_15.new(public_key).verify(data_hash, signature)
+            pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
             return True  # Signature is valid
+        
         except (ValueError, TypeError):
             return False  # Signature is invalid
         
     @staticmethod
-    def verify_hashed_signature(public_key, signature, data_hash):
-        public_key_1 = RSA.import_key(public_key)
+    def verify_hashed_signature(public_key, signature, data):
+        data_hash = SHA256.new(data.encode())
+        public_key_RSA = RSA.import_key(public_key)
         
         try:
-            pkcs1_15.new(public_key_1).verify(data_hash, signature)
+            pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
             return True 
         
         except (ValueError, TypeError):
