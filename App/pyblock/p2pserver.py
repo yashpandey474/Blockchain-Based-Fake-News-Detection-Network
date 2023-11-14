@@ -332,7 +332,6 @@ class P2pServer:
             "type": MESSAGE_TYPE["block"],
             "block": Block.to_json(block)
         }
-        
         message = ChainUtil.encryptWithSoftwareKey(message_data)
 
         message = json.dumps(message, cls=CustomJSONEncoder)
