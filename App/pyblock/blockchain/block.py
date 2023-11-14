@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import numpy as np
 # Assuming ChainUtil.py exists in the same directory
 from pyblock.chainutil import ChainUtil
 import time
@@ -45,6 +46,8 @@ class Block:
             "signature": self.signature.hex() if self.signature else None,
             "countofvotes": len(self.votes)
         }
+        
+
 
     #CREATE THE INITIAL BLOCK
     @staticmethod
@@ -72,31 +75,54 @@ class Block:
         #SET THE TIMESTAMP
         timestamp = time.time()
         #SET PREVIOUS BLOCK'S HASH
-        last_hash = Block.block_hash(lastBlock)
+        lastHash = Block.block_hash(lastBlock)
         #CONVERT THE TRANSACTIOONS TO JSON 
         transactions = [Transaction(**tx.to_json()) for tx in data]
-        #GENERATE HASH FOR SIGNING
-        data_hash = Block.get_hash(timestamp, last_hash, transactions)
         #GET THE VALIDATOR'S PUBLIC KEY
         validator = wallet.get_public_key()
+        
         #SIGN THE BLOCK WITH VALIDATOR'S PRIVATE KEY
-        signature = wallet.sign_hashed_data(data_hash)
+        block_data = {
+            "timestamp": timestamp,
+            "lastHash": lastHash,
+            "transactions": [transaction.to_json() for transaction in transactions],
+            "validator": validator
+        }
+        
+        block_json = json.dumps(block_data)
+        
+        signature = wallet.sign(block_json)    
+        
         #RETURN THE CREATED BLOCK
-        return Block(timestamp, last_hash, data, validator, signature, len(blockchain.chain) + 1)
+        return Block(
+            timestamp = timestamp,
+            lastBlock = lastBlock,
+            transactions = data,
+            validator = validator,
+            signature = signature,
+            index=  len(blockchain.chain) + 1)
 
     @staticmethod
-    def get_hash(timestamp, last_hash, transactions):
-        # Use the new helper method to hash transactions
-        transactions_hash = Block.hash_transactions(transactions)
+    def get_hash(timestamp, lastHash, transactions):
+        data = {
+            "timestamp": timestamp,
+            "last_hash": lastHash,
+            "transactions": transactions
+        }
+
+        # Serialize the dictionary to a JSON string
+        data_str = json.dumps(data, cls=CustomJSONEncoder)
+
+        # Hash the serialized JSON string using SHA256
         sha = hashlib.sha256()
-        sha.update(
-            f"{timestamp}{last_hash}{transactions_hash}".encode('utf-8'))
+        sha.update(data_str.encode('utf-8'))
+
         return sha.hexdigest()
 
     @staticmethod
     def block_hash(block):
         # Use the new helper method to hash transactions within the block
-        return Block.get_hash(block.timestamp, block.last_hash, block.transactions)
+        return Block.get_hash(block.timestamp, block.lastHash, block.transactions)
 
 
     @staticmethod
@@ -105,9 +131,27 @@ class Block:
         for transaction in block.transactions:
             if not Transaction.verify_transaction(transaction=transaction):
                 return False
+            
+
+        block_data = {
+            "timestamp": block.timestamp,
+            "lastHash": block.lastHash,
+            "transactions": [transaction.to_json() for transaction in block.transactions],
+            "validator": block.validator
+        }
+        
         #VERIFY THE SIGNATURE OF THE BLOCK
-        return ChainUtil.verify_hashed_signature(
+        return ChainUtil.verify_signature(
             block.validator,
             block.signature,
-            Block.block_hash(block)  # Verify the signature against the recreated hash
+            block_data  # Verify the signature against the recreated hash
         )
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, bytes):
+            return o.hex()
+        elif isinstance(o, np.float32):
+            return float(o)
+        return json.JSONEncoder.default(self, o)

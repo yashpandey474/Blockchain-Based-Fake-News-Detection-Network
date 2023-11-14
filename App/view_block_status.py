@@ -8,23 +8,34 @@ import time
 def block_valid():
     return int(time.time()) - st.session_state.p2pserver.received_block.timestamp <= config.BLOCK_VALIDATOR_CHOOSE_INTERVAL
 
-
+#CREATE A NEW BLOCK
 def propose_block():
     st.title("Create A Block")
     st.write("You are the current block proposer.")
 
-    # SHOW TRANSACTION POOL AND ASK TO CHOOSE TRANSACTIONS
+    #TABLE DATA TO SHOW TRANSACTIONS
     table_data = []
+    
+    #GET CURRENT MEMPOOL TRANSACTIONS
     transactions = st.session_state.p2pserver.transaction_pool.transactions
+    
+    #DICTIONARY MAPPING ID TO TRANSACTION
     transaction_dict = {
         transaction.id: transaction for transaction in transactions}
 
+    #FOR EACH TRANSACTION
     for transaction in transactions:
         st.subheader(f"Transaction {transaction.id}")
+        
+        #WHETHER TO INCLUDE IN BLOCK OR NOT
         include_value = st.radio("Include in Block?", [
                                  "False", "True"], key=f"include_{transaction.id}")
+        
+        #WHETHER NEWS IS FAKE OR TRUE
         vote_value = st.radio("Vote on this Transaction?", [
                               "False", "True"], key=f"vote_{transaction.id}")
+        
+        #CREATE THE TABLE
         table_data.append({
             "ID": transaction.id,
             "IPFS Address": transaction.ipfs_address,
@@ -36,6 +47,8 @@ def propose_block():
 
     # DISPLAY TABLE OF TRANSACTIONS WITH SELECT AND VOTE BUTTONS
     st.write("Choose transactions and vote on them:")
+    
+    #THE SELECTED TRANSACTIONS
     selected_transactions = st.multiselect(
         "Select transactions to Include in Block",
         table_data,
@@ -54,16 +67,19 @@ def propose_block():
     if st.button("Create Block") and len(selected_transactions) <= max_selections:
         selected_transaction_objects = []
     
-        for transaction in selected_transaction:
+        for transaction in selected_transactions:
             if transaction["Include"] == True:
                 transaction_object = transaction_dict[transaction["ID"]]
                 if transaction["Vote"] == "True":
-                    transaction.positive_votes+=1
+                    transaction.positive_votes.add(st.session_state.p2pserver.wallet.get_public_key())
+                    
+                else:
+                    transaction.negative_votes.add(
+                        st.session_state.p2pserver.wallet.get_public_key())
+
                     
                 selected_transaction_objects.append(transaction_object)
         
-            # Implement your logic to handle the votes for each transaction
-
         # CREATE A BLOCK WITH TRANSACTIONS (PASSED AS LIST)
         block = Block.create_block(
             lastBlock=st.session_state.blockchain.chain[-1],

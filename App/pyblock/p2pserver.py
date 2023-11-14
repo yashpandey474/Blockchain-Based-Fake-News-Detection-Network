@@ -3,6 +3,7 @@ import streamlit as st
 import json
 import websocket
 from pyblock.blockchain.blockchain import Blockchain
+from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from websocket_server import WebsocketServer
@@ -329,9 +330,8 @@ class P2pServer:
     def broadcast_block(self, block):
         message_data = {
             "type": MESSAGE_TYPE["block"],
-            "block": block
+            "block": Block.to_json(block)
         }
-        
         message = ChainUtil.encryptWithSoftwareKey(message_data)
 
         message = json.dumps(message, cls=CustomJSONEncoder)
