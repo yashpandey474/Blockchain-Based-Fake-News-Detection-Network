@@ -56,7 +56,7 @@ def propose_block():
     
         for transaction in selected_transaction:
             if transaction["Include"] == True:
-                transaction_object = transaction_dict[transaction["ID"]
+                transaction_object = transaction_dict[transaction["ID"]]
                 if transaction["Vote"] == "True":
                     transaction.positive_votes+=1
                     
