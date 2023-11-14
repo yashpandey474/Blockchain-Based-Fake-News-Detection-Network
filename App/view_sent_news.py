@@ -19,8 +19,8 @@ def view_sent_news():
             content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
             table_data.append({
                 "Model Score": transaction.model_score,
-                "Sender Reputation": transaction.sender_reputation,
                 "Transaction Fee": transaction.fee,
+                # TODO: "Status": 
                 "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                 "Title": content.split("\n")[0],
                 "Text": " ".join(content.split("\n")[1:]),

@@ -125,7 +125,7 @@ def calculate_lexical_diversity(text):
 
 
 # ADD COLUMN FOR NUMBER OF WORDS IN TEXT
-@st.cache
+# @st.cache
 def enter():
     global model
     global scaler
