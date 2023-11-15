@@ -8,14 +8,13 @@ from typing import Type
 
 class Transaction:
     def __init__(self):
-        self.id = ChainUtil.id()
+        self.id = id(ChainUtil.id())
         self.ipfs_address = None
         self.sender_address = None
         self.sender_reputation = None
         self.model_score = None
         self.sign = None
         self.positive_votes = set()
-        #ADD SO THAT USERS WHO DID NOT VOTE CORRECTLY CAN BE PENALISED [POSITVE (TRUE) OR NEGATIVE (FAKE)]
         self.negative_votes = set()
         self.timestamp = int(time.time())
         self.fee = 0
@@ -43,16 +42,15 @@ class Transaction:
         transaction.sender_reputation = json_data["sender_reputation"]
         transaction.model_score = json_data["model_score"]
         transaction.fee = json_data["fee"]
+        transaction.timestamp = json_data["timestamp"]
+        transaction.positive_votes = set(json_data["positive_votes"])
+        transaction.negative_votes = set(json_data["negative_votes"])
     
         if "sign" in json_data and json_data["sign"]:
             transaction.sign = bytes.fromhex(json_data["sign"])
         else:
             transaction.sign = None
-    
-        transaction.timestamp = json_data["timestamp"]
-        transaction.positive_votes = set(json_data["positive_votes"])
-        transaction.negative_votes = set(json_data["negative_votes"])
-        
+            
         return transaction
     
     
@@ -65,34 +63,76 @@ class Transaction:
 
     @staticmethod
     def generate_from_file(sender_wallet: Type[Wallet], file, blockchain, fee):
+        #GET DATA FROM FILE
         data = file.read()
-        ipfs_address = IPFSHandler.put_to_ipfs(data)
+        
+        #INSTANTIATE TRANSACTION
         transaction = Transaction()
-        transaction.timestamp = time.time
-        transaction.ipfs_address = ipfs_address
+        
+        # GET IPFS ADDRESS AFTER STORING CONTENT
+        transaction.ipfs_address = IPFSHandler.put_to_ipfs(data)
+        
+        #SET CURRENT TIME
+        transaction.timestamp = int(time.time())
+        #SET SENDER PUBLIC KEY
         transaction.sender_address = sender_wallet.get_public_key()
-        transaction.sign = sender_wallet.sign(ChainUtil.hash(transaction))
+        #SET SENDER REPUTATION
         transaction.sender_reputation = (blockchain.get_balance(sender_wallet.get_public_key())
                             + blockchain.get_stake(sender_wallet.get_public_key()))
+        #SET SCORE FROM ML MODEL
         transaction.model_score = transaction.get_transaction_score()
-        transaction.timestamp = int(time.time())
+        #SET TRRANSACTION FEE
         transaction.fee = fee
+        
+        #SET SIGNATURE
+        transaction_data = {
+            "id": str(transaction.id),
+            "ipfs_address": transaction.ipfs_address,
+            "sender_address": transaction.sender_address,
+            "sender_reputation": transaction.sender_reputation,
+            "model_score": round(transaction.model_score, 2),
+            "timestamp": transaction.timestamp,
+            "fee": transaction.fee
+        }
+        
+        transaction.sign = ChainUtil.sign(
+            private_key=sender_wallet.get_private_key(),
+            data = transaction_data
+        )
+        
+        
+        print("SIGN WHEN SENDING = ", transaction.sign)
+        print("DATA WHEN SENDING = ", transaction_data)
+        
         return transaction
 
     @staticmethod
-    def verify_transaction(transaction, error_bound: float = 0.01):
-        signature = transaction.sign
-        transaction.sign = None
-        transaction_hash = ChainUtil.hash(transaction)
+    def verify_transaction(transaction, error_bound: float = 0.1):
+        #HASH THE TRANSACTION WITH SIGNATURE AS NONE
+        transaction_data = {
+            "id": str(transaction.id),
+            "ipfs_address": transaction.ipfs_address,
+            "sender_address": transaction.sender_address,
+            "sender_reputation": transaction.sender_reputation,
+            "model_score": round(transaction.model_score, 2),
+            "timestamp": transaction.timestamp,
+            "fee": transaction.fee
+        }
+        
+        #GET THE MODEL SCORE
         model_score = transaction.get_transaction_score()
-        transaction.sign = signature
         
         # Compare the model_score with transaction.model_score within the error bound
         if abs(model_score - transaction.model_score) > error_bound:
+            print("MODEL SCORE NOT MATCHING")
             return False
 
-        return ChainUtil.verify_hasignature(
-            transaction.sender_address,  # Public key
-            signature,  # Signature to verify
-            transaction_hash  # Hash of the content that was signed
+        print("DATA WHEN RECEIVED = ", transaction_data)
+        print("SIGN WHEN RECEIVED = ", transaction.sign)
+        
+        #VERIFY THE TRANSACTION SIGNATURE
+        return ChainUtil.verify_signature(
+            public_key = transaction.sender_address,  # Public key
+            signature = transaction.sign,  # Signature to verify
+            data = transaction_data # Hash of the content that was signed
         )

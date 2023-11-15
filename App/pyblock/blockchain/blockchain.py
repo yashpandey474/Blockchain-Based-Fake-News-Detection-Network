@@ -59,13 +59,19 @@ class Blockchain:
     def is_valid_block(self, block, transaction_pool, accounts):
         
         #IF ALL TRRANSACTIIONS EXISTS AND ALL ACCOUNTS HAVE THE BALANCE
-        if not (transaction_pool.verify_transactions_exist(block.transactions)
-        and accounts.verify_transactions_balance(block.transactions)):
+        if not (
+            transaction_pool.verify_transactions_exist(block.transactions)
+        and accounts.verify_transactions_balance(block.transactions)
+        ):
+            print(transaction_pool.verify_transactions_exist(block.transactions))
+            print(accounts.verify_transactions_balance(block.transactions))
+            print("FIRST VERIFICATION FAILED.")
             return False
         
         #IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
         if not (block.last_hash == self.chain[-1].hash and
             Block.verify_block(block)):
+            print("SECOND VERIFICATION FAILED.")
             return False
         
         return True

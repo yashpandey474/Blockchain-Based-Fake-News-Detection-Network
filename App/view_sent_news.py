@@ -24,7 +24,7 @@ def view_sent_news():
                 "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                 "Title": content.split("\n")[0],
                 "Text": " ".join(content.split("\n")[1:]),
-                "Sender Address": transaction.sender_address,
+                # "Sender Address": transaction.sender_address,
                 "ID": transaction.id
             })
 

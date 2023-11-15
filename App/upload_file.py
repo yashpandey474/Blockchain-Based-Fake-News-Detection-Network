@@ -27,7 +27,7 @@ def upload_file():
                     fee=transaction_fee
                 )
 
-                st.write("UPLOADED FILE: ", uploaded_file.name)
+                st.success(f"Successfully Uploaded File: {uploaded_file.name}")
                 st.session_state.upload_file_executed = True
                 
                 # BROADCASE NEWLY CREATED TRANSACTION
@@ -40,7 +40,7 @@ def upload_file():
                 
 
     else:
-        st.write("File successfully uploaded.")
+        st.success("File successfully uploaded.")
 
     # GO TO PREVIOUS SCREEN
     if st.button("Back"):
