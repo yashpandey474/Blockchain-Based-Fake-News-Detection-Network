@@ -9,14 +9,8 @@ import queue
 logging.basicConfig(level=logging.INFO)
 
 # Configuration
-bin_url = "https://api.jsonbin.io/v3/b/6554946c54105e766fd047ce"
-headers = {
-    "Content-Type": "application/json",
-    "X-Master-Key": "$2a$10$egTdD5PZqyPXutDSkhJRFu7YUnEU9cSSAueMbNHNnJLv00.SnpvoS",
-    "X-Access-Key": "$2a$10$OdanrmShDr1J97Cw4TH6Eu4LL4TZY40mNdZLsHa84vu.ynzTOAKWm"
-}
-
-default_port = 59854
+server_url = 'http://65.1.130.255/app'  # Local server URL
+default_port = 6969
 default_public_key = '123'
 myaddress = 0
 # Global variables
@@ -76,14 +70,14 @@ def start_server(port):
         message = zmq_socket.recv_string()
         print(f"Received message: {message}")
         zmq_socket.send_string(
-            f"Abe teri ma ki {message}. Sent from {myaddress}")
+            f"Received message {message}. Sent from {myaddress}")
 
 
 def broadcast_message(message):
     print("Broadcasting message")
     context = zmq.Context()
     responses = []
-    newpeers = get_data()
+    newpeers = get_peers()
     print(f"Peers: {newpeers}")
     for peer in newpeers:
         try:
@@ -102,14 +96,18 @@ def broadcast_message(message):
     return responses
 
 
-def get_data():
+def get_peers():
+    print("Fetching peers")
     try:
-        response = requests.get(bin_url, headers=headers)
-        print(f"Peers Response from server: {response}")
-        return response.json()
+        response = requests.get(f'{server_url}/peers')
+        response.raise_for_status()
+        peers_list = response.json()
+        print(f"Received peers: {peers_list}")
+        return peers_list
     except requests.RequestException as e:
-        logging.error(f"Error fetching data: {e}")
-        return None
+        logging.error(f"Failed to fetch peers: {e}")
+        st.error('Failed to fetch peers')
+        return []
 
 
 # Streamlit UI
