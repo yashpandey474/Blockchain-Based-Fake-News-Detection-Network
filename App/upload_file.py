@@ -27,7 +27,7 @@ def upload_file():
                     fee=transaction_fee
                 )
 
-                st.success(f"Successfully Uploaded File: {uploaded_file.name}")
+                # st.success(f"Successfully Uploaded File: {uploaded_file.name}")
                 st.session_state.upload_file_executed = True
                 
                 # BROADCASE NEWLY CREATED TRANSACTION
@@ -36,6 +36,7 @@ def upload_file():
                 )
 
                 print("BROADCASTED TRANSACTION")
+                st.rerun()
 
                 
 

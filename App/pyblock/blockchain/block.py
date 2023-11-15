@@ -16,13 +16,6 @@ class Block:
         #TIME OF BLOCK CREATION
         self.timestamp = timestamp
         #HASH OF PREVIOUS BLOCK
-        
-        #GENESIS BLOCK
-        # if index == 1:
-        #     self.lastHash = "0000"
-        # else:
-        #     self.lastHash = Block.block_hash(lastBlock)
-            
         self.lastHash = lastHash
         
         #LIST OF TRANSACTIONS
@@ -31,14 +24,12 @@ class Block:
         self.validator = validator
         # SIGNATURE BY VALIDATOR
         self.signature = signature
-
         # SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
         self.votes = set()
         # INDEX OF BLOCK IN CHAIN
         self.index = index
 
     # FUNCTION TO CONVERT BLOCK TO JSON
-
     def to_json(self):
         return {
             "index": self.index,
@@ -46,7 +37,7 @@ class Block:
             "lastHash": self.lastHash,
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
-            "signature": self.signature.hex() if self.signature else None,
+            "signature": str(self.signature.hex()) if self.signature else "",
             "countofvotes": list(self.votes)
         }
         
@@ -92,17 +83,17 @@ class Block:
     def create_block(lastBlock, data, wallet, blockchain):
         # SET THE TIMESTAMP
         timestamp = time.time()
+        
         #SET PREVIOUS BLOCK'S HASH
         lastHash = Block.block_hash(lastBlock)
-        #CONVERT THE TRANSACTIOONS TO JSON 
-        # transactions = [Transaction(**tx.to_json()) for tx in data]
-        transactions = data
+        
         #GET THE VALIDATOR'S PUBLIC KEY
         validator = wallet.get_public_key()
+        
         # RETURN THE CREATED BLOCK
         block = Block(
             timestamp=timestamp,
-            lastBlock=lastBlock,
+            lastHash=lastHash,
             transactions=data,
             validator=validator,
             signature=None,
@@ -110,6 +101,8 @@ class Block:
 
         # SIGN THE BLOCK
         block.signature = Block.getBlockSignature(block, wallet)
+        
+        print("SIGNATURE OF BLOCK  = ", block.signature)
         return block
 
     @staticmethod
@@ -120,18 +113,15 @@ class Block:
             "transactions": [transaction.to_json() for transaction in block.transactions],
             "validator": block.validator
         }
-        block_json = json.dumps(block_data)
-        
-        signature = wallet.sign(block_json)    
+
+        #USE SIGN AND VERIFY SIGN OF CHAINUTIL TO MAINTAIN CONSISTENCY
+        signature = ChainUtil.sign(
+            private_key = wallet.get_private_key(),
+            data = block_data
+        )    
         
         #RETURN THE CREATED BLOCK
-        return Block(
-            timestamp = timestamp,
-            lastHash = lastHash,
-            transactions = data,
-            validator = validator,
-            signature = signature,
-            index=  len(blockchain.chain) + 1)
+        return signature
 
     @staticmethod
     def get_hash(timestamp, lastHash, transactions):
@@ -157,10 +147,6 @@ class Block:
 
     @staticmethod
     def verify_block(block):
-        # VERIFY ALL THE TRANSACTIONS IN BLOCK
-        for transaction in block.transactions:
-            if not Transaction.verify_transaction(transaction=transaction):
-                return False
 
         block_data = {
             "timestamp": block.timestamp,

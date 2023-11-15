@@ -79,7 +79,9 @@ def propose_block():
             # CONFIRMATION MESSAGE
             st.success("The created block was transmitted.")
             
+            
             # st.session_state.created_block = True
+            # st.rerun()
 
     if st.button("Back"):
         change_screen("main_page")

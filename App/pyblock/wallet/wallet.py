@@ -30,6 +30,7 @@ class Wallet:
         signature = pkcs1_15.new(self.__private_key).sign(data_hash)
         return signature
     
+    
     def sign_hashed_data(self, data_hash):
         signature = pkcs1_15.new(self.__private_key).sign(data_hash)
         return signature

@@ -28,8 +28,8 @@ class TransactionPool:
                 return False
                 
             if not Transaction.verify_transaction(transaction):
-                # print(Transaction.verify_transaction(transaction))
                 print("VERIFICATION OF TRANSACTION FAILED")
                 return False
             
+        return True
             

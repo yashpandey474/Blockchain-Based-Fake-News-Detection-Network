@@ -16,7 +16,7 @@ class Background:
         self.time = None
         self.p2pserver = p2pserver
 
-    def can_add_block(block):
+    def can_add_block(self, block):
         return len(block.votes) >= (0.5 * len(PEERS))
 
     def run_forever(self):
@@ -38,12 +38,16 @@ class Background:
                 
                 #IF THE BLOCK HAD VOTES FROM MAJORITY
                 if self.can_add_block(self.p2pserver.received_block):
+                    print("RECEIVED BLOCK ADDED TO CHAIN\n")
                     #ADD THE BLOCK TO THE BLOCKCHAIN
                     self.p2pserver.blockchain.append_block(
                         self.p2pserver.received_block,
                         self.p2pserver.transaction_pool,
                         self.p2pserver.accounts
                     )
+                    
+                else:
+                    print("RECIEVED BLOCK DID NOT GET ENOUGH VOTES\n")
 
             #SET THE RECEIVED BLOCK TO NONE
             self.p2pserver.received_block = None
@@ -51,6 +55,6 @@ class Background:
 
             # IF WAS ABLE TO CHOOSE A BLOCK PROPOSER
             if self.p2pserver.block_proposer:
-                print("BLOCK PROPOSER CHOSEN: " + self.p2pserver.block_proposer)
+                print("BLOCK PROPOSER CHOSEN!.\n")
             else:
-                print("NO BLOCK PROPOSER CHOSEN.")
+                print("NO BLOCK PROPOSER CHOSEN.\n")
