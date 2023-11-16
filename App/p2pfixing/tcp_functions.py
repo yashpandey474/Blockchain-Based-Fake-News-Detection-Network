@@ -15,7 +15,7 @@ default_public_key = '123'
 myaddress = 0
 # Global variables
 peers = []
-
+context = zmq.Context()
 # Initialize session state
 if 'received_messages' not in st.session_state:
     st.session_state['received_messages'] = []
@@ -36,7 +36,7 @@ def register(public_key, address):
         return None
 
 
-def get_ip_address():
+def get_private_network_ip_address():
     print("Getting IP address")
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -46,6 +46,18 @@ def get_ip_address():
             return ip_address
     except Exception as e:
         logging.error(f"Error obtaining IP address: {e}")
+        return None
+
+
+def get_ip_address():
+    print("Getting public IP address")
+    try:
+        response = requests.get("https://httpbin.org/ip")
+        ip_address = response.json().get('origin')
+        print(f"Obtained public IP address: {ip_address}")
+        return ip_address
+    except Exception as e:
+        logging.error(f"Error obtaining public IP address: {e}")
         return None
 
 
@@ -60,9 +72,8 @@ def start_server(port):
         st.error("Failed to obtain IP address. Server cannot start.")
         return
 
-    context = zmq.Context()
     zmq_socket = context.socket(zmq.REP)
-    zmq_socket.bind(f"tcp://{ip_address}:{port}")
+    zmq_socket.bind(f"tcp://0.0.0.0:{port}")
     myaddress = f"{ip_address}:{port}"
     register(address=f"{ip_address}:{port}", public_key=default_public_key)
 
@@ -73,17 +84,20 @@ def start_server(port):
             f"Received message {message}. Sent from {myaddress}")
 
 
-def broadcast_message(message):
+def broadcast_message(message, context):
     print("Broadcasting message")
-    context = zmq.Context()
     responses = []
     newpeers = get_peers()
     print(f"Peers: {newpeers}")
     for peer in newpeers:
+        zmq_socket = context.socket(zmq.REQ)
+        # Receive timeout in milliseconds
+        zmq_socket.setsockopt(zmq.RCVTIMEO, 5000)
+        # Send timeout in milliseconds
+        zmq_socket.setsockopt(zmq.SNDTIMEO, 5000)
         try:
             tcpaddr = f"tcp://{peer['address']}"
             print(f"Sending message to {tcpaddr}")
-            zmq_socket = context.socket(zmq.REQ)
             zmq_socket.connect(tcpaddr)
             zmq_socket.send_string(message)
             reply = zmq_socket.recv_string()
@@ -132,7 +146,7 @@ else:
 st.header('Send a Message')
 message = st.text_area('Message')
 if st.button('Send Message'):
-    responses = broadcast_message(message)
+    responses = broadcast_message(message, context)
     print(f"Message sent, responses: {responses}")
     if responses:
         st.success('Message sent successfully')
