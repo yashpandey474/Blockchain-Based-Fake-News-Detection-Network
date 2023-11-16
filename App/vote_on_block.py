@@ -45,9 +45,10 @@ def vote_on_block():
             st.table(table_data)
 
             if st.button("Submit Votes"):
-                st.session_state.p2pserver.broadcast_votes(
-                    transaction_votes
-                )
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_votes(
+                        transaction_votes
+                    )
 
                 st.write("Votes Submitted. Thank you")
 

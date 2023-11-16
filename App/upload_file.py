@@ -38,9 +38,10 @@ def upload_file():
                 st.session_state.upload_file_executed = True
                 
                 # BROADCASE NEWLY CREATED TRANSACTION
-                st.session_state.p2pserver.broadcast_transaction(
-                    transaction
-                )
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_transaction(
+                        transaction
+                    )
 
                 print("BROADCASTED TRANSACTION")
                 st.rerun()

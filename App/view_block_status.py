@@ -91,7 +91,8 @@ def propose_block():
                 block.votes.add(st.session_state.wallet.get_public_key())
 
                 # BROADCAST THE BLOCK
-                st.session_state.p2pserver.broadcast_block(block)
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_block(block)
 
                 # CONFIRMATION MESSAGE
                 st.success("The created block was transmitted.")

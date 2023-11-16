@@ -28,7 +28,8 @@ class Background:
             time_elapsed = current_time - START_TIME.timestamp()
             sleep_time = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
             print("Sleeping for {} seconds".format(sleep_time))
-            time.sleep(sleep_time - 1)
+            time.sleep(sleep_time)
+            
             
             #IF THERE WAS A RECEIVED BLOCK FROM PREVIOUS BLOCK PROPOSERR
             if self.p2pserver.received_block:

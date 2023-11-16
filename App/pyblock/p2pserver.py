@@ -35,8 +35,8 @@ MESSAGE_TYPE = {
 logging.basicConfig(level=logging.INFO)
 # Configuration
 server_url = 'http://65.1.130.255/app'  # Local server URL
-send_timeout = 5000
-receive_timeout = 5000
+send_timeout = 500
+receive_timeout = 500
 
 context = zmq.Context()
 myClientPort = 0

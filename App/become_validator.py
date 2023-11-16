@@ -47,7 +47,8 @@ def become_validator():
                     
                     #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
                 if old_stake != st.session_state.stake:
-                    st.session_state.p2pserver.broadcast_new_validator(
+                    with st.spinner("Please Wait.."):
+                        st.session_state.p2pserver.broadcast_new_validator(
                                     stake = st.session_state.stake
                         )
                         
