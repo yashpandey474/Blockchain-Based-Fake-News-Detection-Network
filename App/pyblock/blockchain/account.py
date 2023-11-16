@@ -15,8 +15,7 @@ class Account:
 
 class Accounts:
     def __init__(self):
-        self.accounts = {}  # This will store address: Account mappings
-        # self.accounts[config.VM_PUBLIC_KEY] = Account(balance=50, stake = 0, clientPort=None)
+        self.accounts = {}
 
     def initialize(self, address, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
         if address not in self.accounts:

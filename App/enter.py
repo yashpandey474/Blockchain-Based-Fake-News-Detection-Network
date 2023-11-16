@@ -14,7 +14,7 @@ import atexit
 
 
 def run_p2pserver(p2pserver):
-    print("Running p2p server on port: "+str(P2P_PORT))
+    print("Running p2p server")
     p2pserver.listen()
 
 def run_background_task(background):

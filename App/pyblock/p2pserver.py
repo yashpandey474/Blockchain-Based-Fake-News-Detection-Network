@@ -11,7 +11,7 @@ from typing import Type
 from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.wallet.transaction import *
-
+from pyblock.config import *
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',

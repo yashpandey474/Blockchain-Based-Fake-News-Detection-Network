@@ -29,6 +29,7 @@ def propose_block():
 
         if not transactions:
             st.warning("No transactions in the mempool.")
+            
         else:
             #FOR EACH TRANSACTION
             for transaction in transactions:
@@ -89,12 +90,12 @@ def propose_block():
                 # BROADCAST THE BLOCK
                 st.session_state.p2pserver.broadcast_block(block)
 
-            # CONFIRMATION MESSAGE
-            st.success("The created block was transmitted.")
-            
-            
-            st.session_state.created_block = True
-            st.rerun()
+                # CONFIRMATION MESSAGE
+                st.success("The created block was transmitted.")
+                
+                
+                st.session_state.created_block = True
+                st.rerun()
 
     if st.button("Back"):
         change_screen("main_page")
