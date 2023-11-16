@@ -19,6 +19,7 @@ import logging
 import threading
 import socket
 import queue
+import random as random
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',
@@ -33,8 +34,8 @@ MESSAGE_TYPE = {
 logging.basicConfig(level=logging.INFO)
 # Configuration
 server_url = 'http://65.1.130.255/app'  # Local server URL
-send_timeout = 500
-receive_timeout = 500
+send_timeout = 5000
+receive_timeout = 5000
 peers = []
 context = zmq.Context()
 myClientPort = 0
@@ -52,7 +53,14 @@ class P2pServer:
         self.block_received = None
         self.block_proposer = None
 
+
+    def create_new_thread(self,func):
+        thread = threading.Thread(target=func)
+        thread.start()
+        return thread
+
     def private_send_message(self, clientPort, message):
+        reply = None
         # assumes message is encrypted
         zmq_socket = context.socket(zmq.REQ)
         # Receive timeout in milliseconds
@@ -78,7 +86,7 @@ class P2pServer:
             message)  # Re-encode and encrypt
         return encrypted_message
 
-    def register(public_key, clientPort):
+    def register(self, public_key, clientPort):
         print("Registering with public key and address")
         data = {'public_key': public_key, 'address': clientPort}
         try:
@@ -89,7 +97,7 @@ class P2pServer:
             logging.error(f"Registration failed: {e}")
             return None
 
-    def get_ip_address():
+    def get_ip_address(self):
         print("Getting IP address")
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -108,21 +116,21 @@ class P2pServer:
         if ip_address is None:
             st.error("Failed to obtain IP address. Server cannot start.")
             return
-
-        zmq_socket = context.socket(zmq.REP)
-        zmq_socket.bind(f"tcp://0.0.0.0:{port}")
         global myClientPort
         myClientPort = f"{ip_address}:{port}"
-        self.register(address=f"{ip_address}:{port}",
-                      public_key=Wallet.get_public_key())
+        zmq_socket = context.socket(zmq.REP)
+        zmq_socket.bind(f"tcp://{myClientPort}")
+
+        self.register(clientPort=f"{ip_address}:{port}",
+                      public_key=self.wallet.get_public_key())
 
         self.broadcast_new_node()
         while True:
             message = zmq_socket.recv_string()
             print(f"Received message: {message}")
             zmq_socket.send_string(
-                f"Received message {message}. Sent from {myClientPort}")
-            self.message_received(message['clientPort'], message)
+                f"Successfully received message {message}. Sent from {myClientPort}")
+            self.message_received(message)
 
     def broadcast_message(self, message):
         print("Broadcasting message")
@@ -132,7 +140,7 @@ class P2pServer:
         print(f"Peers: {newpeers}")
         for peer in newpeers:
             responses.append(self.private_send_message(
-                encrypted_message, peer))
+                peer['address'], encrypted_message))
         return responses
 
     def send_direct_encrypted_message(self, message, clientPort):
@@ -140,7 +148,7 @@ class P2pServer:
         encrypted_message = self.get_encrypted_message(message)
         return self.private_send_message(encrypted_message, clientPort)
 
-    def get_peers():
+    def get_peers(self):
         print("Fetching peers")
         try:
             response = requests.get(f'{server_url}/peers')
@@ -155,7 +163,11 @@ class P2pServer:
 
     def listen(self):
         print("Starting tcp server...")
-        self.start_server()
+        server_thread = threading.Thread(
+            target=self.start_server, daemon=True)
+        server_thread.start()
+        print("Server thread started")
+
 
     # # FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
     # def new_client(self, client, server):
@@ -179,15 +191,15 @@ class P2pServer:
 
     # FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
 
-    def client_left(self, client, server):
-        print("Client left:", client['id'])
+    # def client_left(self, client, server):
+    #     print("Client left:", client['id'])
 
-        # REMOVE CLIENT FROM CONNECTIONS
-        self.connections.remove(client)
-        # self.accounts.clientLeft(clientport=client)
+    #     # REMOVE CLIENT FROM CONNECTIONS
+    #     self.connections.remove(client)
+    #     # self.accounts.clientLeft(clientport=client)
 
     # FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
-    def message_received(self, clientPort, message):
+    def message_received(self, message):
         try:
             # CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
@@ -200,6 +212,8 @@ class P2pServer:
         if not ChainUtil.decryptWithSoftwareKey(data):
             print("Invalid message recieved.")
             return
+
+        clientPort = data["clientPort"]
 
         print("MESSAGE RECIEVED OF TYPE", data["type"])
 
@@ -252,7 +266,7 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             clientPort = data["clientPort"]
             self.accounts.addANewClient(
-                address=data["public_key"], clientPort=clientPort)
+                address=data["public_key"], clientPort=clientPort, userType=self.user_type)
             if (clientPort != myClientPort):
                 self.send_mempool(clientPort)
                 self.send_chain(clientPort)
@@ -388,7 +402,7 @@ class P2pServer:
         }
 
         # # Convert the message content to a JSON string
-        message_json = json.dumps(message_content)
+        message_json = json.dumps(message_content, cls=CustomJSONEncoder)
 
         # Sign the JSON string
         signature = self.wallet.sign(message_json)
@@ -401,12 +415,3 @@ class P2pServer:
         # self.message_received(None, None, message)
 
         self.broadcast_message(message_content)
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, bytes):
-            return o.hex()
-        elif isinstance(o, np.float32):
-            return float(o)
-        return json.JSONEncoder.default(self, o)

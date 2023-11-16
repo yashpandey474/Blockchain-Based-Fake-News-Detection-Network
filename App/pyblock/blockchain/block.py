@@ -9,16 +9,17 @@ import time
 from pyblock.wallet.transaction import Transaction
 from typing import *
 from pyblock.wallet.wallet import Wallet
+from pyblock.chainutil import *
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, index: int, signature = None):
-        #TIME OF BLOCK CREATION
+    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, index: int, signature=None):
+        # TIME OF BLOCK CREATION
         self.timestamp = timestamp
-        #HASH OF PREVIOUS BLOCK
+        # HASH OF PREVIOUS BLOCK
         self.lastHash = lastHash
-        
-        #LIST OF TRANSACTIONS
+
+        # LIST OF TRANSACTIONS
         self.transactions = transactions
         # VALIDATOR PUBLIC KEY
         self.validator = validator
@@ -40,12 +41,11 @@ class Block:
             "signature": str(self.signature.hex()) if self.signature else "",
             "countofvotes": list(self.votes)
         }
-        
 
     @staticmethod
     def from_json(data_json):
-        block =  Block(
-            index = data_json["index"],
+        block = Block(
+            index=data_json["index"],
             timestamp=data_json["timestamp"],
             lastHash=data_json["lastHash"],
             transactions=[Transaction.from_json(
@@ -54,15 +54,16 @@ class Block:
             signature=bytes.fromhex(
                 data_json["signature"]) if data_json["signature"] else None
         )
-        
+
         block.votes = set(data_json["countofvotes"])
-        
+
         return block
-    #CREATE THE INITIAL BLOCK
+    # CREATE THE INITIAL BLOCK
+
     @staticmethod
     def genesis():
-        return Block(timestamp = int(time.time()), 
-                     lastHash = "0000", 
+        return Block(timestamp=int(time.time()),
+                     lastHash="0000",
                      transactions=[],
                      validator="Creators",
                      signature=None,
@@ -83,13 +84,13 @@ class Block:
     def create_block(lastBlock, data, wallet, blockchain):
         # SET THE TIMESTAMP
         timestamp = time.time()
-        
-        #SET PREVIOUS BLOCK'S HASH
+
+        # SET PREVIOUS BLOCK'S HASH
         lastHash = Block.block_hash(lastBlock)
-        
-        #GET THE VALIDATOR'S PUBLIC KEY
+
+        # GET THE VALIDATOR'S PUBLIC KEY
         validator = wallet.get_public_key()
-        
+
         # RETURN THE CREATED BLOCK
         block = Block(
             timestamp=timestamp,
@@ -101,7 +102,7 @@ class Block:
 
         # SIGN THE BLOCK
         block.signature = Block.getBlockSignature(block, wallet)
-        
+
         print("SIGNATURE OF BLOCK  = ", block.signature)
         return block
 
@@ -114,13 +115,13 @@ class Block:
             "validator": block.validator
         }
 
-        #USE SIGN AND VERIFY SIGN OF CHAINUTIL TO MAINTAIN CONSISTENCY
+        # USE SIGN AND VERIFY SIGN OF CHAINUTIL TO MAINTAIN CONSISTENCY
         signature = ChainUtil.sign(
-            private_key = wallet.get_private_key(),
-            data = block_data
-        )    
-        
-        #RETURN THE CREATED BLOCK
+            private_key=wallet.get_private_key(),
+            data=block_data
+        )
+
+        # RETURN THE CREATED BLOCK
         return signature
 
     @staticmethod
@@ -161,12 +162,3 @@ class Block:
             block.signature,
             block_data  # Verify the signature against the recreated hash
         )
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, bytes):
-            return o.hex()
-        elif isinstance(o, np.float32):
-            return float(o)
-        return json.JSONEncoder.default(self, o)

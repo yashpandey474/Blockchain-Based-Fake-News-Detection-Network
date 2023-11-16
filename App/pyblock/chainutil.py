@@ -14,8 +14,9 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 import binascii
 # from blockchain.block import *
-class ChainUtil:
 
+
+class ChainUtil:
 
     @staticmethod
     def generate_32_byte_seed_from_timestamp():
@@ -36,15 +37,14 @@ class ChainUtil:
     @staticmethod
     def hash(data):
         return hashlib.sha256(str(data).encode()).hexdigest()
-    
+
     @staticmethod
     def sign(private_key, data):
         private_key_RSA = RSA.import_key(private_key)
-        data_str = json.dumps(data, cls = CustomJSONEncoder)
+        data_str = json.dumps(data, cls=CustomJSONEncoder)
         data_hash = SHA256.new(data_str.encode())
         signature = pkcs1_15.new(private_key_RSA).sign(data_hash)
         return signature
-    
 
     @staticmethod
     def verify_signature(public_key, signature, data):
@@ -54,34 +54,35 @@ class ChainUtil:
             data_hash = SHA256.new(data_str.encode())
             pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
             return True  # Signature is valid
-        
+
         except (ValueError, TypeError) as e:
             print(f"Verification failed: {e}")
             return False  # Signature is invalid
-        
+
     @staticmethod
     def encryptWithSoftwareKey(data):
-        signature = ChainUtil.sign(config.VM_PRIVATE_KEY, json.dumps(data))
+        signature = ChainUtil.sign(config.VM_PRIVATE_KEY, data)
         data["VM_signature"] = signature
-        return json.dumps(data)
+        return json.dumps(data, cls=CustomJSONEncoder)
 
     @staticmethod
     def decryptWithSoftwareKey(data):
         signature_hex = data["VM_signature"]
         signature = binascii.unhexlify(signature_hex)
-        
+
         del data["VM_signature"]
-        
+
         if ChainUtil.verify_signature(config.VM_PUBLIC_KEY, signature, data):
             return data
-        
+
         return None
-    
+
+
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, bytes):
             return o.hex()
         elif isinstance(o, np.float32):
             return float(o)
-            
+
         return json.JSONEncoder.default(self, o)
