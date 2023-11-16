@@ -33,9 +33,7 @@ class Accounts:
         if (amount > self.accounts[fromaddress].balance):
             return False
         
-        self.log_reputation_change(
-            toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
-        
+        self.log_reputation_change(toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
@@ -65,14 +63,15 @@ class Accounts:
                     news_transaction.sender_address, "News Broadcasted Voted True", config.SENDER_REWARD)
                 
             else:
-                # TODO: MAYBE AUDITORS GET PENALISED MORE? MAYBE PENALISE A PERCENTAGE OF BALANCE?
                 # PERCENTAGE TO STOP RICH GETTING RICHER
+                penalty_amount = self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT//100
+                
                 self.accounts[news_transaction.sender_address].balance -= (
-                    self.accounts[news_transaction.sender_address].balance *
-                    config.SENDER_PENALTY_PERCENT
+                    penalty_amount
                 )
+                
                 self.log_reputation_change(
-                    news_transaction.sender_address, "News Broadcasted Voted Fake", config.SENDER_PENALTY_PERCENT)
+                    news_transaction.sender_address, "News Broadcasted Voted Fake",penalty_amount)
         
             #IF MAJORITY VOTED "TRUE"
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
@@ -88,7 +87,7 @@ class Accounts:
                         #LOG REPUTATION CHANGE
                         self.log_reputation_change(
                             public_key, f"Penalty for Voting Against Majority on {news_transaction.id}",
-                            penalty_amount
+                            -penalty_amount
                         )
             # IF MAJORITY VOTED "FAKE"
             if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
@@ -104,7 +103,7 @@ class Accounts:
                         # LOG REPUTATION CHANGE
                         self.log_reputation_change(
                             public_key, f"Penalty for Voting Against Majority on {news_transaction.id}",
-                            penalty_amount
+                            -penalty_amount
                         )
 
                 

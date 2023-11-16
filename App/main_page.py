@@ -2,9 +2,7 @@
 import streamlit as st
 from change_screen import *
 from pyblock.wallet.transaction import *
-from pyblock import config
 from pyblock.blockchain.block import *
-import time
 
 def main_page():
     # st.title("Fake News Detection System Utilising Blockchain")
@@ -28,7 +26,10 @@ def main_page():
 
         if st.button("View Sent News/Transactions"):
             change_screen("view_sent_news")
-            
+        
+        if st.button("View Log of Reputation Changes"):
+            change_screen("view_log_reputation")
+              
     with c2:
         if st.session_state.user_type == "Auditor":
             if st.button("View all transactions in mempool"):
