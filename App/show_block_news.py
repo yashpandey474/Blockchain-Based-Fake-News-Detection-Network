@@ -26,7 +26,7 @@ def show_blocks_news():
 
                 # If the button is clicked, call make_qr(transaction)
                 if qr_button:
-                    show_transaction(transaction)
+                    show_transaction(transaction, show = 1)
                 
                 table_data.append({
                     "Model Fake Score": transaction.model_score,
