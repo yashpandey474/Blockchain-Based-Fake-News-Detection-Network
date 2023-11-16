@@ -1,5 +1,5 @@
 from pyblock.blockchain.account import Accounts
-from pyblock.config import START_TIME, BLOCK_VALIDATOR_CHOOSE_INTERVAL
+from pyblock.config import *
 from pyblock.peers import PEERS
 import time
 import streamlit as st
@@ -33,8 +33,6 @@ class Background:
             print("Sleeping for {} seconds".format(sleep_time))
             time.sleep(sleep_time)
             
-            #CHOOSE THE BLOCK PROPOSER AT THE START TO NOT HAVE DELAY BECAUSE OF APPENDING
-            self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(current_time)
             
             #IF THERE WAS A RECEIVED BLOCK FROM PREVIOUS BLOCK PROPOSERR
             if self.p2pserver.received_block:
@@ -50,7 +48,13 @@ class Background:
                     )
                 
                 else:
+                    #PUNISH THE BLOCK PROPOSER FOR NO BLOCK!
+                    self.p2pserver.accounts[self.p2pserver.block_proposer].balance -= PENALTY_NO_BLOCK
                     print("RECIEVED BLOCK DID NOT GET ENOUGH VOTES\n")
+
+            # CHOOSE THE BLOCK PROPOSER AT THE START TO NOT HAVE DELAY BECAUSE OF APPENDING
+            self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(
+                current_time)
 
             #SET THE RECEIVED BLOCK TO NONE
             self.p2pserver.received_block = None
