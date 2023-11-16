@@ -18,9 +18,9 @@ class Background:
 
     def can_add_block(self, block):
         print("VOTES  = ", len(block.votes))
-        print("PEERS = ", len(PEERS))
+        print("PEERS = ", len(self.p2pserver.peers))
         
-        return len(block.votes) >= (0.5 * len(PEERS))
+        return len(block.votes) >= (0.5 * len(self.p2pserver.peers))
 
     def run_forever(self):
         while True:

@@ -19,12 +19,13 @@ def login():
             vc = crypto_logic.verify(user_input)
 
             if vc[0]:
-                st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
+                # st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
                 initialise(vc[2])
                 change_screen("main_page")
 
             else:
-                st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
+                # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
+                st.error(vc[1])
         else:
             st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
 
