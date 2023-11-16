@@ -61,9 +61,9 @@ class ChainUtil:
         
     @staticmethod
     def encryptWithSoftwareKey(data):
-        signature = ChainUtil.sign(config.VM_PRIVATE_KEY, data)
+        signature = ChainUtil.sign(config.VM_PRIVATE_KEY, json.dumps(data))
         data["VM_signature"] = signature
-        return data
+        return json.dumps(data)
 
     @staticmethod
     def decryptWithSoftwareKey(data):

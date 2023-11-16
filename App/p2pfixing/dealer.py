@@ -72,16 +72,23 @@ def start_server(port):
         st.error("Failed to obtain IP address. Server cannot start.")
         return
 
-    zmq_socket = context.socket(zmq.REP)
+    zmq_socket = context.socket(zmq.ROUTER)
+
+    zmq_socket.bind(f"tcp://0.0.0.0:{port}")
     myaddress = f"{ip_address}:{port}"
-    zmq_socket.bind(f"tcp://{myaddress}")
-    register(address=f"{myaddress}", public_key=default_public_key)
+    register(address=f"{ip_address}:{port}", public_key=default_public_key)
 
     while True:
-        message = zmq_socket.recv_string()
-        print(f"Received message: {message}")
-        zmq_socket.send_string(
-            f"Received message {message}. Sent from {myaddress}")
+        try:
+            # Receive a message
+            identity, message = socket.recv_multipart()
+            print(f"Received message from {identity}: {message}")
+
+            # Send a response back to the client
+            socket.send_multipart([identity, b"Response message"])
+        except zmq.ZMQError as e:
+            # Handle any errors here
+            pass
 
 
 def broadcast_message(message, context):

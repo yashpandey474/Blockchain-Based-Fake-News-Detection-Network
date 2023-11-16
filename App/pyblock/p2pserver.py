@@ -12,6 +12,13 @@ from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.wallet.transaction import *
 
+import streamlit as st
+import requests
+import zmq
+import logging
+import threading
+import socket
+import queue
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',
@@ -19,13 +26,22 @@ MESSAGE_TYPE = {
     'transaction': 'TRANSACTION',
     'new_validator': 'NEW_VALIDATOR',
     'vote': 'VOTE',
-    "block_proposer_address": "BLOCK_PROPOSER_ADDRESS"
+    "block_proposer_address": "BLOCK_PROPOSER_ADDRESS",
+    "new_node": "NEW_NODE"
 }
 # to handle self.... self.message_received(None, None, message)
+logging.basicConfig(level=logging.INFO)
+# Configuration
+server_url = 'http://65.1.130.255/app'  # Local server URL
+send_timeout = 500
+receive_timeout = 500
+peers = []
+context = zmq.Context()
+myClientPort = 0
 
 
 class P2pServer:
-    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], user_type = "Reader"):
+    def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], user_type="Reader"):
         self.blockchain = blockchain
         self.transaction_pool = transaction_pool
         self.wallet = wallet  # assuming initialised wallet
@@ -36,114 +52,190 @@ class P2pServer:
         self.block_received = None
         self.block_proposer = None
 
-    #SEND SIGNED MESSAGE TO GIVEN SOCKET
-    def sendEncryptedMessage(self, socket, message):
-        self.server.send_message(
-            socket, ChainUtil.encryptWithSoftwareKey(message)
-        )
+    def private_send_message(self, clientPort, message):
+        # assumes message is encrypted
+        zmq_socket = context.socket(zmq.REQ)
+        # Receive timeout in milliseconds
+        zmq_socket.setsockopt(zmq.RCVTIMEO, receive_timeout)
+        # Send timeout in milliseconds
+        zmq_socket.setsockopt(zmq.SNDTIMEO, send_timeout)
+        try:
+            tcpaddr = f"tcp://{clientPort}"
+            print(f"Sending message to {tcpaddr}")
+            zmq_socket.connect(tcpaddr)
+            zmq_socket.send_string(message)
+            reply = zmq_socket.recv_string()
+            print(f"Received reply from {clientPort}: {reply}")
+        except Exception as e:
+            logging.error(f"Error communicating with {clientPort}: {e}")
+        finally:
+            zmq_socket.close()
+        return reply
+
+    def get_encrypted_message(self, message):
+        message['clientPort'] = myClientPort  # Add the clientPort
+        encrypted_message = ChainUtil.encryptWithSoftwareKey(
+            message)  # Re-encode and encrypt
+        return encrypted_message
+
+    def register(public_key, clientPort):
+        print("Registering with public key and address")
+        data = {'public_key': public_key, 'address': clientPort}
+        try:
+            response = requests.post(f'{server_url}/register', json=data)
+            print(f"Response from server: {response}")
+            return response.json()
+        except requests.RequestException as e:
+            logging.error(f"Registration failed: {e}")
+            return None
+
+    def get_ip_address():
+        print("Getting IP address")
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 80))
+                ip_address = s.getsockname()[0]
+                print(f"Obtained IP address: {ip_address}")
+                return ip_address
+        except Exception as e:
+            logging.error(f"Error obtaining IP address: {e}")
+            return None
+
+    def start_server(self):
+        port = random.randint(50000, 65535)
+        print(f"Starting server on port {port}")
+        ip_address = self.get_ip_address()
+        if ip_address is None:
+            st.error("Failed to obtain IP address. Server cannot start.")
+            return
+
+        zmq_socket = context.socket(zmq.REP)
+        zmq_socket.bind(f"tcp://0.0.0.0:{port}")
+        global myClientPort
+        myClientPort = f"{ip_address}:{port}"
+        self.register(address=f"{ip_address}:{port}",
+                      public_key=Wallet.get_public_key())
+
+        self.broadcast_new_node()
+        while True:
+            message = zmq_socket.recv_string()
+            print(f"Received message: {message}")
+            zmq_socket.send_string(
+                f"Received message {message}. Sent from {myClientPort}")
+            self.message_received(message['clientPort'], message)
+
+    def broadcast_message(self, message):
+        print("Broadcasting message")
+        responses = []
+        newpeers = self.get_peers()
+        encrypted_message = self.get_encrypted_message(message)
+        print(f"Peers: {newpeers}")
+        for peer in newpeers:
+            responses.append(self.private_send_message(
+                encrypted_message, peer))
+        return responses
+
+    def send_direct_encrypted_message(self, message, clientPort):
+        print("Sending direct message")
+        encrypted_message = self.get_encrypted_message(message)
+        return self.private_send_message(encrypted_message, clientPort)
+
+    def get_peers():
+        print("Fetching peers")
+        try:
+            response = requests.get(f'{server_url}/peers')
+            response.raise_for_status()
+            peers_list = response.json()
+            print(f"Received peers: {peers_list}")
+            return peers_list
+        except requests.RequestException as e:
+            logging.error(f"Failed to fetch peers: {e}")
+            st.error('Failed to fetch peers')
+            return []
 
     def listen(self):
-        print("Starting p2p server...")
-        self.create_self_account()
-        self.server = WebsocketServer(port=P2P_PORT, host="0.0.0.0")
-        self.server.set_fn_new_client(self.new_client)
-        self.server.set_fn_client_left(self.client_left)
-        self.server.set_fn_message_received(self.message_received)
-        self.connect_to_peers()
-        self.server.account = self.wallet.get_public_key()
-        self.server.run_forever()
-        
-    #CREATE A NEW ACCOUNT FOR OWN-USER
-    def create_self_account(self):
-        self.accounts.addANewClient(
-            address=self.wallet.get_public_key(), clientPort = None,
-            userType = self.user_type
-        )
+        print("Starting tcp server...")
+        self.start_server()
 
-        print("ACCOUNT CREATED")
+    # # FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
+    # def new_client(self, client, server):
+    #     print("Socket connected:", client)
 
-    #FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
-    def new_client(self, client, server):
-        print("Socket connected:", client)
-        
-        #ADD CLIENT TO CONNECTIONS
-        self.connections.add(client)
-        self.send_chain(client)
-        self.send_mempool(client)
-        self.send_current_block_proposer(client)
-        
-    #SEND THE CURRENT BLOCK PROPOSER TO A NEWLY JOINED NODE
-    def send_current_block_proposer(self, socket):
-        message = json.dumps({
+    #     # ADD CLIENT TO CONNECTIONS
+    #     self.connections.add(client)
+    #     self.send_chain(client)
+    #     self.send_mempool(client)
+    #     self.send_current_block_proposer(client)
+
+    # SEND THE CURRENT BLOCK PROPOSER TO A NEWLY JOINED NODE
+
+    def send_current_block_proposer(self, clientPort):
+        message = {
             "type": MESSAGE_TYPE["block_proposer_address"],
             "address": st.session_state.p2pserver.block_proposer
-        })
+        }
 
-        self.sendEncryptedMessage(socket, message)
-        
-        
-    #FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
+        self.send_direct_encrypted_message(message, clientPort)
+
+    # FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
+
     def client_left(self, client, server):
         print("Client left:", client['id'])
-        
-        #REMOVE CLIENT FROM CONNECTIONS
+
+        # REMOVE CLIENT FROM CONNECTIONS
         self.connections.remove(client)
         # self.accounts.clientLeft(clientport=client)
 
-    #FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
-    def message_received(self, client, server, message):
-        
+    # FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
+    def message_received(self, clientPort, message):
         try:
-            #CONVERT FROM JSON TO DICTIONARY
+            # CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
 
         except json.JSONDecodeError:
             print("Failed to decode JSON")
             return
-        
-        #CHECK IF SIGNATURE IS VALID
+
+        # CHECK IF SIGNATURE IS VALID
         if not ChainUtil.decryptWithSoftwareKey(data):
             print("Invalid message recieved.")
             return
 
         print("MESSAGE RECIEVED OF TYPE", data["type"])
 
-        #IF BLOCKCAIN RECIEVED
+        # IF BLOCKCAIN RECIEVED
         if data["type"] == MESSAGE_TYPE["chain"]:
-            #TRY TO REPLACE IF LONGER CHAIN
+            # TRY TO REPLACE IF LONGER CHAIN
             self.blockchain.replace_chain(data["chain"])
 
-        
         elif data["type"] == MESSAGE_TYPE["transaction"]:
-            #CREATE TRANSACTION FROM JSON FORM
+            # CREATE TRANSACTION FROM JSON FORM
             transaction = Transaction.from_json(data["transaction"])
-            
-            #IF DOESN'T EXIST; ADD IT [VALIDATED AT TIME OF BLOCK RECIEVED]
+
+            # IF DOESN'T EXIST; ADD IT [VALIDATED AT TIME OF BLOCK RECIEVED]
             self.transaction_pool.add_transaction(transaction)
-            
-            #ADD TO TRANSACTIONS SENT BY A USER TO VIEW
+
+            # ADD TO TRANSACTIONS SENT BY A USER TO VIEW
             self.accounts.add_transaction(transaction)
-
-
 
         elif data["type"] == MESSAGE_TYPE["block"]:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
-            block =  Block.from_json(data["block"])
-            
+            block = Block.from_json(data["block"])
+
             print(block.transactions)
             if self.block_proposer != block.validator:
                 print("RECEIVED BLOCK DOESN'T HAVE CORRECT VALIDATOR!")
                 return
-            
-            #CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
+
+            # CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
-                block, self.transaction_pool, self.accounts)):
-                
+                    block, self.transaction_pool, self.accounts)):
+
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
                 self.received_block = block
                 self.accounts.add_sent_block(block.validator, block)
-            
+
             else:
                 print("RECEIVED BLOCK DEEMED INVALID.")
 
@@ -151,48 +243,46 @@ class P2pServer:
             # NEW VALIDATOR
             new_validator_public_key = data["public_key"]
             new_validator_stake = data["stake"]
-            
+
             # CHECK & MAKE THE ACCOUNT A VALIDATOR
             self.accounts.makeAccountValidatorNode(
                 address=new_validator_public_key, stake=new_validator_stake
             )
 
-        # TODO: HOW WILL A NEW NODE SEND MESSAGE TO OTHER CLIENTS?
         elif data["type"] == MESSAGE_TYPE["new_node"]:
-            
-            public_key = data["public_key"]
-            self.accounts.addANewClient(address=public_key, clientPort=client)
-            self.send_mempool(client)
-            self.send_chain(client)
-            
+            clientPort = data["clientPort"]
+            self.accounts.addANewClient(
+                address=data["public_key"], clientPort=clientPort)
+            if (clientPort != myClientPort):
+                self.send_mempool(clientPort)
+                self.send_chain(clientPort)
+                self.send_current_block_proposer(clientPort)
+
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
-            
-        elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
-            #SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
-            self.block_proposer = data["address"]
-            
-        
-    
 
-    def send_mempool(self, socket):
+        elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
+            # SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
+            self.block_proposer = data["address"]
+
+    def send_mempool(self, clientPort):
         transaction_list = list(
             self.transaction_pool.transactions
         )
-        
-        message = json.dumps({
+
+        message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": transaction_list
-        })
-        
-        self.sendEncryptedMessage(socket, message)
-        
+        }
+
+        self.send_direct_encrypted_message(message, clientPort)
+
     def handle_votes(self, data):
         # CHECK IF THE VOTE IS VALID
         if not self.accounts.check_if_active(data["address"]):
             print("INVALID VOTE")
             return
-        
+
         # IF NOT CURRENT BLOCK
         if data["block_index"] != st.session_state.p2pserver.received_block.index:
             print("OLD VOTE RECEIVED")
@@ -205,7 +295,7 @@ class P2pServer:
         transactions_dict = {
             transaction.id: transaction for transaction in st.session_state.p2pserver.received_block.transactions
         }
-        
+
         for key, value in self.received_block.transactions:
             if value == "True":
                 transactions_dict[key].positive_votes.add(data["address"])
@@ -215,17 +305,6 @@ class P2pServer:
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(st.session_state.p2pserver.received_block.transactions):
             self.received_block.transactions[index] = transactions_dict[transaction.id]
-
-    def broadcast_new_node(self):
-        """
-        Broadcast new node's public key to all to create a new account
-        """
-        
-        # active_accounts = self.accounts.get_active_accounts()
-        for client in self.connections:
-            self.send_new_node(
-                client, self.wallet.get_public_key()
-            )
 
     def broadcast_new_validator(self, stake):
         """
@@ -239,115 +318,63 @@ class P2pServer:
             "public_key": self.wallet.get_public_key(),
             "stake": stake
         }
-        
+
         message = ChainUtil.encryptWithSoftwareKey(message)
 
         message = json.dumps(message, cls=CustomJSONEncoder)
-        
-        self.message_received(None, None, message)
-        
-        
+
+        # self.message_received(None, None, message)
+
         print("ACTIVE ACCOUNTS: ", self.connections)
-        
+
         for client in self.connections:
             self.send_new_validator(
                 client, self.wallet.get_public_key(), stake)
 
-    def send_new_validator(self, socket, public_key: str, stake):
+    def send_new_validator(self, clientPort, public_key: str, stake):
         """
         Send a new validator's public key to the specified socket.
         """
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["new_validator"],
             "public_key": public_key,
             "stake": stake
-        })
-        
-        self.sendEncryptedMessage(socket, message)
+        }
 
-    def connect_to_peers(self):
-        for peer in PEERS:
-            try:
-                socket_app = websocket.WebSocketApp(peer,
-                                                    on_message=self.on_peer_message,
-                                                    on_close=self.on_peer_close,
-                                                    on_open=self.on_peer_open)
-                socket_app.run_forever()
-            except Exception as e:
-                print(f"Failed to connect to peer {peer}. Error: {e}")
+        self.send_direct_encrypted_message(message, clientPort=clientPort)
 
-    def on_peer_message(self, ws, message):
-        self.message_received(ws, self.server, message)
-
-    def on_peer_close(self, ws, *args):
-        self.connections.remove(ws)
-
-    def on_peer_open(self, ws):
-        self.send_new_node(
-            ws, self.wallet.get_public_key()
-        )
-
-    def send_new_node(self, ws, public_key: str):
+    def broadcast_new_node(self):
         """
-        Send a new node message with the public key to the specified socket.
+        Broadcast a new node message.
         """
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["new_node"],
-            "public_key": public_key
-        })
-        ws.send(message)
+            "public_key": self.wallet.get_public_key(),
+            "clientPort": myClientPort
+        }
+        self.broadcast_message(message)
 
-    def send_chain(self, socket):
+    def send_chain(self, clientPort):
         chain_as_json = [block.to_json() for block in self.blockchain.chain]
-        message = json.dumps({
+        message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json
-        })
-        self.sendEncryptedMessage(socket, message)
-
-    def sync_chain(self):
-        # active_accounts = self.accounts.get_active_accounts(
-        # self.wallet.get_public_key())
-        for client in  self.connections:
-            self.send_chain(client)
+        }
+        self.send_direct_encrypted_message(message, clientPort=clientPort)
 
     def broadcast_transaction(self, transaction):
         message = {
             "type": MESSAGE_TYPE["transaction"],
             "transaction": transaction.to_json()
         }
-        
-        message = ChainUtil.encryptWithSoftwareKey(message)
-        
-        message = json.dumps(message, cls = CustomJSONEncoder)
-        
-        self.message_received(
-            None, None, message
-        )
-        
-
-        for client in self.connections:
-            self.send_transaction(
-                client, message
-            )
-
-    def send_transaction(self, socket, message):
-        self.sendEncryptedMessage(socket, message)
+        self.broadcast_message(message)
 
     def broadcast_block(self, block):
-        message_data = {
+        message = {
             "type": MESSAGE_TYPE["block"],
             "block": block.to_json()
         }
-        
-        message = ChainUtil.encryptWithSoftwareKey(message_data)
-
-        message = json.dumps(message, cls=CustomJSONEncoder)
-        
-        self.message_received(None, None, message)
-        
-        for client in self.connections:
-            self.send_block(client, message_data)
+        self.broadcast_message(message)
 
     def broadcast_votes(self, votes_dict):
         votes_list = [(key, value) for key, value in votes_dict.items()]
@@ -370,13 +397,10 @@ class P2pServer:
         message_content['signature'] = signature
 
         # Convert the full message with signature to JSON
-        message = json.dumps(message_content, cls=CustomJSONEncoder)
-        
 
-        self.message_received(None, None, message)
-        
-        for client in self.connections:
-            self.sendEncryptedMessage(client, message)
+        # self.message_received(None, None, message)
+
+        self.broadcast_message(message_content)
 
 
 class CustomJSONEncoder(json.JSONEncoder):
