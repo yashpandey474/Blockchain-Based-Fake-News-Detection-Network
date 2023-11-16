@@ -10,5 +10,5 @@ def make_qr(text:str, show = 0):
 
     return "qr.png"
 
-if __name__ == "__main__":
-    make_qr("Hello World", show = 1)
+# if __name__ == "__main__":
+#     make_qr("Hello World", show = 1)
