@@ -8,12 +8,12 @@ def show_transaction(transaction, show = 0):
                               (len(transaction.negative_votes) + len(transaction.positive_votes)))
 
     data = f"""
-Model Fake Score: {transaction.model_score},
-Percent of Fake Votes: {str(percent_fake_votes) + "%"},
-Percent of True Votes: {str(100 - percent_fake_votes)  + "%"},
-Transaction Creation Time: {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},
-Sender Reputation: {transaction.sender_reputation},
-Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link
-"""
+    Model Fake Score: {transaction.model_score},
+    Percent of Fake Votes: {str(percent_fake_votes) + "%"},
+    Percent of True Votes: {str(100 - percent_fake_votes)  + "%"},
+    Transaction Creation Time: {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},
+    Sender Reputation: {transaction.sender_reputation},
+    Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link
+    """
 
     return make_qr(data, show)

@@ -35,9 +35,11 @@ def main_page():
                 change_screen("show_transac")
 
             if not st.session_state.validator and st.button("Become a Validator"):
+                st.session_state.stake_submitted = False
                 change_screen("become_validator")
                 
             if st.session_state.validator and st.button("Modify Your Stake in Network"):
+                st.session_state.stake_submitted = False
                 change_screen("become_validator")
                 
             

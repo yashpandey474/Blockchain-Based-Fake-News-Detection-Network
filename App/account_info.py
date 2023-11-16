@@ -39,8 +39,8 @@ def show_account_info():
     with st.expander("Click to view private key"):
         st.write(private_key)
         
-    with st.expander("Click to view private key"):
-        st.write(private_key)
+    with st.expander("Click to view public key"):
+        st.write(public_key)
 
     if st.button("Back"):
         change_screen(st.session_state.previous_screen)

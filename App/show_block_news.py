@@ -5,6 +5,8 @@ import pandas as pd
 from datetime import datetime
 from pyblock.qr.transactions_info import *
 
+
+
 def show_blocks_news():
     chain = st.session_state.p2pserver.blockchain.chain
     
@@ -21,13 +23,6 @@ def show_blocks_news():
                 
                 percent_fake_votes = 100*(len(transaction.negative_votes)/(len(transaction.negative_votes) + len(transaction.positive_votes)))
                 
-                qr_button = st.button(
-                    f"Generate QR for Transaction {transaction.id}")
-
-                # If the button is clicked, call make_qr(transaction)
-                if qr_button:
-                    show_transaction(transaction, show = 1)
-                
                 table_data.append({
                     "Model Fake Score": transaction.model_score,
                     "Percent of Fake Votes": str(percent_fake_votes) + "%",
@@ -40,12 +35,14 @@ def show_blocks_news():
                     "Validator Public Key": block.validator,
                     # TODO: "Validator Reputation": st.session_state.accounts.get_
                     "Sender Reputation": transaction.sender_reputation,
-                    "Sign of sender": transaction.sign
-                    
+                    "Sign of sender": transaction.sign,
+                    "qr code": st.button(f"QR for {transaction.id}", on_click = show_transaction, kwargs={"transaction": transaction, "show":1})
                 })
-                
-        st.dataframe(pd.DataFrame(table_data), height=500)
-    
+        df = pd.DataFrame(table_data)
+
+        st.dataframe(df, height=500)
+        
+
     if st.button("Back"):
         # Set the previous screen in the session state
         change_screen(st.session_state.previous_screen)

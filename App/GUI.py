@@ -19,11 +19,9 @@ from view_sent_blocks import *
 
 background_style = '''<style>
 div .appview-container{
-background-image: url("https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmxvY2tjaGFpbnxlbnwwfHwwfHx8MA%3D%3D");
+background-image: url("https://i.gifer.com/5ARz.gif");
 background-size: cover;
 background-position: center;
-width: 100%;
-height: 100vh;
 }
 </style>
 '''

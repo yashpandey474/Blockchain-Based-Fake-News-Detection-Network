@@ -21,8 +21,9 @@ def sign_up_generate():
         
         # PRINT THE PRIVATE KEY
         with st.expander("Click to view private key"):
-            
-            st.write(private_key.export_key().decode())
+            kk = private_key.export_key().decode()
+            kk = kk.replace("\n","<br>")
+            st.markdown(kk, unsafe_allow_html=True)
         
         #INITIALISE ACCOUNT & WALLET OF SESSION
         initialise(private_key)
