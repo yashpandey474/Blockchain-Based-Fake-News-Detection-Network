@@ -151,7 +151,7 @@ class P2pServer:
     def get_peers(self):
         print("Fetching peers")
         global peers
-        
+
         try:
             response = requests.get(f'{server_url}/peers')
             response.raise_for_status()
@@ -159,7 +159,7 @@ class P2pServer:
             print(f"Received peers: {peers_list}")
             self.peers = peers_list
             return peers_list
-        
+
         except requests.RequestException as e:
             logging.error(f"Failed to fetch peers: {e}")
             print('Failed to fetch peers')
@@ -229,10 +229,10 @@ class P2pServer:
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
             print(self.accounts.accounts)
-            self.transaction_pool = TransactionPool.from_json(
-                data["transaction_pool"])
+            self.transaction_pool.from_json(
+                json_data=data["transaction_pool"])
             print("REPLACED TRANSACTION POOL")
-            print(self.transaction_pool.transactions)
+            print(self.transaction_pool)
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             # CREATE TRANSACTION FROM JSON FORM

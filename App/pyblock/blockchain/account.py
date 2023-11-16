@@ -3,28 +3,16 @@ import pyblock.config as config
 
 
 class Account:
-    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None, isActive=True):
+    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None, isActive=True, reputation_changes=None, sent_transactions=None, sent_blocks=None):
         self.balance = balance
         self.isValidator = False
         self.isActive = isActive
         self.stake = stake
         self.clientPort = clientPort
-        self.sent_transactions = set()
-        self.sent_blocks = set()
-        self.reputation_changes = []
-        self.reputation_changes.append(("Assigned Initial Reputation", balance))
-
-    def to_dict(self):
-        return {
-            "balance": self.balance,
-            "isActive": self.isActive,
-            "stake": self.stake,
-            "clientPort": self.clientPort,
-            # Convert set to list for JSON serialization
-            "sent_transactions": list(self.sent_transactions),
-            "sent_blocks": list(self.sent_blocks),
-            "reputation_changes": self.reputation_changes
-        }
+        self.sent_transactions = sent_transactions if sent_transactions is not None else set()
+        self.sent_blocks = sent_blocks if sent_blocks is not None else set()
+        self.reputation_changes = reputation_changes if reputation_changes is not None else [
+            ("Assigned Initial Reputation", balance)]
 
 
     def to_dict(self):
@@ -111,9 +99,9 @@ class Accounts:
                 self.accounts[news_transaction.sender_address].balance -= (
                     penalty_amount
                 )
-                
-                print("BALANCE OF SENDER = ", self.accounts[news_transaction.sender_address].balance)
-                
+
+                print("BALANCE OF SENDER = ",
+                      self.accounts[news_transaction.sender_address].balance)
 
                 self.log_reputation_change(
                     news_transaction.sender_address, "News Broadcasted Voted Fake", penalty_amount)
@@ -182,8 +170,9 @@ class Accounts:
             transaction)
 
     def log_reputation_change(self, address, change_string, change_amount):
-        self.accounts[address].reputation_changes.append((change_string, change_amount))
-        
+        self.accounts[address].reputation_changes.append(
+            (change_string, change_amount))
+
         self.accounts[address].reputation_changes[change_string] = change_amount
 
     def makeAccountValidatorNode(self, address, stake):
@@ -192,7 +181,7 @@ class Accounts:
             raise ValueError("Account does not exist.")
 
         account = self.accounts[address]
-        
+
         account.isValidator = True
 
         # IF NOT ENOUGH BALANCE
