@@ -11,17 +11,20 @@ import spacy
 import pickle
 import nltk
 import streamlit as st
-
-
-
+nlp = None
+stemmer = None
+stop_words = None
+sid = None
+model = None
+scaler = None
 
 
 def preprocess_text(text):
-    doc = st.session_state.nlp(text)
+    doc = nlp(text)
     preprocessed_tokens = [
-        token.lemma_ for token in doc if token.text.lower() not in st.session_state.stop_words
+        token.lemma_ for token in doc if token.text.lower() not in stop_words
     ]
-    return " ".join([st.session_state.stemmer.stem(token) for token in preprocessed_tokens])
+    return " ".join([stemmer.stem(token) for token in preprocessed_tokens])
 
 
 def add_readability_score(df):
@@ -40,14 +43,13 @@ def add_text_length(df):
 def add_vader_text_sentiment_score(df):
 
     df['TEXT SENTIMENT SCORE'] = df['NEWS TEXT'].apply(
-        lambda d: st.session_state.sid.polarity_scores(d)['compound'])
+        lambda d: sid.polarity_scores(d)['compound'])
 
 
 def add_vader_title_sentiment_score(df):
-    
 
     df['TITLE SENTIMENT SCORE'] = df['NEWS TITLE'].apply(
-        lambda d: st.session_state.sid.polarity_scores(d)['compound'])
+        lambda d: sid.polarity_scores(d)['compound'])
 
 
 def add_sentiment_category(df, threshold):
@@ -87,7 +89,7 @@ def add_pos_tags(df):
         return pos_count
 
     def pos_counts(text):
-        doc = st.session_state.nlp(text)
+        doc = nlp(text)
         Pos_counts = doc.count_by(spacy.attrs.POS)
         return Pos_counts
 
@@ -104,7 +106,7 @@ def add_pos_tags(df):
 
 def add_named_entities(df):
     def count_entities(text):
-        doc = st.session_state.nlp(text)
+        doc = nlp(text)
         ent_count = len([ent.text for ent in doc.ents])
         return ent_count
 
@@ -124,23 +126,35 @@ def calculate_lexical_diversity(text):
     return lexical_diversity
 
 
-
 def get_score(content):
-    if "model" not in st.session_state:
-        st.session_state.nlp = spacy.load('en_core_web_sm')
-        st.session_state.stemmer = PorterStemmer()
-        st.session_state.stop_words = st.session_state.nlp.Defaults.stop_words
-        st.session_state.sid = SentimentIntensityAnalyzer()
-        # nltk.download('vader_lexicon')
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        model_file_path = os.path.join(current_dir, "model_1.pkl")
+    # if "model" not in st.session_state:
+    # nlp = spacy.load('en_core_web_sm')
+    # nlp = nlp
+    # stemmer = PorterStemmer()
+    # stop_words = nlp.Defaults.stop_words
+    # sid = SentimentIntensityAnalyzer()
+    # # nltk.download('vader_lexicon')
+    # current_dir = os.path.dirname(os.path.abspath(__file__))
+    # model_file_path = os.path.join(current_dir, "model_1.pkl")
 
-        with open(model_file_path, "rb") as file:
-            data = pickle.load(file)
+    # with open(model_file_path, "rb") as file:
+    #     data = pickle.load(file)
 
-        st.session_state.model = data["MODEL"]
-        st.session_state.scaler = data["SCALER"]
-    
+    # model = data["MODEL"]
+    # scaler = data["SCALER"]
+    global nlp, stemmer, stop_words, sid, model, scaler
+    nlp = spacy.load('en_core_web_sm')
+    stemmer = PorterStemmer()
+    stop_words = nlp.Defaults.stop_words
+    sid = SentimentIntensityAnalyzer()
+    # nltk.download('vader_lexicon')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_file_path = os.path.join(current_dir, "model_1.pkl")
+    with open(model_file_path, "rb") as file:
+        data = pickle.load(file)
+    model = data["MODEL"]
+    scaler = data["SCALER"]
+
     data = {
         'NEWS TITLE': [content.split("\n")[0]],
         'NEWS TEXT': [" ".join(content.split("\n")[1:])]
@@ -178,6 +192,6 @@ def get_score(content):
         'TEXT CAPITAL CHARS', 'TEXT PUNCTUATION COUNT']
 
     X = df1[features_numeric]
-    X_scaled = st.session_state.scaler.transform(X)
-    prediction = st.session_state.model.predict_proba(X_scaled)
+    X_scaled = scaler.transform(X)
+    prediction = model.predict_proba(X_scaled)
     return prediction[:, 1][0]

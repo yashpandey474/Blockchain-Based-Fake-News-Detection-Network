@@ -108,7 +108,7 @@ class P2pServer:
         print(f"Starting server on port {port}")
         ip_address = self.get_ip_address()
         if ip_address is None:
-            st.error("Failed to obtain IP address. Server cannot start.")
+            print("Failed to obtain IP address. Server cannot start.")
             return
         global myClientPort
         myClientPort = f"{ip_address}:{port}"
@@ -154,7 +154,7 @@ class P2pServer:
             return peers_list
         except requests.RequestException as e:
             logging.error(f"Failed to fetch peers: {e}")
-            st.error('Failed to fetch peers')
+            print('Failed to fetch peers')
             return []
 
     def listen(self):
@@ -179,7 +179,7 @@ class P2pServer:
     def send_current_block_proposer(self, clientPort):
         message = {
             "type": MESSAGE_TYPE["block_proposer_address"],
-            "address": st.session_state.p2pserver.block_proposer
+            "address": self.block_proposer
         }
 
         self.send_direct_encrypted_message(message, clientPort)
@@ -293,7 +293,7 @@ class P2pServer:
             return
 
         # IF NOT CURRENT BLOCK
-        if data["block_index"] != st.session_state.p2pserver.received_block.index:
+        if data["block_index"] != self.received_block.index:
             print("OLD VOTE RECEIVED")
             return
 
@@ -302,7 +302,7 @@ class P2pServer:
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
-            transaction.id: transaction for transaction in st.session_state.p2pserver.received_block.transactions
+            transaction.id: transaction for transaction in self.received_block.transactions
         }
 
         for key, value in self.received_block.transactions:
@@ -312,7 +312,7 @@ class P2pServer:
                 transactions_dict[key].negative_votes.add(data["address"])
 
         # JUST IN CASE OF PASS BY VALUE
-        for index, transaction in enumerate(st.session_state.p2pserver.received_block.transactions):
+        for index, transaction in enumerate(self.received_block.transactions):
             self.received_block.transactions[index] = transactions_dict[transaction.id]
 
     def broadcast_new_validator(self, stake):
@@ -328,17 +328,7 @@ class P2pServer:
             "stake": stake
         }
 
-        message = ChainUtil.encryptWithSoftwareKey(message)
-
-        message = json.dumps(message, cls=CustomJSONEncoder)
-
-        # self.message_received(None, None, message)
-
-        print("ACTIVE ACCOUNTS: ", self.connections)
-
-        for client in self.connections:
-            self.send_new_validator(
-                client, self.wallet.get_public_key(), stake)
+        self.broadcast_message(message)
 
     def send_new_validator(self, clientPort, public_key: str, stake):
         """
@@ -393,7 +383,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["vote"],
             "address": self.wallet.get_public_key(),
             "votes": votes_list,
-            "block_index": st.session_state.p2pserver.received_block.index
+            "block_index": self.received_block.index
         }
 
         # # Convert the message content to a JSON string
