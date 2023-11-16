@@ -221,9 +221,7 @@ class Accounts:
             return None
         
         print("\n\n\nELIGIBLE VALIDATORS = ", eligible_accounts, "\n\n\n")
-        
-        sorted_accounts = sorted(eligible_accounts, key=lambda address: (
-            address[1].stake, address))
+        sorted_accounts = sorted(eligible_accounts, key=lambda a: a[1].stake)
 
         stakes = [eligible_accounts[address].stake for address in sorted_accounts]
 

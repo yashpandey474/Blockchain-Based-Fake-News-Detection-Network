@@ -35,8 +35,8 @@ MESSAGE_TYPE = {
 logging.basicConfig(level=logging.INFO)
 # Configuration
 server_url = 'http://65.1.130.255/app'  # Local server URL
-send_timeout = 500
-receive_timeout = 500
+send_timeout = 5000
+receive_timeout = 5000
 
 context = zmq.Context()
 myClientPort = 0
@@ -110,10 +110,12 @@ class P2pServer:
     def start_server(self):
         port = random.randint(50000, 65535)
         print(f"Starting server on port {port}")
+        
         ip_address = self.get_ip_address()
         if ip_address is None:
             print("Failed to obtain IP address. Server cannot start.")
             return
+        
         global myClientPort
         myClientPort = f"{ip_address}:{port}"
         zmq_socket = context.socket(zmq.REP)
@@ -121,9 +123,11 @@ class P2pServer:
 
         self.register(clientPort=f"{ip_address}:{port}",
                       public_key=self.wallet.get_public_key())
+        
         print("Creating new thread")
         thread = threading.Thread(target=self.broadcast_new_node)
         thread.start()
+        
         print("New thread started")
         while True:
             message = zmq_socket.recv_string()
