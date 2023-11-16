@@ -11,6 +11,7 @@ from typing import Type
 from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.wallet.transaction import *
+from pyblock.blockchain.account import *
 
 import streamlit as st
 import requests
@@ -69,6 +70,7 @@ class P2pServer:
             reply = zmq_socket.recv_string()
             print(f"Received reply from {clientPort}: {reply}")
         except Exception as e:
+            # if "resource temporarily unavaliable" in str(e).lower():
             logging.error(f"Error communicating with {clientPort}: {e}")
         finally:
             zmq_socket.close()
@@ -142,7 +144,7 @@ class P2pServer:
     def send_direct_encrypted_message(self, message, clientPort):
         print("Sending direct message")
         encrypted_message = self.get_encrypted_message(message)
-        return self.private_send_message(encrypted_message, clientPort)
+        return self.private_send_message(clientPort, encrypted_message)
 
     def get_peers(self):
         print("Fetching peers")
@@ -218,9 +220,13 @@ class P2pServer:
             self.blockchain.replace_chain(data["chain"])
             # TODO: SUS
             print("REPLACED CHAIN")
-            self.accounts.accounts = (data["accounts"].accounts)
+            self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
             print(self.accounts.accounts)
+            self.transaction_pool = TransactionPool.from_json(
+                data["transaction_pool"])
+            print("REPLACED TRANSACTION POOL")
+            print(self.transaction_pool.transactions)
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             # CREATE TRANSACTION FROM JSON FORM
@@ -268,7 +274,6 @@ class P2pServer:
             self.accounts.addANewClient(
                 address=data["public_key"], clientPort=clientPort, userType=self.user_type)
             if (clientPort != myClientPort):
-                self.send_mempool(clientPort)
                 self.send_chain(clientPort)
                 self.send_current_block_proposer(clientPort)
 
@@ -278,18 +283,6 @@ class P2pServer:
         elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
             # SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
             self.block_proposer = data["address"]
-
-    def send_mempool(self, clientPort):
-        transaction_list = list(
-            self.transaction_pool.transactions
-        )
-
-        message = {
-            "type": MESSAGE_TYPE["chain"],
-            "chain": transaction_list
-        }
-
-        self.send_direct_encrypted_message(message, clientPort)
 
     def handle_votes(self, data):
         # CHECK IF THE VOTE IS VALID
@@ -363,9 +356,11 @@ class P2pServer:
         message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
-            "accounts": self.accounts
+            "accounts": self.accounts.to_json(),
+            "transaction_pool": TransactionPool.to_json(self.transaction_pool)
         }
-        self.send_direct_encrypted_message(message, clientPort=clientPort)
+        self.send_direct_encrypted_message(
+            message=message, clientPort=clientPort)
 
     def broadcast_transaction(self, transaction):
         message = {

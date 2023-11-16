@@ -3,9 +3,9 @@ import pyblock.config as config
 
 
 class Account:
-    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
+    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None, isActive=True):
         self.balance = balance
-        self.isActive = True
+        self.isActive = isActive
         self.stake = stake
         self.clientPort = clientPort
         self.sent_transactions = set()
@@ -13,9 +13,34 @@ class Account:
         self.reputation_changes = {}
         self.reputation_changes["Assigned Initial Reputation"] = balance
 
+    def to_dict(self):
+        return {
+            "balance": self.balance,
+            "isActive": self.isActive,
+            "stake": self.stake,
+            "clientPort": self.clientPort,
+            # Convert set to list for JSON serialization
+            "sent_transactions": list(self.sent_transactions),
+            "sent_blocks": list(self.sent_blocks),
+            "reputation_changes": self.reputation_changes
+        }
+
+
 class Accounts:
     def __init__(self):
         self.accounts = {}
+
+    def to_json(self):
+        return {address: account.to_dict() for address, account in self.accounts.items()}
+
+    def from_json(self, json_data):
+        self.accounts = {}
+        for address, account_data in json_data.items():
+            account_data['sent_transactions'] = set(
+                account_data.get('sent_transactions', []))
+            account_data['sent_blocks'] = set(
+                account_data.get('sent_blocks', []))
+            self.accounts[address] = Account(**account_data)
 
     def initialize(self, address, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
         if address not in self.accounts:
@@ -32,8 +57,9 @@ class Accounts:
     def send_amount(self, fromaddress, toaddress, amount):
         if (amount > self.accounts[fromaddress].balance):
             return False
-        
-        self.log_reputation_change(toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
+
+        self.log_reputation_change(
+            toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
@@ -44,13 +70,14 @@ class Accounts:
     def update_accounts(self, block):
         # REWARD THE BLOCK PROPOSER AS BLOCK IS ACCEPTED
         self.accounts[block.validator].balance += config.BLOCK_REWARD
-        
-        #LOG THE CHANGE FOR BLOCK PROPSER
-        self.log_reputation_change(block.validator, "Reward for Confirmed Proposed Block",  config.BLOCK_REWARD)
-        
-        #FOR EACH TRANSACTION; REWARD/PENALISE SENDERS AND VOTERS
+
+        # LOG THE CHANGE FOR BLOCK PROPSER
+        self.log_reputation_change(
+            block.validator, "Reward for Confirmed Proposed Block",  config.BLOCK_REWARD)
+
+        # FOR EACH TRANSACTION; REWARD/PENALISE SENDERS AND VOTERS
         for news_transaction in block.transactions:
-            #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR [REPUTATION CHANGE LOGGED IN FUNCTION]
+            # TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR [REPUTATION CHANGE LOGGED IN FUNCTION]
             self.send_amount(
                 news_transaction.sender_address,
                 block.validator,
@@ -61,30 +88,32 @@ class Accounts:
                 self.accounts[news_transaction.sender_address].balance += config.SENDER_REWARD
                 self.log_reputation_change(
                     news_transaction.sender_address, "News Broadcasted Voted True", config.SENDER_REWARD)
-                
+
             else:
                 # PERCENTAGE TO STOP RICH GETTING RICHER
-                penalty_amount = self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT//100
-                
+                penalty_amount = self.accounts[news_transaction.sender_address].balance * \
+                    config.SENDER_PENALTY_PERCENT//100
+
                 self.accounts[news_transaction.sender_address].balance -= (
                     penalty_amount
                 )
-                
+
                 self.log_reputation_change(
-                    news_transaction.sender_address, "News Broadcasted Voted Fake",penalty_amount)
-        
-            #IF MAJORITY VOTED "TRUE"
+                    news_transaction.sender_address, "News Broadcasted Voted Fake", penalty_amount)
+
+            # IF MAJORITY VOTED "TRUE"
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
                 # IF MODEL AGREED WITH MAJORITY
                 if news_transaction.model_score < 0.5:
-                    
-                    #FOR THOSE THAT VOTED NEGATIVELY
+
+                    # FOR THOSE THAT VOTED NEGATIVELY
                     for public_key in news_transaction.negative_votes:
-                        penalty_amount = self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100
-                        #PENALISE BY % OF STAKE
+                        penalty_amount = self.accounts[public_key].stake * \
+                            config.PENALTY_STAKE_PERCENT//100
+                        # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= (
                             penalty_amount)
-                        #LOG REPUTATION CHANGE
+                        # LOG REPUTATION CHANGE
                         self.log_reputation_change(
                             public_key, f"Penalty for Voting Against Majority on {news_transaction.id}",
                             -penalty_amount
@@ -95,18 +124,17 @@ class Accounts:
                 if news_transaction.model_score >= 0.5:
                     # FOR THOSE THAT VOTED POSITIVELY
                     for public_key in news_transaction.positive_votes:
-                        penalty_amount = self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100
-                            
+                        penalty_amount = self.accounts[public_key].stake * \
+                            config.PENALTY_STAKE_PERCENT//100
+
                         # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= penalty_amount
-                        
+
                         # LOG REPUTATION CHANGE
                         self.log_reputation_change(
                             public_key, f"Penalty for Voting Against Majority on {news_transaction.id}",
                             -penalty_amount
                         )
-
-                
 
     def clientLeft(self, clientport):
         for address, account in self.accounts.items():
@@ -133,11 +161,12 @@ class Accounts:
         return account.sent_transactions if account else []
 
     def add_transaction(self, transaction):
-        self.accounts[transaction.sender_address].sent_transactions.add(transaction)
-    
+        self.accounts[transaction.sender_address].sent_transactions.add(
+            transaction)
+
     def log_reputation_change(self, address, change_string, change_amount):
         self.accounts[address].reputation_changes[change_string] = change_amount
-        
+
     def makeAccountValidatorNode(self, address, stake):
         # IF ADDRESS IS NOT VALID
         if address not in self.accounts:

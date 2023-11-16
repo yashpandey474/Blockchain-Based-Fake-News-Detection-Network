@@ -7,6 +7,12 @@ class TransactionPool:
         #SET OF TRANSACTIONS
         self.transactions = set()
 
+    def to_json(self):
+        return [tx.to_json() for tx in self.transactions]
+    
+    def from_json(self, json_data):
+        self.transactions = {Transaction.from_json(tx) for tx in json_data}
+
     def add_transaction(self, transaction):
         #ADD A TRANSACTION TO SET
         return self.transactions.add(transaction)
