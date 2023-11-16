@@ -219,11 +219,12 @@ class Accounts:
 
         if not eligible_accounts:
             return None
-        
-        print("\n\n\nELIGIBLE VALIDATORS = ", eligible_accounts, "\n\n\n")
-        sorted_accounts = sorted(eligible_accounts, key=lambda a: a[1].stake)
 
-        stakes = [eligible_accounts[address].stake for address in sorted_accounts]
+        print("\n\n\nELIGIBLE VALIDATORS = ", eligible_accounts, "\n\n\n")
+        sorted_accounts = sorted(
+            eligible_accounts.items(), key=lambda a: a[1].stake)
+
+        stakes = [account.stake for address, account in sorted_accounts]
 
         total_stake = sum(stakes)
 
@@ -232,7 +233,7 @@ class Accounts:
         random_generator = random.Random(seed)
 
         chosen_validator = random_generator.choices(
-            sorted_accounts, weights=weights, k=1)[0]
+            sorted_accounts, weights=weights, k=1)[0][0]
 
         return chosen_validator
 
