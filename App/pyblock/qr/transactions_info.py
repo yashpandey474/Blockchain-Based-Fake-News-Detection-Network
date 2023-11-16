@@ -4,15 +4,15 @@ import streamlit as st
 from .qr_handler import make_qr
 
 def show_transaction(transaction):
+    percent_fake_votes = 100*(len(transaction.negative_votes) /
+                              (len(transaction.negative_votes) + len(transaction.positive_votes)))
 
     data = f"""
-        Model Score: {transaction.model_score}\n
-        Sender Reputation: {transaction.sender_reputation}\n
-        Sender Stake: {st.session_state.p2pserver.blockchain.get_stake(transaction.sender_address)}\n
-        Transaction Fee: {transaction.fee}\n
-        Timestamp: {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")}\n
-        Sender Address: {transaction.sender_address}\n
-        ID: {transaction.id}\n
+        Model Fake Score": {transaction.model_score},
+        "Percent of Fake Votes": {str(percent_fake_votes) + "%"},
+        "Percent of True Votes": {str(100 - percent_fake_votes)  + "%"},
+        "Transaction Creation Time": {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},
+        "Sender Reputation": {transaction.sender_reputation},
         Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link
     """
 

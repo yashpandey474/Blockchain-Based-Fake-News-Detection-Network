@@ -27,6 +27,7 @@ def propose_block():
         #GET CURRENT MEMPOOL TRANSACTIONS
         transactions = st.session_state.p2pserver.transaction_pool.transactions
 
+<<<<<<< HEAD
         if not transactions:
             st.warning("No transactions in the mempool.")
         else:
@@ -45,6 +46,24 @@ def propose_block():
                 if include_value == "True":
                     selected_transactions.append(transaction)
                     votes[transaction.id] = vote_value
+=======
+
+        #FOR EACH TRANSACTION
+        for transaction in transactions:
+            st.subheader(f"Transaction {transaction.id}")
+            
+            #WHETHER TO INCLUDE IN BLOCK OR NOT
+            include_value = st.radio("Include in Block?", [
+                                    "False", "True"], key=f"include_{transaction.id}")
+            
+            #WHETHER NEWS IS FAKE OR TRUE
+            vote_value = st.radio("Vote on this Transaction?", [
+                                "False", "True"], key=f"vote_{transaction.id}")
+            
+            if include_value == "True":
+                selected_transactions.append(transaction)
+                votes[transaction.id] = vote_value
+>>>>>>> 84563e1 (Fix votes)
 
 
             # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
@@ -82,12 +101,21 @@ def propose_block():
                 # BROADCAST THE BLOCK
                 st.session_state.p2pserver.broadcast_block(block)
 
+<<<<<<< HEAD
                 # CONFIRMATION MESSAGE
                 st.success("The created block was transmitted.")
                 
                 
                 # st.session_state.created_block = True
                 # st.rerun()
+=======
+            # CONFIRMATION MESSAGE
+            st.success("The created block was transmitted.")
+            
+            
+            st.session_state.created_block = True
+            st.rerun()
+>>>>>>> 84563e1 (Fix votes)
 
     if st.button("Back"):
         change_screen("main_page")

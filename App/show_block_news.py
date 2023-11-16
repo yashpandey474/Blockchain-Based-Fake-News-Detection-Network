@@ -3,6 +3,7 @@ import streamlit as st
 from change_screen import *
 import pandas as pd
 from datetime import datetime
+from pyblock.qr.transactions_info import *
 
 def show_blocks_news():
     chain = st.session_state.p2pserver.blockchain.chain
@@ -17,7 +18,15 @@ def show_blocks_news():
         
         for block in chain:
             for transaction in block.transactions:
+                
                 percent_fake_votes = 100*(len(transaction.negative_votes)/(len(transaction.negative_votes) + len(transaction.positive_votes)))
+                
+                qr_button = st.button(
+                    f"Generate QR for Transaction {transaction.id}")
+
+                # If the button is clicked, call make_qr(transaction)
+                if qr_button:
+                    show_transaction(transaction)
                 
                 table_data.append({
                     "Model Fake Score": transaction.model_score,
