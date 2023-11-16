@@ -216,6 +216,11 @@ class P2pServer:
         if data["type"] == MESSAGE_TYPE["chain"]:
             # TRY TO REPLACE IF LONGER CHAIN
             self.blockchain.replace_chain(data["chain"])
+            # TODO: SUS
+            print("REPLACED CHAIN")
+            self.accounts.accounts = (data["accounts"].accounts)
+            print("REPLACED ACCOUNTS")
+            print(self.accounts.accounts)
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             # CREATE TRANSACTION FROM JSON FORM
@@ -357,7 +362,8 @@ class P2pServer:
         chain_as_json = [block.to_json() for block in self.blockchain.chain]
         message = {
             "type": MESSAGE_TYPE["chain"],
-            "chain": chain_as_json
+            "chain": chain_as_json,
+            "accounts": self.accounts
         }
         self.send_direct_encrypted_message(message, clientPort=clientPort)
 
