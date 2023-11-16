@@ -47,4 +47,4 @@ def show_blocks_news():
 
     if st.button("Back"):
         # Set the previous screen in the session state
-        change_screen(st.session_state.previous_screen)
+        change_screen("main_page")

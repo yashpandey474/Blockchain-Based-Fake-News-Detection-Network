@@ -63,6 +63,8 @@ def main_page():
     # while True:
     #     t.markdown("%s" % str(int(time.time())))
     #     time.sleep(1)
+        # st.rerun()
+        
     
     
 

@@ -18,8 +18,9 @@ def sign_up_generate():
     #GENERATE A NEW PRIVATE KEY FOR USER
     if st.button("Click to generate a new private key"):
         st.session_state.gen_key_pressed = True
-
-        private_key = crypto_logic.gen_sk()
+        
+        with st.spinner("Please Wait.."):
+            private_key = crypto_logic.gen_sk()
         
         st.success("Generated Private key. Please store it safely.")
         
