@@ -85,6 +85,7 @@ class Transaction:
         
         #SET SCORE FROM ML MODEL
         transaction.model_score = transaction.get_transaction_score()
+        
         #SET TRRANSACTION FEE
         transaction.fee = fee
         
@@ -94,7 +95,6 @@ class Transaction:
             "ipfs_address": transaction.ipfs_address,
             "sender_address": transaction.sender_address,
             "sender_reputation": transaction.sender_reputation,
-            # "model_score": round(transaction.model_score, 1),
             "timestamp": transaction.timestamp,
             "fee": transaction.fee
         }
@@ -108,6 +108,20 @@ class Transaction:
         return transaction
 
     @staticmethod
+    def get_transaction_data(transaction):
+        percent_fake_votes = 100*(len(transaction.negative_votes)/(
+            len(transaction.negative_votes) + len(transaction.positive_votes)))
+        
+        return f"""
+                         Model Fake Score": {transaction.model_score},
+                        "Percent of Fake Votes": {str(percent_fake_votes) + "%"},
+                        "Percent of True Votes": {str(100 - percent_fake_votes)  + "%"},
+                        "Transaction Creation Time": {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},
+                        "Sender Reputation": {transaction.sender_reputation}
+                """
+                
+                
+    @staticmethod
     def verify_transaction(transaction, error_bound: float = 0.1):
         #HASH THE TRANSACTION WITH SIGNATURE AS NONE
         transaction_data = {
@@ -115,7 +129,6 @@ class Transaction:
             "ipfs_address": transaction.ipfs_address,
             "sender_address": transaction.sender_address,
             "sender_reputation": transaction.sender_reputation,
-            # "model_score": round(transaction.model_score, 1),
             "timestamp": transaction.timestamp,
             "fee": transaction.fee
         }
