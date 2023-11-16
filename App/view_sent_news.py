@@ -4,7 +4,11 @@ import pandas as pd
 from datetime import datetime
 from pyblock.ipfs.ipfs_handler import *
 def view_sent_news():
-    st.title("News/Transactions broadcasted by you.")
+    # st.title("News/Transactions broadcasted by you.")
+    st.markdown(
+        "<h1 style='text-align: center;'>News Broadcasted by you</h1>",
+        unsafe_allow_html=True
+    )
     sent_transactions = st.session_state.p2pserver.accounts.get_sent_transactions(
         st.session_state.p2pserver.wallet.get_public_key()
     )

@@ -3,6 +3,7 @@ import streamlit as st
 from change_screen import *
 from pyblock.wallet.transaction import *
 from pyblock.blockchain.block import *
+from datetime import datetime
 
 def main_page():
     # st.title("Fake News Detection System Utilising Blockchain")
@@ -56,8 +57,13 @@ def main_page():
     st.write("")
     st.write("")
     
+    # Display the current time dynamically
+    # t = st.empty()
+
+    # while True:
+    #     t.markdown("%s" % str(int(time.time())))
+    #     time.sleep(1)
     
-    if st.button("Exit Screen"):
-        change_screen("enter")
+    
 
     

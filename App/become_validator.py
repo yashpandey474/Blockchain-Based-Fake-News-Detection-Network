@@ -4,7 +4,10 @@ from change_screen import *
 
 def become_validator():
     
-    
+    st.markdown(
+        f"<h1 style='text-align: center;'>Manage Stake In Network{st.session_state.user_type}</h1>",
+        unsafe_allow_html=True
+    )
     if st.session_state.validator:
         st.write("You are already a validator.")
     

@@ -66,7 +66,6 @@ def initialise(private_key=None):
         background_thread.start()
 
         st.session_state.initialise = True
-        # atexit.register(on_program_exit)
         
         print("EVERYTHING INITIALIZED")
 

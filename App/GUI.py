@@ -28,8 +28,10 @@ background-position: center;
 '''
 
 st.markdown(background_style, unsafe_allow_html=True)
-st.title("Fake News Detection System Utilising Blockchain")
-
+st.markdown(
+    "<h1 style='text-align: center;'>Fake News Detection System Utilising Blockchain</h1>",
+    unsafe_allow_html=True
+)
 screen_functions = {
     "enter": enter,
     "login": login,

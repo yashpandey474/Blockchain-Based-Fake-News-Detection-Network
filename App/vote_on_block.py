@@ -2,8 +2,11 @@ import streamlit as st
 from change_screen import *
 
 def vote_on_block():
-    st.title("Vote on Recieved Block News.")
-            # IF RECEIVED A BLOCK 
+    # st.title("Vote on Recieved Block News.")
+    st.markdown(
+        "<h1 style='text-align: center;'>Vote on Received Block</h1>",
+        unsafe_allow_html=True
+    )    # IF RECEIVED A BLOCK
         
     if st.session_state.voted:
         st.write("You have already voted on the current proposed block.")
@@ -24,7 +27,7 @@ def vote_on_block():
         for transaction in block.data:
             transaction_id = transaction.id
             vote = st.radio(
-                    f"Vote for Transaction", ("True", "False")
+                    f"Vote on News", ("True", "Fake")
             )
             
             transaction_votes[transaction_id] = vote

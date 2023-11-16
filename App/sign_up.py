@@ -7,7 +7,11 @@ import re
 
 
 def sign_up_generate():
-    st.title("Sign Up as a " + st.session_state.user_type)
+    # st.title("Sign Up as a " + st.session_state.user_type)
+    st.markdown(
+        f"<h1 style='text-align: center;'>Sign Up as a {st.session_state.user_type}</h1>",
+        unsafe_allow_html=True
+    )
     print("session NAME = ", st.session_state.name)
     print("session EMAIL = ", st.session_state.email)
 
