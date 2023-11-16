@@ -20,7 +20,7 @@ class Background:
         print("VOTES  = ", len(block.votes))
         print("PEERS = ", len(PEERS))
         
-        return len(block.votes) >= (0.5 * len(PEERS))
+        return len(block.votes) >= (0.5 * len(self.p2pserver.peers))
 
     def run_forever(self):
         while True:

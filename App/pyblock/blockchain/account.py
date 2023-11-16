@@ -70,6 +70,8 @@ class Accounts:
                     penalty_amount
                 )
                 
+                print("BALANCE OF SENDER = ", self.accounts[news_transaction].balance)
+                
                 self.log_reputation_change(
                     news_transaction.sender_address, "News Broadcasted Voted Fake",penalty_amount)
         

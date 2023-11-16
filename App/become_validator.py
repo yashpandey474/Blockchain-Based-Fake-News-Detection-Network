@@ -8,7 +8,7 @@ def become_validator():
     if st.session_state.validator:
         st.write("You are already a validator.")
     
-    else:
+    elif not st.session_state.stake_submitted:
         st.session_state.stake = 0
 
         #GET CURRENT BALANCE
@@ -32,7 +32,7 @@ def become_validator():
             stake = st.number_input(
                         "Amount to stake in VRC",
                         min_value=config.MIN_STAKE, 
-                        max_value=st.session_state.balance+st.session_state.stake,
+                        max_value=int(st.session_state.balance+st.session_state.stake),
                         value=max(config.MIN_STAKE, st.session_state.stake),
                         step=1
                 )

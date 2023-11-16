@@ -36,7 +36,7 @@ logging.basicConfig(level=logging.INFO)
 server_url = 'http://65.1.130.255/app'  # Local server URL
 send_timeout = 5000
 receive_timeout = 5000
-peers = []
+
 context = zmq.Context()
 myClientPort = 0
 
@@ -52,6 +52,7 @@ class P2pServer:
         self.received_block = None
         self.block_received = None
         self.block_proposer = None
+        self.peers = []
 
     def private_send_message(self, clientPort, message):
         reply = None
@@ -146,11 +147,13 @@ class P2pServer:
 
     def get_peers(self):
         print("Fetching peers")
+        global peers
         try:
             response = requests.get(f'{server_url}/peers')
             response.raise_for_status()
             peers_list = response.json()
             print(f"Received peers: {peers_list}")
+            self.peers = peers_list
             return peers_list
         except requests.RequestException as e:
             logging.error(f"Failed to fetch peers: {e}")
