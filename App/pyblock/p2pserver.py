@@ -53,12 +53,6 @@ class P2pServer:
         self.block_received = None
         self.block_proposer = None
 
-
-    def create_new_thread(self,func):
-        thread = threading.Thread(target=func)
-        thread.start()
-        return thread
-
     def private_send_message(self, clientPort, message):
         reply = None
         # assumes message is encrypted
@@ -123,8 +117,10 @@ class P2pServer:
 
         self.register(clientPort=f"{ip_address}:{port}",
                       public_key=self.wallet.get_public_key())
-
-        self.broadcast_new_node()
+        print("Creating new thread")
+        thread = threading.Thread(target=self.broadcast_new_node)
+        thread.start()
+        print("New thread started")
         while True:
             message = zmq_socket.recv_string()
             print(f"Received message: {message}")
@@ -167,7 +163,6 @@ class P2pServer:
             target=self.start_server, daemon=True)
         server_thread.start()
         print("Server thread started")
-
 
     # # FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
     # def new_client(self, client, server):

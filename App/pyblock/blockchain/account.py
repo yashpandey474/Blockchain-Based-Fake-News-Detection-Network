@@ -35,43 +35,44 @@ class Accounts:
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
-    
+
     def add_sent_block(self, address, block):
         self.accounts[address].sent_blocks.add(block)
-        
+
     def update_accounts(self, block):
-        #REWARD THE BLOCK PROPOSER AS BLOCK IS ACCEPTED
+        # REWARD THE BLOCK PROPOSER AS BLOCK IS ACCEPTED
         self.accounts[block.validator].balance += config.BLOCK_REWARD
-        
-        #FOR EACH TRANSACTION; REWARD/PENALISE SENDERS AND VOTERS
+
+        # FOR EACH TRANSACTION; REWARD/PENALISE SENDERS AND VOTERS
         for news_transaction in block.transactions:
-            #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
+            # TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
             self.send_amount(
                 news_transaction.sender_address,
                 block.validator,
                 news_transaction.fee
             )
-            #IF NEWS WAS TRUE; REWARD SENDER
+            # IF NEWS WAS TRUE; REWARD SENDER
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
                 self.accounts[news_transaction.sender_address].balance += config.SENDER_REWARD
-                
+
             else:
                 # TODO: MAYBE AUDITORS GET PENALISED MORE? MAYBE PENALISE A PERCENTAGE OF BALANCE?
                 # PERCENTAGE TO STOP RICH GETTING RICHER
                 self.accounts[news_transaction.sender_address].balance -= (
-                    self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT
+                    self.accounts[news_transaction.sender_address].balance *
+                    config.SENDER_PENALTY_PERCENT
                 )
-        
-            #IF MAJORITY VOTED "TRUE"
+
+            # IF MAJORITY VOTED "TRUE"
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
-                #IF MODEL AGREED WITH MAJORITY
+                # IF MODEL AGREED WITH MAJORITY
                 if news_transaction.model_score < 0.5:
-                    #FOR THOSE THAT VOTED NEGATIVELY
+                    # FOR THOSE THAT VOTED NEGATIVELY
                     for public_key in news_transaction.negative_votes:
-                        #PENALISE BY % OF STAKE
+                        # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= (
                             self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100)
-                        
+
             # IF MAJORITY VOTED "FAKE"
             if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
                 # IF MODEL AGREED WITH MAJORITY
@@ -81,9 +82,6 @@ class Accounts:
                         # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= (
                             self.accounts[public_key].stake*config.PENALTY_STAKE_PERCENT//100)
-
-
-                
 
     def clientLeft(self, clientport):
         for address, account in self.accounts.items():
@@ -108,10 +106,11 @@ class Accounts:
     def get_sent_transactions(self, address):
         account = self.get_account(address)
         return account.sent_transactions if account else []
-    
+
     def add_transaction(self, transaction):
-        self.accounts[transaction.sender_address].sent_transactions.add(transaction)
-        
+        self.accounts[transaction.sender_address].sent_transactions.add(
+            transaction)
+
     def makeAccountValidatorNode(self, address, stake):
         # IF ADDRESS IS NOT VALID
         if address not in self.accounts:
@@ -129,11 +128,12 @@ class Accounts:
                 f"Stake must be at least {config.MIN_STAKE} to become a validator.")
 
         # ADJUST BALANCE & STAKE OF ACCOUNT
-        
+
         account.balance = account.balance - stake + account.stake
         account.stake = stake
 
     def addANewClient(self, address, clientPort, userType):
+        print(f"Adding a new client {address} with clientPort {clientPort}")
         if address in self.accounts:
             if self.accounts[address].isActive:
                 raise ValueError(
@@ -143,7 +143,8 @@ class Accounts:
                 self.accounts[address].isActive = True
                 self.accounts[address].clientPort = clientPort
 
-        self.initialize(address, clientPort=clientPort, balance = config.DEFAULT_BALANCE[userType])
+        self.initialize(address, clientPort=clientPort,
+                        balance=config.DEFAULT_BALANCE[userType])
 
     def choose_validator(self, seed=None):
         eligible_accounts = {address: acc for address, acc in self.accounts.items()
@@ -156,16 +157,16 @@ class Accounts:
             eligible_accounts[address].stake, address))
 
         stakes = [eligible_accounts[address].stake for address in sorted_accounts]
-        
+
         total_stake = sum(stakes)
-        
+
         weights = [stake / total_stake for stake in stakes]
-        
+
         random_generator = random.Random(seed)
-        
+
         chosen_validator = random_generator.choices(
             sorted_accounts, weights=weights, k=1)[0]
-        
+
         return chosen_validator
 
     # VERIFY EACH TRANSACTION'S SENDER HAS ENOUGH BALANCE FORR THE FEE
