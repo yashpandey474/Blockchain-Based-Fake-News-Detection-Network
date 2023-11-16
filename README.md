@@ -4,6 +4,13 @@
 
 This project develops a blockchain-based network for detecting fake news, leveraging NLP bases ML models and a consortium of auditors. The system operates on a consortium blockchain, enabling anonymous participation for readers to access news and submit news items as transactions.
 
+## Running the Project
+
+1. Clone the repository locally.
+2. Run the following command in your command line interface: streamlit run App/GUI.py
+3. Choose to act in the network as an auditor or reader
+4. For a proof-of-concept authentication as an auditor, provide a certificate-id starting with "ABCD" to sign-up.
+   
 ### Key Features
 
 - **Machine Learning Model**: Utilizes a model trained on extensive datasets to assign a probability score indicating the likelihood of news being fake.
