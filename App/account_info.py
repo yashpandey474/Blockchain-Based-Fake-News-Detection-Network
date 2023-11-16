@@ -18,7 +18,10 @@ function copyTextToClipboard(text) {
 
 
 def show_account_info():
-    st.title("ACCOUNT INFORMATION")
+    st.markdown(
+        "<h1 style='text-align: center;'>ACCOUNT INFORMATION</h1>",
+        unsafe_allow_html=True
+    )
     #GET USER'S DETAILS
     public_key = st.session_state.p2pserver.wallet.get_public_key()
     private_key = st.session_state.p2pserver.wallet.get_private_key()
