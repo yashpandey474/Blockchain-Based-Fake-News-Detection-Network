@@ -17,6 +17,9 @@ class Background:
         self.p2pserver = p2pserver
 
     def can_add_block(self, block):
+        print("VOTES  = ", len(block.votes))
+        print("PEERS = ", len(PEERS))
+        
         return len(block.votes) >= (0.5 * len(PEERS))
 
     def run_forever(self):

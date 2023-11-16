@@ -39,10 +39,16 @@ def main_page():
                 
             if st.session_state.validator and st.button("Modify Your Stake in Network"):
                 change_screen("become_validator")
+                
+            
         
         if (st.session_state.validator
         and st.button("View Current Block Status")):
             change_screen("view_block_status")
+            
+        if (st.session_state.validator
+            and st.button("View Broadcasted Blocks")):
+            change_screen("view_sent_blocks")
 
     st.write("")
     st.write("")

@@ -72,6 +72,9 @@ def propose_block():
             )
             
             print(block.transactions)
+            
+            #ADD THE ADDRESS TO VOTE
+            block.votes.add(st.session_state.wallet.get_public_key())
 
             # BROADCAST THE BLOCK
             st.session_state.p2pserver.broadcast_block(block)
