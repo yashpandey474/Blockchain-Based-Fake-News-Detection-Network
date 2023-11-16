@@ -72,6 +72,9 @@ def propose_block():
             )
             
             print(block.transactions)
+            
+            #ADD THE ADDRESS TO VOTE
+            block.votes.add(st.session_state.wallet.get_public_key())
 
             # BROADCAST THE BLOCK
             st.session_state.p2pserver.broadcast_block(block)
@@ -79,7 +82,9 @@ def propose_block():
             # CONFIRMATION MESSAGE
             st.success("The created block was transmitted.")
             
+            
             # st.session_state.created_block = True
+            # st.rerun()
 
     if st.button("Back"):
         change_screen("main_page")

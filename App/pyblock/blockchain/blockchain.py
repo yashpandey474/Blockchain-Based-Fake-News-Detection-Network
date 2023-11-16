@@ -58,7 +58,7 @@ class Blockchain:
     #VERIFY BLOCK IS VALID [WHEN RECEIVED! AS THEN THE SENDERS MUST HAVE ENOUGH BALANCE FOR TRANSACTIONS.]
     def is_valid_block(self, block, transaction_pool, accounts):
         
-        #IF ALL TRRANSACTIIONS EXISTS AND ALL ACCOUNTS HAVE THE BALANCE
+        #IF ALL TRRANSACTIIONS EXISTS AND ALL ACCOUNTS HAVE ENOUGH BALANCE
         if not (
             transaction_pool.verify_transactions_exist(block.transactions)
         and accounts.verify_transactions_balance(block.transactions)
@@ -69,7 +69,7 @@ class Blockchain:
             return False
         
         #IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
-        if not (block.last_hash == self.chain[-1].hash and
+        if not (block.lastHash == Block.block_hash(self.chain[-1]) and
             Block.verify_block(block)):
             print("SECOND VERIFICATION FAILED.")
             return False

@@ -39,42 +39,25 @@ class ChainUtil:
     
     @staticmethod
     def sign(private_key, data):
-        data_str = json.dumps(data, cls = CustomJSONEncoder)
         private_key_RSA = RSA.import_key(private_key)
+        data_str = json.dumps(data, cls = CustomJSONEncoder)
         data_hash = SHA256.new(data_str.encode())
         signature = pkcs1_15.new(private_key_RSA).sign(data_hash)
         return signature
     
-    @staticmethod
-    def sign_hashed_data(private_key, data_hash):
-        private_key_1 = RSA.import_key(private_key)
-        signature = pkcs1_15.new(private_key_1).sign(data_hash)
-        return signature
-    
+
     @staticmethod
     def verify_signature(public_key, signature, data):
-        public_key_RSA = RSA.import_key(public_key)
-        data_str = json.dumps(data, cls = CustomJSONEncoder)
-        data_hash = SHA256.new(data_str.encode())
-        
         try:
+            public_key_RSA = RSA.import_key(public_key)
+            data_str = json.dumps(data, cls=CustomJSONEncoder)
+            data_hash = SHA256.new(data_str.encode())
             pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
             return True  # Signature is valid
         
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            print(f"Verification failed: {e}")
             return False  # Signature is invalid
-        
-    @staticmethod
-    def verify_hashed_signature(public_key, signature, data):
-        data_hash = SHA256.new(data.encode())
-        public_key_RSA = RSA.import_key(public_key)
-        
-        try:
-            pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
-            return True 
-        
-        except (ValueError, TypeError):
-            return False
         
     @staticmethod
     def encryptWithSoftwareKey(data):
@@ -86,11 +69,12 @@ class ChainUtil:
     def decryptWithSoftwareKey(data):
         signature_hex = data["VM_signature"]
         signature = binascii.unhexlify(signature_hex)
-        del data["VM_signature"]
         
+        del data["VM_signature"]
         
         if ChainUtil.verify_signature(config.VM_PUBLIC_KEY, signature, data):
             return data
+        
         return None
     
 class CustomJSONEncoder(json.JSONEncoder):

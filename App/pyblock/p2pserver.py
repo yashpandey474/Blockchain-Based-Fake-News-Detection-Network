@@ -142,7 +142,7 @@ class P2pServer:
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
                 self.received_block = block
-                self.accounts.add_sent_block(data["address"], block)
+                self.accounts.add_sent_block(block.validator, block)
             
             else:
                 print("RECEIVED BLOCK DEEMED INVALID.")
@@ -248,6 +248,7 @@ class P2pServer:
         
         
         print("ACTIVE ACCOUNTS: ", self.connections)
+        
         for client in self.connections:
             self.send_new_validator(
                 client, self.wallet.get_public_key(), stake)
@@ -261,6 +262,7 @@ class P2pServer:
             "public_key": public_key,
             "stake": stake
         })
+        
         self.sendEncryptedMessage(socket, message)
 
     def connect_to_peers(self):
@@ -319,13 +321,10 @@ class P2pServer:
         
         message = json.dumps(message, cls = CustomJSONEncoder)
         
-        print("MESSAGE SENT TO SELF")
-        
         self.message_received(
             None, None, message
         )
         
-        print("ACTIVE ACCOUNTS: ", self.connections)
 
         for client in self.connections:
             self.send_transaction(
@@ -340,6 +339,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["block"],
             "block": block.to_json()
         }
+        
         message = ChainUtil.encryptWithSoftwareKey(message_data)
 
         message = json.dumps(message, cls=CustomJSONEncoder)

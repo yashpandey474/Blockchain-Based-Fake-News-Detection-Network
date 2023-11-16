@@ -2,6 +2,7 @@
 import streamlit as st
 from change_screen import *
 import pandas as pd
+from datetime import datetime
 
 def show_blocks_news():
     chain = st.session_state.p2pserver.blockchain.chain
@@ -16,16 +17,22 @@ def show_blocks_news():
         
         for block in chain:
             for transaction in block.transactions:
+                percent_fake_votes = 100*(len(transaction.negative_votes)/(len(transaction.negative_votes) + len(transaction.positive_votes)))
+                
                 table_data.append({
+                    "Model Fake Score": transaction.model_score,
+                    "Percent of Fake Votes": str(percent_fake_votes) + "%",
+                    "Percent of True Votes": str(100 - percent_fake_votes)  + "%",
                     "ID": transaction.id,
-                    "Transaction Creation Time": transaction.timestamp,
-                    "Block Creation Time": block.timestamp,
+                    "Transaction Creation Time": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
+                    "Block Creation Time": datetime.fromtimestamp(block.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                     "IPFS Address": transaction.ipfs_address,
-                    "Sender Address": transaction.sender_address,
-                    "Validator Address": block.validator,
+                    "Sender Public Key": transaction.sender_address,
+                    "Validator Public Key": block.validator,
+                    # TODO: "Validator Reputation": st.session_state.accounts.get_
                     "Sender Reputation": transaction.sender_reputation,
-                    "Sign of sender": transaction.sign,
-                    "Model Score": transaction.model_score
+                    "Sign of sender": transaction.sign
+                    
                 })
                 
         st.dataframe(pd.DataFrame(table_data), height=500)

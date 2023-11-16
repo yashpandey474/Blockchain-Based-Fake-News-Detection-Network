@@ -6,7 +6,8 @@ from datetime import datetime
 
 def view_sent_blocks():
     st.title("Blocks Broadcasted by you.")
-    blocks = st.session_state.p2pserver.accounts[
+    
+    blocks = st.session_state.p2pserver.accounts.accounts[
         st.session_state.p2pserver.wallet.get_public_key()
     ].sent_blocks
     

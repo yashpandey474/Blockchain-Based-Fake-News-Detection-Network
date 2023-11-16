@@ -52,7 +52,7 @@ def become_validator():
                 st.session_state.validator = True
                         
             else:
-                st.success("Your stake has been successfully modified to: ", st.session_state.stake)
+                st.success(f"Your stake has been successfully modified to: {st.session_state.stake}")
                         
         
     

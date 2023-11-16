@@ -4,11 +4,12 @@ from pyblock.ipfs.ipfs_handler import IPFSHandler
 from pyblock.nlp.ml_model import *
 from pyblock.wallet.wallet import Wallet
 from typing import Type
+from pyblock.config import *
 
 
 class Transaction:
     def __init__(self):
-        self.id = id(ChainUtil.id())
+        self.id = str(ChainUtil.id())
         self.ipfs_address = None
         self.sender_address = None
         self.sender_reputation = None
@@ -26,7 +27,7 @@ class Transaction:
             "sender_address": self.sender_address,
             "sender_reputation": self.sender_reputation,
             "model_score": self.model_score,
-            "sign": str(self.sign.hex()) if self.sign else "",
+            "sign": self.sign.hex() if self.sign else "",
             "positive_votes": list(self.positive_votes),
             "negative_votes": list(self.negative_votes),
             "timestamp": self.timestamp,
@@ -74,11 +75,14 @@ class Transaction:
         
         #SET CURRENT TIME
         transaction.timestamp = int(time.time())
+        
         #SET SENDER PUBLIC KEY
         transaction.sender_address = sender_wallet.get_public_key()
+        
         #SET SENDER REPUTATION
         transaction.sender_reputation = (blockchain.get_balance(sender_wallet.get_public_key())
                             + blockchain.get_stake(sender_wallet.get_public_key()))
+        
         #SET SCORE FROM ML MODEL
         transaction.model_score = transaction.get_transaction_score()
         #SET TRRANSACTION FEE
@@ -90,19 +94,16 @@ class Transaction:
             "ipfs_address": transaction.ipfs_address,
             "sender_address": transaction.sender_address,
             "sender_reputation": transaction.sender_reputation,
-            "model_score": round(transaction.model_score, 2),
+            # "model_score": round(transaction.model_score, 1),
             "timestamp": transaction.timestamp,
             "fee": transaction.fee
         }
         
+        private_key = sender_wallet.get_private_key()
         transaction.sign = ChainUtil.sign(
-            private_key=sender_wallet.get_private_key(),
+            private_key = private_key,
             data = transaction_data
         )
-        
-        
-        print("SIGN WHEN SENDING = ", transaction.sign)
-        print("DATA WHEN SENDING = ", transaction_data)
         
         return transaction
 
@@ -114,7 +115,7 @@ class Transaction:
             "ipfs_address": transaction.ipfs_address,
             "sender_address": transaction.sender_address,
             "sender_reputation": transaction.sender_reputation,
-            "model_score": round(transaction.model_score, 2),
+            # "model_score": round(transaction.model_score, 1),
             "timestamp": transaction.timestamp,
             "fee": transaction.fee
         }
@@ -127,9 +128,6 @@ class Transaction:
             print("MODEL SCORE NOT MATCHING")
             return False
 
-        print("DATA WHEN RECEIVED = ", transaction_data)
-        print("SIGN WHEN RECEIVED = ", transaction.sign)
-        
         #VERIFY THE TRANSACTION SIGNATURE
         return ChainUtil.verify_signature(
             public_key = transaction.sender_address,  # Public key
