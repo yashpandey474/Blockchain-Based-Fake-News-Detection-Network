@@ -1,7 +1,8 @@
 from Crypto.PublicKey import RSA
-
+import re
 
 def verify(private_key):
+    private_key = re.sub(r' ', '\n', private_key)
     try:
         rsa_private_key = RSA.import_key(private_key)
     except:
