@@ -15,9 +15,12 @@ def upload_file():
             st.write("Your current balance: ", balance)
             # ASK FOR OPTIONAL TRANSACTION FEE
             transaction_fee = st.number_input(
-                "Enter transaction fee amount you want to include", min_value=0,
-                max_value=balance
+                "Enter transaction fee amount you want to include", 
+                min_value = 0,
+                max_value = int(balance),
+                step = 1
             )
+            
             if st.button("Submit News"):
 
                 transaction = Transaction.generate_from_file(
@@ -37,9 +40,7 @@ def upload_file():
 
                 print("BROADCASTED TRANSACTION")
                 st.rerun()
-
                 
-
     else:
         st.success("File successfully uploaded.")
 

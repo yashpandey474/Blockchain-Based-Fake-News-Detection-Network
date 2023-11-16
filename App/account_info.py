@@ -1,7 +1,20 @@
 from pyblock.wallet.transaction import *
 import streamlit as st
 from change_screen import *
-import binascii
+
+copy_to_clipboard_js = """
+function copyTextToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            console.log("Text copied to clipboard");
+            alert("Private key copied to clipboard!");
+        })
+        .catch(err => {
+            console.error("Error in copying text: ", err);
+            alert("Failed to copy private key!");
+        });
+}
+"""
 
 
 def show_account_info():
@@ -19,8 +32,12 @@ def show_account_info():
     if st.session_state.validator:
         st.write("Currrent Stake in Network = ", stake)
     st.write("Current Reputation = ", balance + stake)
-    st.write("PUBLIC KEY = ", public_key)
-    st.write("PRIVATE KEY = ", private_key)
+    
+    with st.expander("Click to view private key"):
+        st.write(private_key)
+        
+    with st.expander("Click to view private key"):
+        st.write(private_key)
 
     if st.button("Back"):
         change_screen(st.session_state.previous_screen)

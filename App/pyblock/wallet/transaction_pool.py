@@ -1,4 +1,3 @@
-from pyblock.config import TRANSACTION_THRESHOLD
 from typing import List
 from .transaction import Transaction
 

@@ -4,7 +4,8 @@ from change_screen import *
 import pyblock.config as config
 from pyblock.blockchain.block import *
 import time
-
+from pyblock.wallet.transaction import *
+from datetime import datetime
 def block_valid():
     return int(time.time()) - st.session_state.p2pserver.received_block.timestamp <= config.BLOCK_VALIDATOR_CHOOSE_INTERVAL
 
@@ -12,14 +13,13 @@ def block_valid():
 def propose_block():
     st.title("You are the current block proposer.")
 
-    if "created_block" in st.session_state and st.session_state.created_block == True:
+    if st.session_state.p2pserver.received_block:
         st.write("You have already transmitted the block")
         st.write("Current Confirmations on Block: ", len(
             st.session_state.p2pserver.received_block.votes))
     
     else:
         #TABLE DATA TO SHOW TRANSACTIONS
-        table_data = []
         selected_transactions = []
         votes = {}
         public_key = st.session_state.p2pserver.wallet.get_public_key()
@@ -34,6 +34,12 @@ def propose_block():
             for transaction in transactions:
                 st.subheader(f"Transaction {transaction.id}")
                 
+                #SHOW IMPORTANT DATA RELATED TO TRANSACTION
+                st.markdown(
+                    f"""<span><b>Model Fake Score: {transaction.model_score},<br>
+                        Transaction Creation Time: {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},<br>
+                        Sender Reputation: {transaction.sender_reputation}</b></span>"""       , unsafe_allow_html=True)
+
                 #WHETHER TO INCLUDE IN BLOCK OR NOT
                 include_value = st.radio("Include in Block?", [
                                         "False", "True"], key=f"include_{transaction.id}")
@@ -74,6 +80,7 @@ def propose_block():
                     blockchain=st.session_state.p2pserver.blockchain
                 )
                 
+                
                 print(block.transactions)
                 
                 #ADD THE ADDRESS TO VOTE
@@ -82,12 +89,12 @@ def propose_block():
                 # BROADCAST THE BLOCK
                 st.session_state.p2pserver.broadcast_block(block)
 
-                # CONFIRMATION MESSAGE
-                st.success("The created block was transmitted.")
-                
-                
-                # st.session_state.created_block = True
-                # st.rerun()
+            # CONFIRMATION MESSAGE
+            st.success("The created block was transmitted.")
+            
+            
+            st.session_state.created_block = True
+            st.rerun()
 
     if st.button("Back"):
         change_screen("main_page")

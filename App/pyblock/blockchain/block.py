@@ -128,7 +128,7 @@ class Block:
         data = {
             "timestamp": timestamp,
             "last_hash": lastHash,
-            "transactions": transactions
+            "transactions": [transaction.to_json() for transaction in transactions]
         }
 
         # Serialize the dictionary to a JSON string

@@ -3,7 +3,7 @@ import pyblock.config as config
 
 
 class Account:
-    def __init__(self, balance=config.STARTING_BALANCE, stake=0, clientPort=None):
+    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
         self.balance = balance
         self.isActive = True
         self.stake = stake
@@ -17,7 +17,7 @@ class Accounts:
         self.accounts = {}  # This will store address: Account mappings
         # self.accounts[config.VM_PUBLIC_KEY] = Account(balance=50, stake = 0, clientPort=None)
 
-    def initialize(self, address, balance=config.STARTING_BALANCE, stake=0, clientPort=None):
+    def initialize(self, address, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
         if address not in self.accounts:
             self.accounts[address] = Account(
                 balance=balance, stake=stake, clientPort=clientPort)
@@ -40,7 +40,10 @@ class Accounts:
         self.accounts[address].sent_blocks.add(block)
         
     def update_accounts(self, block):
+        #REWARD THE BLOCK PROPOSER AS BLOCK IS ACCEPTED
+        self.accounts[block.validator].balance += config.BLOCK_REWARD
         
+        #FOR EACH TRANSACTION; REWARD/PENALISE SENDERS AND VOTERS
         for news_transaction in block.transactions:
             #TRANSFER AMOUNT FROM SENDER OF NEWS TO VALIDATOR
             self.send_amount(

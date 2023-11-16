@@ -15,11 +15,6 @@ def sign_up_generate():
     if st.button("Click to generate a new private key"):
         st.session_state.gen_key_pressed = True
 
-        # st.markdown(
-        #     "<span style='font-style: italic; color: #FF5733;'><b>Generating New key <br> store it for future use</b></span>",
-        #     unsafe_allow_html=True
-        # )
-
         private_key = crypto_logic.gen_sk()
         
         st.success("Generated Private key. Please store it safely.")
@@ -29,17 +24,12 @@ def sign_up_generate():
             
             st.write(private_key.export_key().decode())
         
-        # st.write(private_key.export_key().decode())
-        
         #INITIALISE ACCOUNT & WALLET OF SESSION
         initialise(private_key)
-
-        
 
 
     if st.session_state.gen_key_pressed:
         if st.button("Go to main"):
-            # st.session_state.gen_key_pressed = False
             change_screen("main_page")
             
     else:
