@@ -6,12 +6,13 @@ class Account:
     def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
         self.balance = balance
         self.isActive = True
+        self.isValidator = False
         self.stake = stake
         self.clientPort = clientPort
         self.sent_transactions = set()
         self.sent_blocks = set()
-        self.reputation_changes = {}
-        self.reputation_changes["Assigned Initial Reputation"] = balance
+        self.reputation_changes = []
+        self.reputation_changes.append(("Assigned Initial Reputation", balance))
 
 class Accounts:
     def __init__(self):
@@ -70,7 +71,7 @@ class Accounts:
                     penalty_amount
                 )
                 
-                print("BALANCE OF SENDER = ", self.accounts[news_transaction].balance)
+                print("BALANCE OF SENDER = ", self.accounts[news_transaction.sender_address].balance)
                 
                 self.log_reputation_change(
                     news_transaction.sender_address, "News Broadcasted Voted Fake",penalty_amount)
@@ -138,7 +139,7 @@ class Accounts:
         self.accounts[transaction.sender_address].sent_transactions.add(transaction)
     
     def log_reputation_change(self, address, change_string, change_amount):
-        self.accounts[address].reputation_changes[change_string] = change_amount
+        self.accounts[address].reputation_changes.append((change_string, change_amount))
         
     def makeAccountValidatorNode(self, address, stake):
         # IF ADDRESS IS NOT VALID
@@ -146,6 +147,8 @@ class Accounts:
             raise ValueError("Account does not exist.")
 
         account = self.accounts[address]
+        
+        account.isValidator = True
 
         # IF NOT ENOUGH BALANCE
         if account.balance < stake:

@@ -12,7 +12,7 @@ def view_log_reputation():
     ].reputation_changes
     
     table_data = []
-    for reason, amount in log_reputation.items():
+    for reason, amount in log_reputation:
         table_data.append({
                 "Change Reason": reason,
                 "Change Amount": amount

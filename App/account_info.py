@@ -31,10 +31,11 @@ def show_account_info():
     stake = st.session_state.blockchain.get_stake(public_key)
     
     #DISPLAY THE DETAILS
-    st.write("Current Balance = ", balance)
-    if st.session_state.validator:
-        st.write("Currrent Stake in Network = ", stake)
     st.write("Current Reputation = ", balance + stake)
+    st.write("Current Balance = ", balance)
+    if st.session_state.user_type == "Auditor":
+        st.write("Currrent Stake in Network = ", stake)
+    
     
     with st.expander("Click to view private key"):
         st.write(private_key)
