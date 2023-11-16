@@ -71,6 +71,8 @@ class P2pServer:
             reply = zmq_socket.recv_string()
             print(f"Received reply from {clientPort}: {reply}")
         except Exception as e:
+            # if e.errno == zmq.ETIMEDOUT:
+            #     print("TIMED OUT\n")
             logging.error(f"Error communicating with {clientPort}: {e}")
         finally:
             zmq_socket.close()
