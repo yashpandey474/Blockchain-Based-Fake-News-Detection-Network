@@ -37,6 +37,7 @@ class Accounts:
 
     def from_json(self, json_data):
         self.accounts = {}
+        
         for address, account_data in json_data.items():
             account_data['sent_transactions'] = set(
                 account_data.get('sent_transactions', []))
@@ -218,9 +219,11 @@ class Accounts:
 
         if not eligible_accounts:
             return None
-
+        
+        print("\n\n\nELIGIBLE VALIDATORS = ", eligible_accounts, "\n\n\n")
+        
         sorted_accounts = sorted(eligible_accounts, key=lambda address: (
-            eligible_accounts[address].stake, address))
+            address[1].stake, address))
 
         stakes = [eligible_accounts[address].stake for address in sorted_accounts]
 

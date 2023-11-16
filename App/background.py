@@ -24,17 +24,17 @@ class Background:
 
     def run_forever(self):
         while True:
+            
             current_time = int(time.time())
             time_elapsed = current_time - START_TIME.timestamp()
             sleep_time = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
-
+            
+            
             print("Sleeping for {} seconds".format(sleep_time))
             time.sleep(sleep_time)
-
-
+            
             #CHOOSE THE BLOCK PROPOSER AT THE START TO NOT HAVE DELAY BECAUSE OF APPENDING
-            self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(
-                current_time)
+            self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(current_time)
             
             #IF THERE WAS A RECEIVED BLOCK FROM PREVIOUS BLOCK PROPOSERR
             if self.p2pserver.received_block:
@@ -48,7 +48,7 @@ class Background:
                         self.p2pserver.transaction_pool,
                         self.p2pserver.accounts
                     )
-                    
+                
                 else:
                     print("RECIEVED BLOCK DID NOT GET ENOUGH VOTES\n")
 
