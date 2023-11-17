@@ -105,8 +105,17 @@ class P2pServer:
             logging.error(f"Error obtaining IP address: {e}")
             return None
 
+    def is_port_available(self, port):
+        print(f"Checking if port {port} is available")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            a = s.connect_ex(('localhost', port)) != 0
+            print(a)
+            return a
+
     def start_server(self):
-        port = random.randint(50000, 65533)
+        port = 6969
+        while not (self.is_port_available(port) and self.is_port_available(port+1)):
+            port = random.randint(50000, 65533)
         print(f"Starting server on port {port}")
 
         ip_address = self.get_ip_address()
@@ -124,7 +133,7 @@ class P2pServer:
         self.get_peers()
         print("Starting heartbeat manager")
         self.heartbeat_manager = HeartbeatManager(
-            myClientPort=self.myClientPort, context=self.context, peers=self.peers)
+            myClientPort=self.myClientPort, context=self.context, peers=self.peers, server_url=server_url)
         heartbeat_thread = threading.Thread(
             target=self.heartbeat_manager.run, daemon=True)
         heartbeat_thread.start()
