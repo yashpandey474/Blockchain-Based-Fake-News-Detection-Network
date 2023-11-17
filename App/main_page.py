@@ -5,67 +5,68 @@ from pyblock.wallet.transaction import *
 from pyblock.blockchain.block import *
 from datetime import datetime
 
+
 def main_page():
-    # st.title("Fake News Detection System Utilising Blockchain")
+    # st.title("Fake News Detection System Utilizing Blockchain")
     st.write("Welcome, " + st.session_state.name)
 
-    c1,m,c2 = st.columns([0.4,0.6,0.4])
-
-    with c1:
-
-        if st.button("Upload New News"):
-            # GET UPLOADED TEXT FILE
-            st.session_state.upload_file_executed = False
-            change_screen("upload_file")
-
-        # VIEW NEWS STORED IN BLOCKCHAIN
-        if st.button("View all Verified News"):
-            change_screen("show_blocks")
-
-        if st.button("View Account Information"):
-            change_screen("account_info")
-
-        if st.button("View Sent News/Transactions"):
-            change_screen("view_sent_news")
+    # Create a navigation bar
+    if st.session_state.user_type == "Reader":
+        nav_selection = st.sidebar.selectbox("Navigation",
+                                            ("Main Page", "Upload News",
+                                            "View Verified News",
+                                            "View Account Info",
+                                            "View Sent News",
+                                            "View Reputation Log",
+                                            "Enter Page"))
         
-        if st.button("View Log of Reputation Changes"):
-            change_screen("view_log_reputation")
-              
-    with c2:
-        if st.session_state.user_type == "Auditor":
-            if st.button("View all transactions in mempool"):
-                change_screen("show_transac")
-
-            if not st.session_state.validator and st.button("Become a Validator"):
-                st.session_state.stake_submitted = False
-                change_screen("become_validator")
-                
-            if st.session_state.validator and st.button("Modify Your Stake in Network"):
-                st.session_state.stake_submitted = False
-                change_screen("become_validator")
-                
+    if st.session_state.user_type == "Auditor":
+        if st.session_state.validator:
+            nav_selection = st.sidebar.selectbox("Navigation",
+                                                 ("Main Page", "Upload News",
+                                                  "Verified News",
+                                                  "Account Info",
+                                                  "Sent News",
+                                                  "Reputation Log",
+                                                  "Transactions in Mempool",
+                                                  "Modify Stake",
+                                                  "Current Block Status",
+                                                  "Broadcasted Blocks",
+                                                  "Enter Page"))
             
-        
-        if (st.session_state.validator
-        and st.button("View Current Block Status")):
-            change_screen("view_block_status")
-            
-        if (st.session_state.validator
-            and st.button("View Broadcasted Blocks")):
-            change_screen("view_sent_blocks")
+        else:
+            nav_selection = st.sidebar.selectbox("Navigation",
+                                                 ("Main Page", "Upload News",
+                                                  "Verified News",
+                                                  "Account Info",
+                                                  "Sent News",
+                                                  "Reputation Log",
+                                                  "Transactions in Mempool",
+                                                  "Become a Validator",
+                                                  "Enter Page"))
 
-    st.write("")
-    st.write("")
-    
-    # Display the current time dynamically
-    # t = st.empty()
+    # Map the nav_selection to corresponding actions
+    if nav_selection == "Upload News":
+        st.session_state.upload_file_executed = False
+        change_screen("upload_file")
+    elif nav_selection == "Verified News":
+        change_screen("show_blocks")
+    elif nav_selection == "Account Info":
+        change_screen("account_info")
+    elif nav_selection == "Sent News":
+        change_screen("view_sent_news")
+    elif nav_selection == "Reputation Log":
+        change_screen("view_log_reputation")
+    elif nav_selection == "Transactions in Mempool":
+        change_screen("show_transac")
+    elif nav_selection == "Modify Stake" or nav_selection == "Become a Validator":
+        st.session_state.stake_submitted = False
+        change_screen("become_validator")
+    elif nav_selection == "Current Block Status":
+        change_screen("view_block_status")
+    elif nav_selection == "Broadcasted Blocks":
+        change_screen("view_sent_blocks")
+    elif nav_selection == "Enter Page":
+        change_screen("enter")
 
-    # while True:
-    #     t.markdown("%s" % str(int(time.time())))
-    #     time.sleep(1)
-        # st.rerun()
-        
-    
-    
-
-    
+    # Rest of your code...
