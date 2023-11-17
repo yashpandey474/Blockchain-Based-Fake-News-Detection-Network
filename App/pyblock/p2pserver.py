@@ -1,25 +1,22 @@
 import numpy as np
 import streamlit as st
 import json
-import websocket
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
-from websocket_server import WebsocketServer
 from typing import Type
 from pyblock.chainutil import *
 from pyblock.peers import *
 from pyblock.wallet.transaction import *
 from pyblock.blockchain.account import *
-
+from pyblock.heartbeat_manager import *
 import streamlit as st
 import requests
 import zmq
 import logging
 import threading
 import socket
-import queue
 import random as random
 
 MESSAGE_TYPE = {
@@ -37,9 +34,8 @@ logging.basicConfig(level=logging.INFO)
 server_url = 'http://65.1.130.255/app'  # Local server URL
 send_timeout = 5000
 receive_timeout = 5000
-
-context = zmq.Context()
-myClientPort = 0
+heartbeat_interval = 10
+heartbeat_timeout = 30  # seconds, adjust as needed
 
 
 class P2pServer:
@@ -49,16 +45,18 @@ class P2pServer:
         self.wallet = wallet  # assuming initialised wallet
         self.accounts = blockchain.accounts
         self.user_type = user_type
-        self.connections = set()
         self.received_block = None
         self.block_received = None
         self.block_proposer = None
-        self.peers = []
+        self.peers = {}  # map of clientPort to dictionary of lastcontacted and public key
+        self.myClientPort = 0
+        self.context = zmq.Context()
+        self.heartbeat_manager = None
 
     def private_send_message(self, clientPort, message):
         reply = None
         # assumes message is encrypted
-        zmq_socket = context.socket(zmq.REQ)
+        zmq_socket = self.context.socket(zmq.REQ)
         # Receive timeout in milliseconds
         zmq_socket.setsockopt(zmq.RCVTIMEO, receive_timeout)
         # Send timeout in milliseconds
@@ -79,7 +77,7 @@ class P2pServer:
         return reply
 
     def get_encrypted_message(self, message):
-        message['clientPort'] = myClientPort  # Add the clientPort
+        message['clientPort'] = self.myClientPort  # Add the clientPort
         encrypted_message = ChainUtil.encryptWithSoftwareKey(
             message)  # Re-encode and encrypt
         return encrypted_message
@@ -108,43 +106,51 @@ class P2pServer:
             return None
 
     def start_server(self):
-        port = random.randint(50000, 65535)
+        port = random.randint(50000, 65533)
         print(f"Starting server on port {port}")
-        
+
         ip_address = self.get_ip_address()
         if ip_address is None:
             print("Failed to obtain IP address. Server cannot start.")
             return
-        
-        global myClientPort
-        myClientPort = f"{ip_address}:{port}"
-        zmq_socket = context.socket(zmq.REP)
-        zmq_socket.bind(f"tcp://{myClientPort}")
+
+        self.myClientPort = f"{ip_address}:{port}"
+        zmq_socket = self.context.socket(zmq.REP)
+        zmq_socket.bind(f"tcp://{self.myClientPort}")
 
         self.register(clientPort=f"{ip_address}:{port}",
                       public_key=self.wallet.get_public_key())
-        
-        print("Creating new thread")
+
+        self.get_peers()
+        print("Starting heartbeat manager")
+        self.heartbeat_manager = HeartbeatManager(
+            myClientPort=self.myClientPort, context=self.context, peers=self.peers)
+        heartbeat_thread = threading.Thread(
+            target=self.heartbeat_manager.run, daemon=True)
+        heartbeat_thread.start()
+        print("Heartbeat manager started")
+        while not self.heartbeat_manager.one_time:
+            time.sleep(0.5)
+        print("Creating new thread since heartbeat manager has run once")
         thread = threading.Thread(target=self.broadcast_new_node)
         thread.start()
-        
+
         print("New thread started")
         while True:
             message = zmq_socket.recv_string()
             print(f"Received message: {message}")
             zmq_socket.send_string(
-                f"Successfully received message {message}. Sent from {myClientPort}")
+                f"Successfully received message {message}. Sent from {self.myClientPort}")
             self.message_received(message)
 
     def broadcast_message(self, message):
         print("Broadcasting message")
         responses = []
-        newpeers = self.get_peers()
         encrypted_message = self.get_encrypted_message(message)
-        print(f"Peers: {newpeers}")
-        for peer in newpeers:
+        print(f"Peers: {self.peers}")
+        for (clientPort, data) in self.peers.copy().items():
             responses.append(self.private_send_message(
-                peer['address'], encrypted_message))
+                clientPort, encrypted_message))
         return responses
 
     def send_direct_encrypted_message(self, message, clientPort):
@@ -154,20 +160,20 @@ class P2pServer:
 
     def get_peers(self):
         print("Fetching peers")
-        global peers
-
         try:
             response = requests.get(f'{server_url}/peers')
             response.raise_for_status()
             peers_list = response.json()
             print(f"Received peers: {peers_list}")
-            self.peers = peers_list
-            return peers_list
+            for peer in peers_list:
+                self.peers[peer['address']] = {
+                    'lastcontacted': time.time(),
+                    'public_key': peer['public_key']
+                }
 
         except requests.RequestException as e:
             logging.error(f"Failed to fetch peers: {e}")
             print('Failed to fetch peers')
-            return []
 
     def listen(self):
         print("Starting tcp server...")
@@ -175,18 +181,6 @@ class P2pServer:
             target=self.start_server, daemon=True)
         server_thread.start()
         print("Server thread started")
-
-    # # FUNCTION CALLED WHEN A NEW CLIENT JOINS SERVER
-    # def new_client(self, client, server):
-    #     print("Socket connected:", client)
-
-    #     # ADD CLIENT TO CONNECTIONS
-    #     self.connections.add(client)
-    #     self.send_chain(client)
-    #     self.send_mempool(client)
-    #     self.send_current_block_proposer(client)
-
-    # SEND THE CURRENT BLOCK PROPOSER TO A NEWLY JOINED NODE
 
     def send_current_block_proposer(self, clientPort):
         message = {
@@ -281,9 +275,10 @@ class P2pServer:
 
         elif data["type"] == MESSAGE_TYPE["new_node"]:
             clientPort = data["clientPort"]
+            self.heartbeat_manager.addToClients(clientPort, data["public_key"])
             self.accounts.addANewClient(
                 address=data["public_key"], clientPort=clientPort, userType=self.user_type)
-            if (clientPort != myClientPort):
+            if (clientPort != self.myClientPort):
                 self.send_chain(clientPort)
                 self.send_current_block_proposer(clientPort)
 
@@ -357,7 +352,7 @@ class P2pServer:
         message = {
             "type": MESSAGE_TYPE["new_node"],
             "public_key": self.wallet.get_public_key(),
-            "clientPort": myClientPort
+            "clientPort": self.myClientPort
         }
         self.broadcast_message(message)
 
