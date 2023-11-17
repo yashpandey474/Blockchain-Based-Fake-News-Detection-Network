@@ -113,7 +113,7 @@ class P2pServer:
             return a
 
     def start_server(self):
-        port = 6969
+        port = random.randint(50000, 65533)
         while not (self.is_port_available(port) and self.is_port_available(port+1)):
             port = random.randint(50000, 65533)
         print(f"Starting server on port {port}")

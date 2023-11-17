@@ -39,7 +39,7 @@ class Block:
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
             "signature": str(self.signature.hex()) if self.signature else "",
-            "countofvotes": list(self.votes)
+            "votes": list(self.votes),
         }
 
     @staticmethod
@@ -52,7 +52,9 @@ class Block:
                 transaction_data) for transaction_data in data_json["transactions"]],
             validator=data_json["validator"],
             signature=bytes.fromhex(
-                data_json["signature"]) if data_json["signature"] else None
+                data_json["signature"]) if data_json["signature"] else None,
+            votes=set(data_json["votes"])
+
         )
 
         block.votes = set(data_json["countofvotes"])

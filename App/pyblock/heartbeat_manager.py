@@ -54,29 +54,36 @@ class HeartbeatManager:
             self.peers[clientPort]['lastcontacted'] = max(
                 self.peers[clientPort]['lastcontacted'], time.time())
 
-    def removeApi(self, public_key, clientPort):
+    def removeApi(self, clientPorts):
         print("Removing with public key and address")
-        data = {'public_key': public_key, 'address': clientPort}
+        print(clientPorts)
+
+        url = f'{self.server_url}/remove/'
+
+        # Print the URL and the data to be sent
+        print(f"URL: {url}")
+        print(f"Data being sent: {clientPorts}")
+
         try:
-            response = requests.post(f'{self.server_url}/remove', json=data)
-            print(f"Response from server: {response}")
+            response = requests.post(url, json=clientPorts)
+            print(f"Response from server: {response.json()}")
             return response.json()
         except requests.RequestException as e:
-            logging.error(f"Registration failed: {e}")
+            logging.error(f"Remove failed: {e}")
             return None
 
-    def make_apicall_and_remove(self, clientPort):
-        thread = threading.Thread(target=self.removeApi, args=(
-            self.peers[clientPort]['public_key'], clientPort))
+    def make_apicall_and_remove(self, clientPorts):
+        thread = threading.Thread(target=self.removeApi, args=(clientPorts,))
         thread.start()
-        del self.peers[clientPort]
+        for clientPort in clientPorts:
+            del self.peers[clientPort]
 
     def remove_inactive_peers(self):
         current_time = time.time()
         inactive_peers = [port for port, data in self.peers.copy().items()
                           if port != self.myClientPort and current_time - data.get('lastcontacted', 0) > self.heartbeat_timeout]
-        for port in inactive_peers:
-            self.make_apicall_and_remove(port)
+        if len(inactive_peers) > 0:
+            self.make_apicall_and_remove(inactive_peers)
 
     def send_heartbeat_to_peer(self, clientPort):
         print("Sending heartbeat")
@@ -84,7 +91,7 @@ class HeartbeatManager:
             "type": "heartbeat",
             "clientPort": self.myClientPort
         })
-        self.send_heartbeat(clientPort=clientPort, message=heartbeat_message)
+        return self.send_heartbeat(clientPort=clientPort, message=heartbeat_message)
 
     def should_send_heartbeat(self, data, isFirstTime):
         if isFirstTime:
@@ -96,16 +103,22 @@ class HeartbeatManager:
 
     def heartbeat_decision(self, isFirstTime=False):
         self.heartbeat_counter = len(self.peers)
-
+        toremove = []
         for clientPort, data in self.peers.copy().items():
             if clientPort == self.myClientPort:
                 self.update_heartbeat_counter()
                 continue
 
             if self.should_send_heartbeat(data, isFirstTime):
-                self.send_heartbeat_to_peer(clientPort)
+                result = self.send_heartbeat_to_peer(clientPort)
+                if result is not None:
+                    toremove.append(result)
             else:
                 self.update_heartbeat_counter()
+
+        if len(toremove) > 0:
+            print(f"To remove {toremove}")
+            self.make_apicall_and_remove(clientPorts=toremove)
 
     @staticmethod
     def getHeartBeatPort(clientPort):
@@ -120,11 +133,13 @@ class HeartbeatManager:
                                           message=message)
         if reply is None:
             print(f"Peer {clientPort} is inactive")
-            self.make_apicall_and_remove(clientPort)
+            self.update_heartbeat_counter()
+            return clientPort
         else:
             print(f"Peer {clientPort} is active")
             self.update_last_contacted(clientPort)
-        self.heartbeat_counter -= 1
+            self.update_heartbeat_counter()
+        return None
 
     def start_heartbeat_server(self):
         print(
