@@ -6,8 +6,10 @@ import time
 
 def login():
     
-    st.title("Login as a " + st.session_state.user_type)
-
+    st.markdown(
+        f"<h1 style='text-align: center;'>Login as a {st.session_state.user_type}</h1>",
+        unsafe_allow_html=True
+    )
     #GET PRIVATE KEY OF USER
     user_input = st.text_area("Enter your Private Key")
 

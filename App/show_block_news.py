@@ -10,8 +10,10 @@ from pyblock.qr.transactions_info import *
 def show_blocks_news():
     chain = st.session_state.p2pserver.blockchain.chain
     
-    st.title("View All Verified News.")
-    
+    st.markdown(
+        "<h1 style='text-align: center;'>View All Verified News</h1>",
+        unsafe_allow_html=True
+    )
     if len(chain) < 2:
         st.write("The current ledger holds no news. Please return later")
     
@@ -45,4 +47,4 @@ def show_blocks_news():
 
     if st.button("Back"):
         # Set the previous screen in the session state
-        change_screen(st.session_state.previous_screen)
+        change_screen("main_page")

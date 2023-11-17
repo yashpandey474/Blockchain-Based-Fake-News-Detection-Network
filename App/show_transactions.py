@@ -7,7 +7,10 @@ from pyblock.ipfs.ipfs_handler import *
 
 
 def show_transactions():
-    st.title("Current Network Transactions")
+    st.markdown(
+        "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
+        unsafe_allow_html=True
+    )
     transac_pool = st.session_state.p2pserver.transaction_pool.transactions
     
     if len(transac_pool) < 1:

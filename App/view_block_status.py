@@ -11,8 +11,11 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
-    st.title("You are the current block proposer.")
-
+    # st.title("You are the current block proposer.")
+    st.markdown(
+        "<h1 style='text-align: center;'>You are the current block proposer</h1>",
+        unsafe_allow_html=True
+    )
     if st.session_state.p2pserver.received_block:
         st.write("You have already transmitted the block")
         st.write("Current Confirmations on Block: ", len(
@@ -42,12 +45,12 @@ def propose_block():
                         Sender Reputation: {transaction.sender_reputation}</b></span>"""       , unsafe_allow_html=True)
 
                 #WHETHER TO INCLUDE IN BLOCK OR NOT
-                include_value = st.radio("Include in Block?", [
+                include_value = st.radio("Include Transaction in Block?", [
                                         "False", "True"], key=f"include_{transaction.id}")
                 
                 #WHETHER NEWS IS FAKE OR TRUE
-                vote_value = st.radio("Vote on this Transaction?", [
-                                    "False", "True"], key=f"vote_{transaction.id}")
+                vote_value = st.radio("Vote on News:", [
+                                    "Fake", "True"], key=f"vote_{transaction.id}")
                 
                 if include_value == "True":
                     selected_transactions.append(transaction)
@@ -88,7 +91,8 @@ def propose_block():
                 block.votes.add(st.session_state.wallet.get_public_key())
 
                 # BROADCAST THE BLOCK
-                st.session_state.p2pserver.broadcast_block(block)
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_block(block)
 
                 # CONFIRMATION MESSAGE
                 st.success("The created block was transmitted.")

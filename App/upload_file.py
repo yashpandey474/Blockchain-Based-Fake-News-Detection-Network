@@ -4,7 +4,11 @@ from change_screen import *
 
 
 def upload_file():
-    st.title("Upload New News to the network.")
+    # st.title("Upload New News to the network.")
+    st.markdown(
+        "<h1 style='text-align: center;'>Upload New News to the network</h1>",
+        unsafe_allow_html=True
+    )
     if not st.session_state.get("upload_file_executed", False):
         uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
         
@@ -34,9 +38,10 @@ def upload_file():
                 st.session_state.upload_file_executed = True
                 
                 # BROADCASE NEWLY CREATED TRANSACTION
-                st.session_state.p2pserver.broadcast_transaction(
-                    transaction
-                )
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_transaction(
+                        transaction
+                    )
 
                 print("BROADCASTED TRANSACTION")
                 st.rerun()

@@ -7,16 +7,21 @@ import re
 
 
 def sign_up_generate():
-    st.title("Sign Up as a " + st.session_state.user_type)
+    # st.title("Sign Up as a " + st.session_state.user_type)
+    st.markdown(
+        f"<h1 style='text-align: center;'>Sign Up as a {st.session_state.user_type}</h1>",
+        unsafe_allow_html=True
+    )
     print("session NAME = ", st.session_state.name)
     print("session EMAIL = ", st.session_state.email)
 
     # GENERATE A NEW PRIVATE KEY FOR USER
     if st.button("Click to generate a new private key"):
         st.session_state.gen_key_pressed = True
-
-        private_key = crypto_logic.gen_sk()
-
+        
+        with st.spinner("Please Wait.."):
+            private_key = crypto_logic.gen_sk()
+        
         st.success("Generated Private key. Please store it safely.")
 
         # PRINT THE PRIVATE KEY

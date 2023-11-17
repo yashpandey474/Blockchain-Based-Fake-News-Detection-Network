@@ -6,7 +6,11 @@ from pyblock.ipfs.ipfs_handler import *
 
 
 def view_log_reputation():
-    st.title("Log of Your Reputation Changes")
+    # st.title("Log of Your Reputation Changes")
+    st.markdown(
+        "<h1 style='text-align: center;'>Log of Your Reputation Changes</h1>",
+        unsafe_allow_html=True
+    )
     log_reputation = st.session_state.p2pserver.accounts.accounts[
         st.session_state.p2pserver.wallet.get_public_key()
     ].reputation_changes

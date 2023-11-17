@@ -5,8 +5,11 @@ import pandas as pd
 from datetime import datetime
 
 def view_sent_blocks():
-    st.title("Blocks Broadcasted by you.")
-    
+    # st.title("Blocks Broadcasted by you.")
+    st.markdown(
+        "<h1 style='text-align: center;'>Blocks Broadcasted by you</h1>",
+        unsafe_allow_html=True
+    )
     blocks = st.session_state.p2pserver.accounts.accounts[
         st.session_state.p2pserver.wallet.get_public_key()
     ].sent_blocks
