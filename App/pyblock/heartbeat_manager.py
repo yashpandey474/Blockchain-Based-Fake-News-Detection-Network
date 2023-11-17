@@ -39,7 +39,7 @@ class HeartbeatManager:
     def start_heartbeat_client(self):
         print(f"Starting heartbeat client")
         while True:
-            print(f"Current peers: {self.peers}")
+            print(f"Current peers: {len(self.peers)}")
             self.heartbeat_decision(isFirstTime=~self.one_time)
             while (self.heartbeat_counter > 0):
                 time.sleep(3)
