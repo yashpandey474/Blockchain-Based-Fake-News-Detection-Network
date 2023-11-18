@@ -278,3 +278,10 @@ class Accounts:
             self.accounts[address].clientPort = None
             self.accounts[address].isValidator = False
             return True
+
+    def get_count_of_validators(self):
+        count = 0
+        for address, account in self.accounts.copy().items():
+            if account.isValidator and account.isActive:
+                count += 1
+        return count
