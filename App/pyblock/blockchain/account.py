@@ -276,7 +276,7 @@ class Accounts:
             print(f"Making {address} inactive in accounts")
             self.accounts[address].isActive = False
             self.accounts[address].clientPort = None
-            self.accounts[address].isValidator = False
+            self.accounts[address].isValidator = True
             return True
 
     def get_count_of_validators(self):
