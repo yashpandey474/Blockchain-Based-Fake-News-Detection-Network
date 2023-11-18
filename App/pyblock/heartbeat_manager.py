@@ -4,6 +4,7 @@ import threading
 import time
 import zmq
 import logging
+from pyblock.blockchain.account import *
 receive_timeout = 1000
 send_timeout = 1000
 heartbeat_interval = 5
@@ -11,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class HeartbeatManager:
-    def __init__(self, myClientPort, context, heartbeat_timeout=20, peers={}, server_url="http://65.1.130.255/app"):
+    def __init__(self, myClientPort, context, heartbeat_timeout=20, peers={}, server_url="http://65.1.130.255/app", accounts=None):
         self.myClientPort = myClientPort
         self.context = context
         self.peers = peers  # map of clientPort to dictionary of lastcontacted and public key
@@ -19,6 +20,7 @@ class HeartbeatManager:
         self.one_time = False
         self.heartbeat_counter = 0
         self.server_url = server_url
+        self.accounts = accounts
 
     def private_send_message(self, clientPort, message):
         reply = None
@@ -76,6 +78,7 @@ class HeartbeatManager:
         thread = threading.Thread(target=self.removeApi, args=(clientPorts,))
         thread.start()
         for clientPort in clientPorts:
+            self.accounts.make_inactive(self.peers[clientPort]['public_key'])
             del self.peers[clientPort]
 
     def remove_inactive_peers(self):

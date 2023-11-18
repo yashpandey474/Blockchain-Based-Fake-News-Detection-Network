@@ -1,5 +1,10 @@
 import random
 import pyblock.config as config
+import logging
+
+# Setting up basic configuration for logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class Account:
@@ -13,7 +18,6 @@ class Account:
         self.sent_blocks = sent_blocks if sent_blocks is not None else set()
         self.reputation_changes = reputation_changes if reputation_changes is not None else [
             ("Assigned Initial Reputation", balance)]
-
 
     def to_dict(self):
         return {
@@ -37,7 +41,7 @@ class Accounts:
 
     def from_json(self, json_data):
         self.accounts = {}
-        
+
         for address, account_data in json_data.items():
             account_data['sent_transactions'] = set(
                 account_data.get('sent_transactions', []))
@@ -214,30 +218,51 @@ class Accounts:
                         balance=config.DEFAULT_BALANCE[userType])
 
     def choose_validator(self, seed=None):
-        eligible_accounts = {address: acc for address, acc in self.accounts.items()
-                             if acc.stake >= config.MIN_STAKE}
+        """
+        Selects a validator from the list of eligible accounts based on their stake.
 
-        if not eligible_accounts:
-            return None
+        Parameters:
+        - seed (Optional[int]): An optional seed for the random number generator to ensure reproducibility.
 
-        print("\n\n\nELIGIBLE VALIDATORS = ", eligible_accounts, "\n\n\n")
-        sorted_accounts = sorted(
-            eligible_accounts.items(), key=lambda a: a[1].stake)
+        Returns:
+        - str: The address of the chosen validator.
 
-        stakes = [account.stake for address, account in sorted_accounts]
+        Raises:
+        - ValueError: If no eligible validators are available.
+        """
+        try:
+            # Filter accounts eligible for validation based on minimum stake and isValidator flag
+            eligible_accounts = {address: acc for address, acc in self.accounts.copy().items()
+                                 if acc.stake >= config.MIN_STAKE and acc.isValidator and acc.isActive}
 
-        total_stake = sum(stakes)
+            if not eligible_accounts:
+                logging.info("No eligible validators available.")
+                return None
 
-        weights = [stake / total_stake for stake in stakes]
+            logging.info(f"Eligible validators: {eligible_accounts}")
 
-        random_generator = random.Random(seed)
+            # Sort accounts by stake
+            sorted_accounts = sorted(
+                eligible_accounts.items(), key=lambda a: a[1].stake)
 
-        chosen_validator = random_generator.choices(
-            sorted_accounts, weights=weights, k=1)[0][0]
+            # Calculate the total stake and weights for each eligible account
+            stakes = [account.stake for address, account in sorted_accounts]
+            total_stake = sum(stakes)
+            weights = [stake / total_stake for stake in stakes]
 
-        return chosen_validator
+            # Use a random generator for selection
+            random_generator = random.Random(seed)
+            chosen_validator = random_generator.choices(
+                sorted_accounts, weights=weights, k=1)[0][0]
+
+            logging.info(f"Chosen validator: {chosen_validator}")
+            return chosen_validator
+        except Exception as e:
+            logging.error(f"Error in choosing validator: {e}")
+            raise ValueError("Error in selecting validator") from e
 
     # VERIFY EACH TRANSACTION'S SENDER HAS ENOUGH BALANCE FORR THE FEE
+
     def verify_transactions_balance(self, transactions):
         for transaction in transactions:
             # IF BALANCE NOT ENOUGH FOR FEE; RETURN FALSE
@@ -245,3 +270,11 @@ class Accounts:
                 return False
 
         return True
+
+    def make_inactive(self, address):
+        if (address in self.accounts):
+            print(f"Making {address} inactive in accounts")
+            self.accounts[address].isActive = False
+            self.accounts[address].clientPort = None
+            self.accounts[address].isValidator = False
+            return True

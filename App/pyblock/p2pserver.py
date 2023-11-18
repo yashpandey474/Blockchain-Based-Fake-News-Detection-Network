@@ -113,19 +113,26 @@ class P2pServer:
             return a
 
     def start_server(self):
-        port = random.randint(50000, 65533)
-        while not (self.is_port_available(port) and self.is_port_available(port+1)):
+        while True:
             port = random.randint(50000, 65533)
-        print(f"Starting server on port {port}")
+            if self.is_port_available(port) and self.is_port_available(port+1):
+                try:
+                    ip_address = self.get_ip_address()
+                    if ip_address is None:
+                        print("Failed to obtain IP address. Server cannot start.")
+                        return
 
-        ip_address = self.get_ip_address()
-        if ip_address is None:
-            print("Failed to obtain IP address. Server cannot start.")
-            return
+                    self.myClientPort = f"{ip_address}:{port}"
+                    zmq_socket = self.context.socket(zmq.REP)
+                    zmq_socket.bind(f"tcp://{self.myClientPort}")
+                    break  # Exit the loop if binding is successful
 
-        self.myClientPort = f"{ip_address}:{port}"
-        zmq_socket = self.context.socket(zmq.REP)
-        zmq_socket.bind(f"tcp://{self.myClientPort}")
+                except zmq.ZMQError as e:
+                    print(f"Failed to bind to port {port}: {e}")
+                    # Optionally, you could add a short delay here before retrying
+                    time.sleep(1)
+            else:
+                print(f"Port {port} is not available. Trying another port.")
 
         self.register(clientPort=f"{ip_address}:{port}",
                       public_key=self.wallet.get_public_key())
@@ -133,7 +140,7 @@ class P2pServer:
         self.get_peers()
         print("Starting heartbeat manager")
         self.heartbeat_manager = HeartbeatManager(
-            myClientPort=self.myClientPort, context=self.context, peers=self.peers, server_url=server_url)
+            myClientPort=self.myClientPort, context=self.context, peers=self.peers, server_url=server_url, accounts=self.accounts)
         heartbeat_thread = threading.Thread(
             target=self.heartbeat_manager.run, daemon=True)
         heartbeat_thread.start()
