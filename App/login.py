@@ -7,7 +7,7 @@ import time
 def login():
     
     st.markdown(
-        f"<h1 style='text-align: center;'>Login as a {st.session_state.user_type}</h1>",
+        f"<h2 style='text-align: center;'>Login as {st.session_state.user_type}</h2>",
         unsafe_allow_html=True
     )
     #GET PRIVATE KEY OF USER
