@@ -272,14 +272,10 @@ class Accounts:
         return True
 
     def make_inactive(self, address):
-        # TODO: RETURN STAKE
         if (address in self.accounts):
             print(f"Making {address} inactive in accounts")
             self.accounts[address].isActive = False
             self.accounts[address].clientPort = None
-            if (self.accounts[address].stake is not None and self.accounts[address].stake > 0):
-                self.accounts[address].balance += self.accounts[address].stake
-                self.accounts[address].stake = 0
             self.accounts[address].isValidator = False
             return True
 
