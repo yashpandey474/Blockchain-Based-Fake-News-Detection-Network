@@ -69,7 +69,7 @@ class Blockchain:
             return False
         
         #IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
-        if not (block.lastHash == Block.block_hash(self.chain[-1]) and
+        if not (block.last_hash == Block.block_hash(self.chain[-1]) and
             Block.verify_block(block)):
             print("SECOND VERIFICATION FAILED.")
             return False

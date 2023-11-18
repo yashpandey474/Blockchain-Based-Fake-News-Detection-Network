@@ -10,32 +10,57 @@ from pyblock.wallet.transaction import Transaction
 from typing import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.chainutil import *
+import logging
+
+# Setting up basic configuration for logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class Block:
-    def __init__(self, timestamp, lastHash, transactions: List[Transaction], validator, index: int, signature=None):
-        # TIME OF BLOCK CREATION
-        self.timestamp = timestamp
-        # HASH OF PREVIOUS BLOCK
-        self.lastHash = lastHash
+    def __init__(self, timestamp, last_hash, transactions: List[Transaction], validator, index: int, signature=None):
+        """
+        Initialize a new block in the blockchain.
 
-        # LIST OF TRANSACTIONS
+        Parameters:
+        - timestamp (float): The time at which the block was created.
+        - last_hash (str): The hash of the previous block in the chain.
+        - transactions (List[Transaction]): A list of transactions included in the block.
+        - validator (str): The public key of the validator who created the block.
+        - index (int): The index of the block in the blockchain.
+        - signature (Optional[bytes]): The digital signature of the block, signed by the validator.
+
+        Raises:
+        - ValueError: If any of the parameters are invalid.
+        """
+        if not isinstance(timestamp, (int, float)):
+            raise ValueError("Timestamp must be a number")
+        if not isinstance(last_hash, str):
+            raise ValueError("Last hash must be a string")
+        if not all(isinstance(tx, Transaction) for tx in transactions):
+            raise ValueError(
+                "All transactions must be instances of Transaction")
+        if not isinstance(validator, str):
+            raise ValueError("Validator must be a string")
+        if not isinstance(index, int):
+            raise ValueError("Index must be an integer")
+
+        self.timestamp = timestamp
+        self.last_hash = last_hash
         self.transactions = transactions
-        # VALIDATOR PUBLIC KEY
         self.validator = validator
-        # SIGNATURE BY VALIDATOR
         self.signature = signature
-        # SET OF VOTES GIVEN [INITIALISE WITH JUST VALIDATOR]
         self.votes = set()
-        # INDEX OF BLOCK IN CHAIN
         self.index = index
+
+        logging.info(f"Block {self.index} initialized.")
 
     # FUNCTION TO CONVERT BLOCK TO JSON
     def to_json(self):
         return {
             "index": self.index,
             "timestamp": self.timestamp,
-            "lastHash": self.lastHash,
+            "last_hash": self.last_hash,
             "transactions": [transaction.to_json() for transaction in self.transactions],
             "validator": self.validator,
             "signature": str(self.signature.hex()) if self.signature else "",
@@ -44,34 +69,57 @@ class Block:
 
     @staticmethod
     def from_json(data_json):
-        block = Block(
-            index=data_json["index"],
-            timestamp=data_json["timestamp"],
-            lastHash=data_json["lastHash"],
-            transactions=[Transaction.from_json(
-                transaction_data) for transaction_data in data_json["transactions"]],
-            validator=data_json["validator"],
-            signature=bytes.fromhex(
-                data_json["signature"]) if data_json["signature"] else None,
-            votes=set(data_json["votes"])
+        """
+        Create a Block object from a JSON representation.
 
-        )
+        Parameters:
+        - data_json (dict): The JSON representation of the block.
 
-        block.votes = set(data_json["countofvotes"])
+        Returns:
+        - Block: The Block object created from the JSON data.
 
-        return block
+        Raises:
+        - ValueError: If the JSON data is invalid.
+        """
+        try:
+            block = Block(
+                index=data_json["index"],
+                timestamp=data_json["timestamp"],
+                last_hash=data_json["last_hash"],
+                transactions=[Transaction.from_json(
+                    tx_data) for tx_data in data_json["transactions"]],
+                validator=data_json["validator"],
+                signature=bytes.fromhex(
+                    data_json["signature"]) if data_json["signature"] else None,
+            )
+            block.votes = set(data_json["votes"])
+
+            return block
+        except KeyError as e:
+            logging.error(f"KeyError in from_json: {e}")
+            raise ValueError("Invalid JSON data for Block") from e
+
     # CREATE THE INITIAL BLOCK
 
     @staticmethod
     def genesis():
-        return Block(timestamp=int(time.time()),
-                     lastHash="0000",
-                     transactions=[],
-                     validator="Creators",
-                     signature=None,
-                     index=1)
+        """
+        Generate the genesis block for the blockchain.
+
+        Returns:
+        - Block: The genesis block.
+        """
+        return Block(
+            timestamp=1700289379.599529,
+            last_hash="0000",
+            transactions=[],
+            validator="Creators",
+            signature=None,
+            index=1
+        )
 
     # HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
+
     @staticmethod
     def hash_transactions(transactions):
         # Create a new list of transactions with votes set to None
@@ -84,35 +132,39 @@ class Block:
 
     @staticmethod
     def create_block(lastBlock, data, wallet, blockchain):
-        # SET THE TIMESTAMP
-        timestamp = time.time()
+        """
+        Create a new block in the blockchain.
 
-        # SET PREVIOUS BLOCK'S HASH
-        lastHash = Block.block_hash(lastBlock)
+        Parameters:
+        - lastBlock (Block): The last block in the blockchain.
+        - data (List[Transaction]): The list of transactions for the new block.
+        - wallet (Wallet): The wallet of the validator.
+        - blockchain (Blockchain): The blockchain to which this block will be added.
 
-        # GET THE VALIDATOR'S PUBLIC KEY
-        validator = wallet.get_public_key()
+        Returns:
+        - Block: The newly created block.
 
-        # RETURN THE CREATED BLOCK
-        block = Block(
-            timestamp=timestamp,
-            lastHash=lastHash,
-            transactions=data,
-            validator=validator,
-            signature=None,
-            index=len(blockchain.chain) + 1)
-
-        # SIGN THE BLOCK
-        block.signature = Block.getBlockSignature(block, wallet)
-
-        print("SIGNATURE OF BLOCK  = ", block.signature)
-        return block
+        Raises:
+        - ValueError: If the input parameters are invalid.
+        """
+        try:
+            timestamp = time.time()
+            last_hash = Block.block_hash(lastBlock)
+            validator = wallet.get_public_key()
+            block = Block(timestamp, last_hash, data,
+                          validator, len(blockchain.chain) + 1)
+            block.signature = Block.getBlockSignature(block, wallet)
+            logging.info(f"Block {block.index} created.")
+            return block
+        except Exception as e:
+            logging.error(f"Error in create_block: {e}")
+            raise ValueError("Error in creating block") from e
 
     @staticmethod
     def getBlockSignature(block, wallet: Type[Wallet]):
         block_data = {
             "timestamp": block.timestamp,
-            "lastHash": block.lastHash,
+            "last_hash": block.last_hash,
             "transactions": [transaction.to_json() for transaction in block.transactions],
             "validator": block.validator
         }
@@ -125,12 +177,13 @@ class Block:
 
         # RETURN THE CREATED BLOCK
         return signature
+    # No pow nonce here
 
     @staticmethod
-    def get_hash(timestamp, lastHash, transactions):
+    def get_hash(timestamp, last_hash, transactions):
         data = {
             "timestamp": timestamp,
-            "last_hash": lastHash,
+            "last_hash": last_hash,
             "transactions": [transaction.to_json() for transaction in transactions]
         }
 
@@ -146,14 +199,14 @@ class Block:
     @staticmethod
     def block_hash(block):
         # Use the new helper method to hash transactions within the block
-        return Block.get_hash(block.timestamp, block.lastHash, block.transactions)
+        return Block.get_hash(block.timestamp, block.last_hash, block.transactions)
 
     @staticmethod
     def verify_block(block):
 
         block_data = {
             "timestamp": block.timestamp,
-            "lastHash": block.lastHash,
+            "last_hash": block.last_hash,
             "transactions": [transaction.to_json() for transaction in block.transactions],
             "validator": block.validator
         }
