@@ -15,7 +15,7 @@ from background import *
 
 def run_p2pserver(p2pserver):
     print("Running p2p server")
-    p2pserver.listen()
+    # p2pserver.listen()
 
 def run_background_task(background):
     print("Running background block proposer updation")

@@ -5,6 +5,9 @@ import change_screen
 
 def upload_file():
     # st.title("Upload New News to the network.")
+    nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+    if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+        change_screen.change_screen_navbar(nav_selection)
     
     if st.session_state.screen == "upload_file":
         st.markdown(

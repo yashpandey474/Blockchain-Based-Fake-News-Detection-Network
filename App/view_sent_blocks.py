@@ -1,11 +1,14 @@
 import streamlit as st
-from  change_screen import *
+import change_screen
 from pyblock.blockchain.block import *
 import pandas as pd
 from datetime import datetime
 
 def view_sent_blocks():
     if st.session_state.screen == "view_sent_blocks":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
         # st.title("Blocks Broadcasted by you.")
         st.markdown(
             "<h1 style='text-align: center;'>Blocks Broadcasted by you</h1>",

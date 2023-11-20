@@ -4,6 +4,9 @@ import change_screen
 
 def become_validator():
     if st.session_state.screen == "become_validator":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
         st.markdown(
             f"<h1 style='text-align: center;'>Manage Stake In Network{st.session_state.user_type}</h1>",
             unsafe_allow_html=True
