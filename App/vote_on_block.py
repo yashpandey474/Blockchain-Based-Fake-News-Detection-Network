@@ -41,11 +41,11 @@ def vote_on_block():
     """
 )
 
-        if st.session_state.voted:
-            st.write("You have already voted on the current proposed block.")
-            
         if not st.session_state.p2pserver.received_block:
             st.write("No valid block received yet.")
+            
+        if st.session_state.p2psever.voted:
+            st.write("You have already voted on the current proposed block.")
             
         else:
             block = st.session_state.p2pserver.received_block
@@ -77,9 +77,9 @@ def vote_on_block():
                         "Vote": vote,
                     })
 
-                st.table(table_data)
+            st.table(table_data)
 
-                st.markdown(
+            st.markdown(
     """
     Please review the transactions and provide your vote for each transaction as either "True" or "Fake".
     Once you've made your selections, click the "Submit Votes" button to cast your votes. 
@@ -87,13 +87,13 @@ def vote_on_block():
     """
 )
                 
-                if st.button("Submit Votes"):
-                    with st.spinner("Please Wait.."):
-                        st.session_state.p2pserver.broadcast_votes(
+            if st.button("Submit Votes"):
+                with st.spinner("Please Wait.."):
+                    st.session_state.p2pserver.broadcast_votes(
                             transaction_votes
                         )
 
-                    st.write("Votes Submitted. Thank you")
+                st.write("Votes Submitted. Thank you")
 
-                    st.session_state.voted = True
+                st.session_state.p2pserver.voted = True
                     
