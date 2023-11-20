@@ -18,6 +18,44 @@ from enter import *
 import time
 import asyncio
 
+auditors_guidelines =         """
+        ### Auditor Guidelines
+        
+        As an auditor, you play a vital role in our trusted private network. Here's what you do:
+        
+        - **Stake Reputation:** Stake some "reputation" to become a validator in the network.
+        
+        - **Block Proposal:** If chosen as a block proposing validator, select transactions for a new block. If the majority of validators (>50%) agree, the block is added, and you earn reputation.
+        
+        - **Voting on News:** Vote on news in incoming blocks labeled "Fake" or "True". A machine learning model provides a score (0-1) for the probability of fake news, alongside the sender's reputation.
+        
+        Your contributions help maintain network integrity and ensure the authenticity of shared news.
+"""
+    
+
+readers_guidelines = """
+### Guidelines for Readers:
+
+As a reader in our network, you have the privilege to access and explore the news posted on our consortium blockchain. Here's what you can do:
+
+1. **Anonymous Exploration:** Anonymously view news posted on the network without the need for authentication.
+
+2. **Access Metrics:** Access essential information about news posts, including title, content, machine learning model score indicating the probability of fake news, percentage of auditors who voted the news as fake, and sender reputation.
+
+3. **Stay Informed:** Engage with informative news content while being aware of the authenticity metrics provided.
+
+4. **Contribute to Data Availability:** Contribute indirectly by generating data through your viewership, aiding in the creation of a more informed network environment.
+"""
+
+# General Message for the Enter Page
+enter_page_message = """
+### Welcome to our Consortium Blockchain Network!
+
+Explore, learn, and engage responsibly with the news shared on our network. Anonymously browse through the latest posts and stay informed about each news item's authenticity metrics. Your viewership contributes to the generation of a transparent and informed network environment.
+
+Discover the power of reliable information dissemination and responsible engagement within our network. Dive in, explore, and be part of a community fostering informed insights!
+"""
+
 screen_functions = {
     "enter": enter,
     "login": login,

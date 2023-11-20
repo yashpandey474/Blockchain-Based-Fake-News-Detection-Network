@@ -29,6 +29,12 @@ def sign_up_generate():
                      score from 0 to 1 as the probability of the news being fake according to our training data, this score
                      along with the reputation of the sender is available with every news received.
                      """)  # Modify this with your intended text
+                
+            else:
+                st.markdown(change_screen.readers_guidelines)
+                
+
+                
 
         # GENERATE A NEW PRIVATE KEY FOR USER
         if st.button("Generate a new Private Key"):

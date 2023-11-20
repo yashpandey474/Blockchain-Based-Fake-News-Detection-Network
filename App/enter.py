@@ -11,8 +11,6 @@ import change_screen
 from background import *
 
 # START LISTENING ON P2P SERVER
-
-
 def run_p2pserver(p2pserver):
     print("Running p2p server")
     # p2pserver.listen()
@@ -74,11 +72,14 @@ def initialise(private_key=None):
 
 
 def enter():
+    
     if st.session_state.screen == "enter":
         st.markdown(
             f"<h2 style='text-align: center;'>Choose a Role to Enter into Network</h2>",
             unsafe_allow_html=True
         )
+        
+        st.markdown(change_screen.enter_page_message)
         
         col1, col2 = st.columns(2)
 
