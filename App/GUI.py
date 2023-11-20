@@ -57,6 +57,13 @@ if __name__ == "__main__":
         text-align: center;
         display: block;
         margin: 0 auto;
+        padding: 0;
+    }
+    .stButton p{
+        font-size: 20px;
+        style: bold;
+        font-weight: 800;
+        font-family: "Calibri";
     }
     </style>
     """,

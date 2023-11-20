@@ -110,9 +110,9 @@ async def watch(test):
         time_remaining = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
         test.markdown(
             f"""
-            <p class="time">
-                Time Remaining in Current Block Proposing Period: {str(time_remaining)}
-            </p>
+            <div class="time" style="font-size: 25px;text-align: center;color: black; background-color: white; style:bold;">
+                Time Remaining in Curvrent Block Proposing Period: {str(time_remaining)}
+            </div>
             """, unsafe_allow_html=True)
         await asyncio.sleep(1)
         
