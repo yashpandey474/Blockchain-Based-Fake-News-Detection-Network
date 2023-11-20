@@ -50,8 +50,3 @@ def show_blocks_news():
 
             st.dataframe(df, height=500)
             
-
-        # if st.button("Back"):
-        #     # Set the previous screen in the session state
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen("main_page")

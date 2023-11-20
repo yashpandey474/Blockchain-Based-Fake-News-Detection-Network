@@ -4,11 +4,7 @@ import change_screen as change_screen_
 
 
 def upload_file():
-    # st.title("Upload New News to the network.")
-    # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-    # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-    #     change_screen_.change_screen_navbar(nav_selection)
-    
+
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     selected_option = st.sidebar.radio("Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
@@ -18,6 +14,23 @@ def upload_file():
         st.markdown(
             "<h1 style='text-align: center;'>Upload New News to the network</h1>",
             unsafe_allow_html=True
+        )
+        st.markdown(
+    """
+    ## Upload News Guidelines
+    
+    As an anonymous user or an auditor of the network, you have the privilege to upload news to the network. 
+    Please ensure the following when uploading news:
+    
+    - **File Format:** Upload a text file (.txt) containing the news article or information.
+    
+    - **Transaction Fee:** Optionally, you can include a transaction fee to prioritize your news on the network. 
+      Ensure the fee is within your available balance.
+    
+    - **Authentication:** Anonymous uploaders must abide by network guidelines and refrain from uploading fake news as this would lead to reputation penalties.
+    
+    By contributing news, you help maintain a diverse and informative network for all users.
+    """
         )
         if not st.session_state.get("upload_file_executed", False):
             uploaded_file = st.file_uploader("Upload a text file", type=["txt"])

@@ -6,10 +6,6 @@ from datetime import datetime
 
 def view_sent_blocks():
     if st.session_state.screen == "view_sent_blocks":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
-        # st.title("Blocks Broadcasted by you.")
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         selected_option = st.sidebar.radio("Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
@@ -19,6 +15,19 @@ def view_sent_blocks():
             "<h1 style='text-align: center;'>Blocks Broadcasted by you</h1>",
             unsafe_allow_html=True
         )
+        st.markdown(
+            """
+            # Blocks Broadcasted by You
+
+            This page displays the blocks that you have broadcasted within the network.
+
+            ## Block Broadcast Log:
+
+            Below is a log containing the details of blocks you've broadcasted:
+
+            """
+        )
+        
         blocks = st.session_state.p2pserver.accounts.accounts[
             st.session_state.p2pserver.wallet.get_public_key()
         ].sent_blocks
@@ -36,6 +45,11 @@ def view_sent_blocks():
                 })
             
             st.dataframe(pd.DataFrame(table_data), height=500)
+            st.markdown(
+        """
+        The table showcases each block's timestamp, the number of votes it received, and its current status within the network.
+        """
+    )
             
         # if st.button("Back"):
         #     with st.spinner("Please Wait"): 

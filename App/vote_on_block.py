@@ -3,10 +3,7 @@ import change_screen as change_screen_
 
 def vote_on_block():
     if st.session_state.screen == "vote_on_block":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
-            
+
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         selected_option = st.sidebar.radio("Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
@@ -23,6 +20,26 @@ def vote_on_block():
             st.write("No valid block received yet.")
         else:
             block = st.session_state.p2pserver.received_block
+            st.markdown(
+    """
+    # Vote on Received Block
+
+    This section allows you to vote on the block proposed within the network.
+
+    ## Block Information:
+
+    Here are the details of the proposed block:
+
+    - **Validator:** [Validator's Public Key]
+    - **Timestamp:** [Timestamp of Block]
+    - **Validator Reputation:** [Validator's Reputation]
+
+    ## Transactions in Block:
+
+    Below, you'll find the transactions included in the proposed block along with their details:
+
+    """
+)
             st.header("Block Info")
             st.write("Validator:", block.validator)
             st.write("Timestamp:", block.timestamp)
@@ -52,6 +69,14 @@ def vote_on_block():
 
                 st.table(table_data)
 
+                st.markdown(
+    """
+    Please review the transactions and provide your vote for each transaction as either "True" or "Fake".
+    Once you've made your selections, click the "Submit Votes" button to cast your votes. 
+    Thank you for your participation!
+    """
+)
+                
                 if st.button("Submit Votes"):
                     with st.spinner("Please Wait.."):
                         st.session_state.p2pserver.broadcast_votes(
@@ -62,8 +87,3 @@ def vote_on_block():
 
                     st.session_state.voted = True
                     
-        # if st.button("Back"):
-        #     # Set the previous screen in the session state
-        #     with st.spinner("Please Wait"):
-        #         change_screen_.change_screen("main_page")
-
