@@ -163,7 +163,7 @@ def change_screen(input_string):
         st.session_state.name = ""
         st.session_state.email = ""
         st.session_state.initialise = False
-        st.session_state.user_type = ""
+        st.session_state.user_type = "Reader"
     
     st.session_state.screen_changed = True
     st.session_state.previous_screen = st.session_state.screen
