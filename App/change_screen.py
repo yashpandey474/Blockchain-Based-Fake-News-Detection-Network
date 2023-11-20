@@ -97,11 +97,13 @@ if "validator" not in st.session_state:
     st.session_state.validator = False
     
 navigation_options = {
-        "Reader": ("Main Page", "Upload News", "View Verified News", "View Account Info", "View Sent News", "View Reputation Log", "Enter Page"),
-        "Auditor": (
-            "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
-            ("Modify Stake" if st.session_state.validator else "Become a Validator"), "Current Block Status", "Broadcasted Blocks", "Enter Page"
-        )
+    "Reader": ("Main Page", "Upload News", "View Verified News", "View Account Info", "View Sent News", "View Reputation Log", "Enter Page"),
+    "Auditor": (
+        "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
+        ("Modify Stake" if st.session_state.validator else "Become a Validator"),
+        ("Current Block Status", "Broadcasted Blocks") if st.session_state.validator else None,
+        "Enter Page"
+    )
 }
 
 screen_mapping = {
