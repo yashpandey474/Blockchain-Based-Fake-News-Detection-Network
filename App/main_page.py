@@ -42,6 +42,7 @@ def main_page():
         
         
     if st.button("Exit Application"):
+        st.session_state.p2pserver.endserver()
         change_screen_.change_screen("enter")
         
     

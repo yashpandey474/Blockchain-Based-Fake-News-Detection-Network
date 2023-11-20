@@ -270,7 +270,6 @@ class P2pServer:
             # CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
                     block, self.transaction_pool, self.accounts)):
-                
 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
@@ -423,3 +422,19 @@ class P2pServer:
         # self.message_received(None, None, message)
 
         self.broadcast_message(message_content)
+
+    def endserver(self):
+        self.heartbeat_manager.stop()
+        self.heartbeat_manager = None
+        self.peers = {}
+        self.myClientPort = 0
+        self.block_proposer = None
+        self.block_received = None
+        self.received_block = None
+        self.blockchain = Blockchain()
+        self.transaction_pool = TransactionPool()
+        self.wallet = Wallet(
+            private_key=None, name=None, email=None
+        )
+        self.context.destroy()
+        self.accounts = Accounts()
