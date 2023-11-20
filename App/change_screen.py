@@ -101,7 +101,7 @@ navigation_options = {
     "Auditor": (
         "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
         ("Modify Stake" if st.session_state.validator else "Become a Validator"),
-        ("Current Block Status", "Broadcasted Blocks") if st.session_state.validator else None,
+        "Current Block Status", "Broadcasted Blocks",
         "Enter Page"
     )
 }

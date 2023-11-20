@@ -162,7 +162,7 @@ def view_block_status():
                 change_screen_.change_screen("propose_block")
 
         
-        if st.session_state.p2pserver.received_block and block_valid():
+        if st.session_state.p2pserver.received_block and block_valid() and st.session_state.validator:
             st.write("A valid block has been received.")
             if st.button("Vote on Received Block"):
                 with st.spinner("Please Wait"): 
