@@ -74,19 +74,28 @@ def initialise(private_key=None):
 
 
 def enter():
-    st.markdown(
-        f"<h2 style='text-align: center;'>Choose a Role to Enter into Network</h2>",
-        unsafe_allow_html=True
-    )
-    
-    col1, col2 = st.columns(2)
+    if st.session_state.screen == "enter":
+        st.markdown(
+            f"<h2 style='text-align: center;'>Choose a Role to Enter into Network</h2>",
+            unsafe_allow_html=True
+        )
+        
+        col1, col2 = st.columns(2)
 
-    with col1:
-        if st.button("Login/Signup as News Auditor in the Private Network."):
-            st.session_state.user_type = "Auditor"
-            change_screen("login")
+        with col1:
+            if st.button("Login/Signup as News Auditor in the Private Network."):
+                st.session_state.user_type = "Auditor"
+                with st.spinner("Please Wait"):
+                    change_screen("login")
 
-    with col2:
-        if st.button("Login/Signup as a Reader in the Public Network."):
-            st.session_state.user_type = "Reader"
-            change_screen("login")
+        with col2:
+            if st.button("Login/Signup as a Reader in the Public Network."):
+                st.session_state.user_type = "Reader"
+                with st.spinner("Please Wait"):
+                    change_screen("login")
+                
+    t = st.empty()    
+    if st.session_state.screen_changed:
+        st.session_state.screen_changed = False
+        asyncio.run(watch(t))
+        

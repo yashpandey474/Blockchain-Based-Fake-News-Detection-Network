@@ -7,32 +7,34 @@ from pyblock.ipfs.ipfs_handler import *
 
 
 def show_transactions():
-    st.markdown(
-        "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
-        unsafe_allow_html=True
-    )
-    transac_pool = st.session_state.p2pserver.transaction_pool.transactions
-    
-    if len(transac_pool) < 1:
-        st.write("The network doesn't have any mempool transactions currently. Please come back later.")
-    
-    else:
-        table_data = []
-        for transaction in transac_pool:
-            content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
-            table_data.append({
-                "Model Score": transaction.model_score,
-                "Sender Reputation": transaction.sender_reputation,
-                "Sender Stake": st.session_state.p2pserver.blockchain.get_stake(transaction.sender_address),
-                "Transaction Fee": transaction.fee,
-                "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
-                "Title": content.split("\n")[0],
-                "Text": " ".join(content.split("\n")[1: ]),
-                "Sender Address": transaction.sender_address,
-                "ID": transaction.id
-            })
+    if st.session_state.screen == "show_transac":
+        st.markdown(
+            "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
+            unsafe_allow_html=True
+        )
+        transac_pool = st.session_state.p2pserver.transaction_pool.transactions
+        
+        if len(transac_pool) < 1:
+            st.write("The network doesn't have any mempool transactions currently. Please come back later.")
+        
+        else:
+            table_data = []
+            for transaction in transac_pool:
+                content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
+                table_data.append({
+                    "Model Score": transaction.model_score,
+                    "Sender Reputation": transaction.sender_reputation,
+                    "Sender Stake": st.session_state.p2pserver.blockchain.get_stake(transaction.sender_address),
+                    "Transaction Fee": transaction.fee,
+                    "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
+                    "Title": content.split("\n")[0],
+                    "Text": " ".join(content.split("\n")[1: ]),
+                    "Sender Address": transaction.sender_address,
+                    "ID": transaction.id
+                })
 
-        st.dataframe(pd.DataFrame(table_data), height=500)
+            st.dataframe(pd.DataFrame(table_data), height=500)
 
-    if st.button("Back"):
-        change_screen(st.session_state.previous_screen)
+        if st.button("Back"):
+            with st.spinner("Please Wait"):
+                change_screen(st.session_state.previous_screen)

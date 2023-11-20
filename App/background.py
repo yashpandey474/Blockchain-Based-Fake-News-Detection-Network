@@ -9,8 +9,6 @@ from pyblock.blockchain.block import *
 
 
 # Background task that periodically checks if a block can be added
-
-
 class Background:
     def __init__(self, p2pserver):
         self.time = None
@@ -26,8 +24,7 @@ class Background:
         while True:
             current_time = int(time.time())
             time_elapsed = current_time - START_TIME.timestamp()
-            sleep_time = BLOCK_VALIDATOR_CHOOSE_INTERVAL - \
-                (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
+            sleep_time = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
             print("Sleeping for {} seconds".format(sleep_time))
             time.sleep(sleep_time)
 

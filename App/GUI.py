@@ -17,6 +17,7 @@ from sign_up import *
 from view_block_status import *
 from view_sent_blocks import *
 from view_log_reputation import *
+import asyncio
 
 background_style = '''<style>
 div .appview-container{
@@ -27,11 +28,8 @@ background-position: center;
 </style>
 '''
 
-st.markdown(background_style, unsafe_allow_html=True)
-st.markdown(
-    "<h1 style='text-align: center;'>Fake News Detection System Utilising Blockchain</h1>",
-    unsafe_allow_html=True
-)
+
+        
 screen_functions = {
     "enter": enter,
     "login": login,
@@ -55,14 +53,44 @@ screen_functions = {
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
+    
     if st.session_state.screen in screen_functions:
         screen_functions[st.session_state.screen]()
-    
+        t = st.empty()
+        st.session_state.screen_changed = False
+        asyncio.run(watch(t))
+        
+        
     else:
         screen_functions["enter"]()
         
 
+
+        
+
 if __name__ == "__main__":
+    st.set_page_config(layout="wide")
+    st.markdown(background_style, unsafe_allow_html=True)
+    st.markdown(
+        "<h1 style='text-align: center;'>Fake News Detection System Utilising Blockchain</h1>",
+        unsafe_allow_html=True
+    )
+    st.markdown(
+    """
+    <style>
+    .stButton>button {
+        width: 350px;
+        height: 100px;
+        text-align: center;
+        display: block;
+        margin: 2 auto;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+    
+    
     if "screen" not in st.session_state:
         st.session_state.gen_key_pressed = False
         st.session_state.name = ""
@@ -72,8 +100,11 @@ if __name__ == "__main__":
         st.session_state.validator = False
         st.session_state.previous_screen = "enter"
         st.session_state.screen = "enter"
-         
+        st.session_state.screen_changed = False
         
         
+     # Start the clock update coroutine
+    t = st.empty()
     main()
-        
+
+    

@@ -23,7 +23,8 @@ def login():
             if vc[0]:
                 # st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
                 initialise(vc[2])
-                change_screen("main_page")
+                with st.spinner("Please Wait"):
+                    change_screen("main_page")
 
             else:
                 # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
@@ -31,13 +32,15 @@ def login():
         else:
             st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
 
-    b1= st.button("New to app? Sign up instead")
+    b1= st.button("Sign up instead")
     b2 = st.button("Exit Screen")
     
     if b1:
-        change_screen("sign_up")
+        with st.spinner("Please Wait"):
+            change_screen("sign_up")
     elif b2:
-        change_screen("enter")
+        with st.spinner("Please Wait"): 
+            change_screen("enter")
 
     # if st.button("Ba ck"):
-    #     change_screen(st.session_state.previous_screen)
+    #     with st.spinner("Please Wait"): change_screen(st.session_state.previous_screen)
