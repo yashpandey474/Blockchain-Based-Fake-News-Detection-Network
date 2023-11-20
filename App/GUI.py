@@ -15,19 +15,15 @@ background-position: center;
 </style>
 '''
 
-
-        
-
-
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
-    
     
     if st.session_state.screen in change_screen.screen_functions:
         change_screen.screen_functions[st.session_state.screen]()
         t = st.empty()
         change_screen.add_space()
-        st.session_state.screen_changed = False
+        change_screen.add_space()
+        st.session_state.screen_changed = False       
         asyncio.run(change_screen.watch(t))
         
     else:
@@ -52,6 +48,13 @@ if __name__ == "__main__":
         text-align: center;
         display: block;
         margin: 0 auto;
+        padding: 0;
+    }
+    .stButton p{
+        font-size: 20px;
+        style: bold;
+        font-weight: 800;
+        font-family: "Calibri";
     }
     </style>
     """,

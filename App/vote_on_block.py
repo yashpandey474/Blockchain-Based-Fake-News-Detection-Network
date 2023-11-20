@@ -3,7 +3,14 @@ import change_screen
 
 def vote_on_block():
     if st.session_state.screen == "vote_on_block":
-        # st.title("Vote on Recieved Block News.")
+        # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        # if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+        #     change_screen.change_screen_navbar(nav_selection)
+            
+        navigation_options = change_screen.navigation_options.get(st.session_state.user_type, ())
+        selected_option = st.sidebar.radio("Navigation", navigation_options)
+        if selected_option and change_screen.screen_mapping[selected_option] != st.session_state.screen:
+            change_screen.change_screen_navbar(selected_option)
         st.markdown(
             "<h1 style='text-align: center;'>Vote on Received Block</h1>",
             unsafe_allow_html=True
@@ -55,8 +62,8 @@ def vote_on_block():
 
                     st.session_state.voted = True
                     
-        if st.button("Back"):
-            # Set the previous screen in the session state
-            with st.spinner("Please Wait"):
-                change_screen.change_screen(st.session_state.previous_screen)
+        # if st.button("Back"):
+        #     # Set the previous screen in the session state
+        #     with st.spinner("Please Wait"):
+        #         change_screen.change_screen("main_page")
 

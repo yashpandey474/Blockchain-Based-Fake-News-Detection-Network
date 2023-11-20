@@ -5,6 +5,15 @@ import change_screen
 
 def upload_file():
     # st.title("Upload New News to the network.")
+    # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+    # if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+    #     change_screen.change_screen_navbar(nav_selection)
+    
+    navigation_options = change_screen.navigation_options.get(st.session_state.user_type, ())
+    selected_option = st.sidebar.radio("Navigation", navigation_options)
+    if selected_option and change_screen.screen_mapping[selected_option] != st.session_state.screen:
+        change_screen.change_screen_navbar(selected_option)
+        
     if st.session_state.screen == "upload_file":
         st.markdown(
             "<h1 style='text-align: center;'>Upload New News to the network</h1>",
@@ -43,7 +52,6 @@ def upload_file():
                         st.session_state.p2pserver.broadcast_transaction(
                             transaction
                         )
-
                     print("BROADCASTED TRANSACTION")
                     st.rerun()
                     
@@ -51,7 +59,7 @@ def upload_file():
             st.success("File successfully uploaded.")
 
         # GO TO PREVIOUS SCREEN
-        if st.button("Back"):
-            # Set the previous screen in the session state
-            with st.spinner("Please Wait"): 
-                change_screen.change_screen("main_page")
+        # if st.button("Back"):
+        #     # Set the previous screen in the session state
+        #     with st.spinner("Please Wait"): 
+        #         change_screen.change_screen("main_page")
