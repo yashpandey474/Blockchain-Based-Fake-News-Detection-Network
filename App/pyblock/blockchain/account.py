@@ -8,9 +8,9 @@ logging.basicConfig(level=logging.INFO,
 
 
 class Account:
-    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None, isActive=True, reputation_changes=None, sent_transactions=None, sent_blocks=None):
+    def __init__(self, balance=config.DEFAULT_BALANCE["Reader"], stake=0, isValidator=False, clientPort=None, isActive=True, reputation_changes=None, sent_transactions=None, sent_blocks=None):
         self.balance = balance
-        self.isValidator = False
+        self.isValidator = isValidator
         self.isActive = isActive
         self.stake = stake
         self.clientPort = clientPort
@@ -25,6 +25,7 @@ class Account:
             "isActive": self.isActive,
             "stake": self.stake,
             "clientPort": self.clientPort,
+            "isValidator": self.isValidator,
             # Convert set to list for JSON serialization
             "sent_transactions": list(self.sent_transactions),
             "sent_blocks": list(self.sent_blocks),
@@ -174,11 +175,15 @@ class Accounts:
         self.accounts[transaction.sender_address].sent_transactions.add(
             transaction)
 
+    def reduce_balance(self, address, amount, reason):
+        self.accounts[address].balance -= amount
+        self.log_reputation_change(address, reason, amount)
+
     def log_reputation_change(self, address, change_string, change_amount):
         self.accounts[address].reputation_changes.append(
             (change_string, change_amount))
 
-        self.accounts[address].reputation_changes[change_string] = change_amount
+        # self.accounts[address].reputation_changes[change_string] = change_amount
 
     def makeAccountValidatorNode(self, address, stake):
         # IF ADDRESS IS NOT VALID
@@ -187,21 +192,21 @@ class Accounts:
 
         account = self.accounts[address]
 
-        account.isValidator = True
-
         # IF NOT ENOUGH BALANCE
         if account.balance < stake:
-            print("Insufficient balance to become a validator.")
+            raise ValueError("Insufficient balance to become a validator.")
 
         # IF NOT ENOUGH STAKE
         if stake < config.MIN_STAKE:
-            print(
+            raise ValueError(
                 f"Stake must be at least {config.MIN_STAKE} to become a validator.")
 
         # ADJUST BALANCE & STAKE OF ACCOUNT
 
         account.balance = account.balance - stake + account.stake
         account.stake = stake
+        account.isValidator = True
+        print(f"Account is now a validator node {account.isValidator}")
 
     def addANewClient(self, address, clientPort, userType):
         print(f"Adding a new client {address} with clientPort {clientPort}")
@@ -234,12 +239,12 @@ class Accounts:
             # Filter accounts eligible for validation based on minimum stake and isValidator flag
             eligible_accounts = {address: acc for address, acc in self.accounts.copy().items()
                                  if acc.stake >= config.MIN_STAKE and acc.isValidator and acc.isActive}
-
-            if not eligible_accounts:
-                logging.info("No eligible validators available.")
+            print(f"Accounts: {self.accounts}")
+            if len(eligible_accounts) == 0:
+                print("No eligible validators available.")
                 return None
-
-            logging.info(f"Eligible validators: {eligible_accounts}")
+            print(f"Seed used {seed}")
+            print(f"Eligible validators: {eligible_accounts}")
 
             # Sort accounts by stake
             sorted_accounts = sorted(
@@ -255,7 +260,8 @@ class Accounts:
             chosen_validator = random_generator.choices(
                 sorted_accounts, weights=weights, k=1)[0][0]
 
-            logging.info(f"Chosen validator: {chosen_validator}")
+            print(
+                f"Chosen validator: {self.accounts[chosen_validator].clientPort}")
             return chosen_validator
         except Exception as e:
             logging.error(f"Error in choosing validator: {e}")
