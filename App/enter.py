@@ -97,4 +97,4 @@ def enter():
             if st.button("Login/Signup as a Reader in the Public Network."):
                 st.session_state.user_type = "Reader"
                 with st.spinner("Please Wait"):
-                    change_screen_.change_screen_("login")
+                    change_screen_.change_screen("login")
