@@ -7,7 +7,7 @@ from pyblock.p2pserver import P2pServer
 from pyblock.peers import *
 import threading
 from pyblock.blockchain.account import *
-import change_screen
+import change_screen as change_screen_
 from background import *
 
 # START LISTENING ON P2P SERVER
@@ -79,7 +79,7 @@ def enter():
             unsafe_allow_html=True
         )
         
-        st.markdown(change_screen.enter_page_message)
+        st.markdown(change_screen_.enter_page_message)
         
         col1, col2 = st.columns(2)
 
@@ -87,12 +87,12 @@ def enter():
             if st.button("Login/Signup as News Auditor in the Private Network."):
                 st.session_state.user_type = "Auditor"
                 with st.spinner("Please Wait"):
-                    change_screen.change_screen("login")
+                    change_screen_.change_screen("login")
 
         with col2:
             if st.button("Login/Signup as a Reader in the Public Network."):
                 st.session_state.user_type = "Reader"
                 with st.spinner("Please Wait"):
-                    change_screen.change_screen("login")
+                    change_screen_.change_screen_("login")
                 
         
