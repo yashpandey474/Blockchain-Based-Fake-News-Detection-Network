@@ -308,8 +308,8 @@ class P2pServer:
             self.block_proposer = data["address"]
 
     def handle_votes(self, data):
-        # CHECK IF THE VOTE IS VALID
-        if not self.accounts.check_if_active(data["address"]):
+        # CHECK IF THE VOTE IS VALID [FROM AN ACTIVE VALIDATOR]
+        if not self.accounts.accounts[data["address"]].isActive or not self.accounts.accounts[data["address"]].isValidator:
             print("INVALID VOTE")
             return
 
