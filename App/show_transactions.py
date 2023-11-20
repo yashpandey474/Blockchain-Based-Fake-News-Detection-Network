@@ -27,8 +27,20 @@ def show_transactions():
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
+            
         st.markdown(
-            "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
+            """
+            ## Current Transactions in Mempool
+
+            Welcome to the 'Current Transactions in Mempool' section.
+
+            - View the current transactions pending in the network's mempool.
+            - Each transaction contains various details such as the sender's reputation, stake, model score, etc.
+            - Review the transaction details and their associated content.
+            - Explore the titles and text to identify pending news in the network's mempool.
+            
+            Stay updated with the latest transactions within the network!
+            """,
             unsafe_allow_html=True
         )
         transac_pool = st.session_state.p2pserver.transaction_pool.transactions
@@ -53,7 +65,3 @@ def show_transactions():
                 })
 
             st.dataframe(pd.DataFrame(table_data), height=500)
-
-        # if st.button("Back"):
-        #     with st.spinner("Please Wait"):
-        #         change_screen_.change_screen("main_page")

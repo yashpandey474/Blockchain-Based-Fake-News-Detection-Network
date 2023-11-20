@@ -4,9 +4,6 @@ import change_screen as change_screen_
 
 def become_validator():
     if st.session_state.screen == "become_validator":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
         
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
@@ -34,12 +31,31 @@ def become_validator():
         elif not st.session_state.stake_submitted:
             st.session_state.stake = 0
 
-            #GET CURRENT BALANCE
+        #GET CURRENT BALANCE
         st.session_state.balance = st.session_state.p2pserver.accounts.get_balance(
         st.session_state.wallet.get_public_key()
             )
+        st.markdown(
+    """
+    # Manage Stake in Network
 
-            #IF NOT ENOUGH BALANCE
+    This section allows you to manage your stake in the network.
+    If you are a Validator, you can modify your current stake; otherwise, you can stake to become a Validator.
+
+    ## Your Current Status:
+
+    - **User Type:** [User Type: Reader/Auditor]
+    - **Current Balance:** [Your Current Balance]
+    - **Minimum Stake Required:** [Minimum Stake Required]
+
+    ## Stake Management:
+
+    If you are not already a Validator, you can stake a certain amount to become one.
+    If you are a Validator, you can modify your existing stake.
+
+    """
+)
+        #IF NOT ENOUGH BALANCE
         if st.session_state.balance  + st.session_state.stake < config.MIN_STAKE:
             st.error(f"You don't have enough balance to stake. Minimum Stake Required: {config.MIN_STAKE}")
 
@@ -60,6 +76,13 @@ def become_validator():
                             step=1
                     )
 
+                st.markdown(
+                """
+                Once you've decided on the stake amount, click the "Submit Stake" button to proceed. 
+                If you've successfully modified or submitted your stake, you'll receive a confirmation message. 
+                Thank you for your participation!
+                """
+                )
                 #SUBMT STAKE
                 if st.button("Submit Stake"):
                     old_stake = st.session_state.stake
@@ -75,6 +98,8 @@ def become_validator():
                     st.session_state.stake_submitted = True
                     st.rerun()
                     
+            
+            
             else:
                 if not st.session_state.validator:
                     st.success(
@@ -84,11 +109,4 @@ def become_validator():
                 else:
                     st.success(f"Your stake has been successfully modified to: {st.session_state.stake}")
                         
-                    
             
-                
-        
-        #GO BACK TO MAIN SCREEN
-        # if st.button("Back"):
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen("main_page")
