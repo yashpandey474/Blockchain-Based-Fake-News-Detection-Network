@@ -31,7 +31,7 @@ def view_sent_blocks():
             
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen(st.session_state.previous_screen)
+                change_screen.change_screen(st.session_state.previous_screen)
             
             
         

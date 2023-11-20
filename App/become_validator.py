@@ -1,6 +1,6 @@
 import streamlit as st
 from pyblock import config
-from change_screen import *
+import change_screen
 
 def become_validator():
     if st.session_state.screen == "become_validator":
@@ -71,4 +71,4 @@ def become_validator():
         #GO BACK TO MAIN SCREEN
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen(st.session_state.previous_screen)
+                change_screen.change_screen(st.session_state.previous_screen)

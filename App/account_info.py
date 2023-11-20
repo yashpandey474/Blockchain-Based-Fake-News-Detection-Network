@@ -1,6 +1,6 @@
 from pyblock.wallet.transaction import *
 import streamlit as st
-from change_screen import *
+import change_screen
 
 
 def show_account_info():
@@ -32,4 +32,4 @@ def show_account_info():
 
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen(st.session_state.previous_screen)
+                change_screen.change_screen(st.session_state.previous_screen)

@@ -49,4 +49,4 @@ def show_blocks_news():
         if st.button("Back"):
             # Set the previous screen in the session state
             with st.spinner("Please Wait"): 
-                change_screen("main_page")
+                change_screen.change_screen("main_page")

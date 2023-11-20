@@ -7,9 +7,9 @@ from pyblock.p2pserver import P2pServer
 from pyblock.peers import *
 import threading
 from pyblock.blockchain.account import *
-from change_screen import *
+import change_screen
 from background import *
-import atexit
+
 # START LISTENING ON P2P SERVER
 
 
@@ -86,16 +86,12 @@ def enter():
             if st.button("Login/Signup as News Auditor in the Private Network."):
                 st.session_state.user_type = "Auditor"
                 with st.spinner("Please Wait"):
-                    change_screen("login")
+                    change_screen.change_screen("login")
 
         with col2:
             if st.button("Login/Signup as a Reader in the Public Network."):
                 st.session_state.user_type = "Reader"
                 with st.spinner("Please Wait"):
-                    change_screen("login")
+                    change_screen.change_screen("login")
                 
-    t = st.empty()    
-    if st.session_state.screen_changed:
-        st.session_state.screen_changed = False
-        asyncio.run(watch(t))
         

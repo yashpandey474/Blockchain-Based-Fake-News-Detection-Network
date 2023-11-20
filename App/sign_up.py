@@ -17,7 +17,7 @@ def sign_up_generate():
         col1, col2, col3 = st.columns([1, 20, 1])
         with col2:
             if st.session_state.user_type == "Auditor":
-                st.write("""As an auditor, you participate in out trusted private network. 
+                st.write("""As an auditor, you participate in our trusted private network. 
                      You must stake some "reputation" to become a validtor in the network. 
                      If you are chosen as a block proposing validator, you must choose some
                      transactions to include in a new block which is transmitted to other validators
@@ -51,13 +51,14 @@ def sign_up_generate():
         if st.session_state.gen_key_pressed:
             if st.button("Go to main"):
                 with st.spinner("Please Wait"):
-                     change_screen("main_page")
+                     change_screen.change_screen("main_page")
                 st.session_state.gen_key_pressed = False
 
-        else:
-            if st.button("Back"):
-                with st.spinner("Please Wait"): 
-                    change_screen("sign_up")
+        if st.button("Back"):
+            with st.spinner("Please Wait"): 
+                change_screen.change_screen("sign_up")
+                
+        change_screen.add_space()
 
 def sign_up():
     if st.session_state.screen == "sign_up":
@@ -86,10 +87,10 @@ def sign_up():
                     st.session_state.name = name
                     st.session_state.email = email
                     with st.spinner("Please Wait"):
-                         change_screen("sign_up_generate")
+                         change_screen.change_screen("sign_up_generate")
 
         # GO TO PREVIOUS SCREEN
         if st.button("Back"):
             with st.spinner("Please Wait"):
-                 change_screen("login")
+                 change_screen.change_screen("login")
             

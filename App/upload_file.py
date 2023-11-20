@@ -1,6 +1,6 @@
 import streamlit as st
 from pyblock.wallet.transaction import *
-from change_screen import *
+import change_screen
 
 
 def upload_file():
@@ -54,4 +54,4 @@ def upload_file():
         if st.button("Back"):
             # Set the previous screen in the session state
             with st.spinner("Please Wait"): 
-                change_screen("main_page")
+                change_screen.change_screen("main_page")

@@ -1,5 +1,5 @@
 import streamlit as st
-from change_screen import *
+import change_screen
 
 def vote_on_block():
     if st.session_state.screen == "vote_on_block":
@@ -58,5 +58,5 @@ def vote_on_block():
         if st.button("Back"):
             # Set the previous screen in the session state
             with st.spinner("Please Wait"):
-                change_screen(st.session_state.previous_screen)
+                change_screen.change_screen(st.session_state.previous_screen)
 

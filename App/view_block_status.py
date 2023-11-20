@@ -1,6 +1,6 @@
 # from your_module import Block, config  # Import necessary modules
 import streamlit as st
-from change_screen import *
+import change_screen
 import pyblock.config as config
 from pyblock.blockchain.block import *
 import time
@@ -104,7 +104,7 @@ def propose_block():
 
         if st.button("Back"):
             with st.spinner("Please Wait"):
-                 change_screen("main_page")
+                 change_screen.change_screen("main_page")
 
 
     
@@ -113,7 +113,7 @@ def view_block_status():
         # IF USER IS THE CURRENT BLOCK PROPOSER
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
             with st.spinner("Please Wait"):
-                 change_screen("propose_block")
+                 change_screen.change_screen("propose_block")
 
         
         st.title("View Current Block Status")
@@ -122,7 +122,7 @@ def view_block_status():
             st.write("A valid block has been received.")
             if st.button("Vote on Received Block"):
                 with st.spinner("Please Wait"): 
-                    change_screen("vote_on_block")
+                    change_screen.change_screen("vote_on_block")
 
             
         st.write("Current Block Proposer Public Key: ", st.session_state.p2pserver.block_proposer)
@@ -133,7 +133,7 @@ def view_block_status():
             
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen("main_page")
+                change_screen.change_screen("main_page")
 
                 
         
