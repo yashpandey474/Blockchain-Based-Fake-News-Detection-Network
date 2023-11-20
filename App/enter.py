@@ -7,15 +7,13 @@ from pyblock.p2pserver import P2pServer
 from pyblock.peers import *
 import threading
 from pyblock.blockchain.account import *
-from change_screen import *
+import change_screen
 from background import *
-import atexit
+
 # START LISTENING ON P2P SERVER
-
-
 def run_p2pserver(p2pserver):
     print("Running p2p server")
-    p2pserver.listen()
+    # p2pserver.listen()
 
 def run_background_task(background):
     print("Running background block proposer updation")
@@ -74,12 +72,27 @@ def initialise(private_key=None):
 
 
 def enter():
-    st.title("Choose Role to enter into Network")
+    
+    if st.session_state.screen == "enter":
+        st.markdown(
+            f"<h2 style='text-align: center;'>Choose a Role to Enter into Network</h2>",
+            unsafe_allow_html=True
+        )
+        
+        st.markdown(change_screen.enter_page_message)
+        
+        col1, col2 = st.columns(2)
 
-    if st.button("Login/Signup as News Auditor in the Private Network."):
-        st.session_state.user_type = "Auditor"
-        change_screen("login")
+        with col1:
+            if st.button("Login/Signup as News Auditor in the Private Network."):
+                st.session_state.user_type = "Auditor"
+                with st.spinner("Please Wait"):
+                    change_screen.change_screen("login")
 
-    if st.button("Login/Signup as a Reader in the Public Network."):
-        st.session_state.user_type = "Reader"
-        change_screen("login")
+        with col2:
+            if st.button("Login/Signup as a Reader in the Public Network."):
+                st.session_state.user_type = "Reader"
+                with st.spinner("Please Wait"):
+                    change_screen.change_screen("login")
+                
+        

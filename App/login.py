@@ -1,5 +1,5 @@
 import streamlit as st
-from change_screen import *
+import change_screen
 from enter import *
 import crypto_logic
 import time
@@ -7,7 +7,7 @@ import time
 def login():
     
     st.markdown(
-        f"<h1 style='text-align: center;'>Login as a {st.session_state.user_type}</h1>",
+        f"<h2 style='text-align: center;'>Login as {st.session_state.user_type}</h2>",
         unsafe_allow_html=True
     )
     #GET PRIVATE KEY OF USER
@@ -18,26 +18,31 @@ def login():
         
         #IF PRIVATE KEY ENTERED
         if user_input:
-            vc = crypto_logic.verify(user_input)
+            with st.spinner("Please Wait"):
+                vc = crypto_logic.verify(user_input)
 
             if vc[0]:
                 # st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
-                initialise(vc[2])
-                change_screen("main_page")
+                with st.spinner("Please Wait"):
+                    initialise(vc[2])
+                    change_screen.change_screen("main_page")
 
             else:
                 # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
                 st.error(vc[1])
         else:
-            st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
-
-    b1= st.button("New to app? Sign up instead")
+            # st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
+            st.warning("Private Key Not Provided")
+            
+    b1= st.button("Sign up instead")
     b2 = st.button("Exit Screen")
     
     if b1:
-        change_screen("sign_up")
+        with st.spinner("Please Wait"):
+            change_screen.change_screen("sign_up")
     elif b2:
-        change_screen("enter")
+        with st.spinner("Please Wait"): 
+            change_screen.change_screen("enter")
 
     # if st.button("Ba ck"):
-    #     change_screen(st.session_state.previous_screen)
+    #     with st.spinner("Please Wait"): change_screen.change_screen(st.session_state.previous_screen)
