@@ -23,10 +23,6 @@ def view_log_reputation():
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
         st.markdown(
-            "<h1 style='text-align: center;'>Log of Your Reputation Changes</h1>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
     """
     # Log of Your Reputation Changes
 

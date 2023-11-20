@@ -28,6 +28,7 @@ def propose_block():
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
+            
         st.markdown(
             "<h1 style='text-align: center;'>You are the current block proposer</h1>",
             unsafe_allow_html=True
@@ -137,9 +138,21 @@ def propose_block():
     
 def view_block_status():
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
-    selected_option = st.sidebar.radio("Navigation", navigation_options)
+    st.markdown(
+            """
+            <style>
+            .stRadio p{
+                font-size: 20px;
+            }
+            .stRadio>label>div>p{
+                font-size: 24px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+    selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
+              
     if st.session_state.screen == "view_block_status":
         # IF USER IS THE CURRENT BLOCK PROPOSER
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():

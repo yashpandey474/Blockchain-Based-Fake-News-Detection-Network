@@ -31,10 +31,6 @@ def view_sent_blocks():
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
-            "<h1 style='text-align: center;'>Blocks Broadcasted by you</h1>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
             """
             # Blocks Broadcasted by You
 
