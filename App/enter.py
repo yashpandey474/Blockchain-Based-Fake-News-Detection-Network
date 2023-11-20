@@ -11,14 +11,17 @@ import change_screen
 from background import *
 
 # START LISTENING ON P2P SERVER
+
+
 def run_p2pserver(p2pserver):
     print("Running p2p server")
-    # p2pserver.listen()
+    p2pserver.listen()
+
 
 def run_background_task(background):
     print("Running background block proposer updation")
     background.run_forever()
-    
+
 
 def on_program_exit():
     print("Main program is exiting. Closing threads.")
@@ -26,6 +29,7 @@ def on_program_exit():
         st.session_state.p2pserver.stop()
     if hasattr(st.session_state, "background"):
         st.session_state.background.stop()
+
 
 def initialise(private_key=None):
     st.session_state.validator = False
@@ -64,7 +68,7 @@ def initialise(private_key=None):
         background_thread.start()
 
         st.session_state.initialise = True
-        
+
         print("EVERYTHING INITIALIZED")
 
     else:
@@ -72,15 +76,15 @@ def initialise(private_key=None):
 
 
 def enter():
-    
+
     if st.session_state.screen == "enter":
         st.markdown(
             f"<h2 style='text-align: center;'>Choose a Role to Enter into Network</h2>",
             unsafe_allow_html=True
         )
-        
+
         st.markdown(change_screen.enter_page_message)
-        
+
         col1, col2 = st.columns(2)
 
         with col1:
@@ -94,5 +98,3 @@ def enter():
                 st.session_state.user_type = "Reader"
                 with st.spinner("Please Wait"):
                     change_screen.change_screen("login")
-                
-        
