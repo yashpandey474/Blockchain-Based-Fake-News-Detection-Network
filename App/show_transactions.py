@@ -1,6 +1,6 @@
 # SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
 import streamlit as st
-import change_screen
+import change_screen as change_screen_
 import pandas as pd
 from datetime import datetime
 from pyblock.ipfs.ipfs_handler import *
@@ -8,14 +8,14 @@ from pyblock.ipfs.ipfs_handler import *
 
 def show_transactions():
     if st.session_state.screen == "show_transac":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen.change_screen_navbar(nav_selection)
+        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
+        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
+        #     change_screen_.change_screen_navbar(nav_selection)
         
-        navigation_options = change_screen.navigation_options.get(st.session_state.user_type, ())
+        navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         selected_option = st.sidebar.radio("Navigation", navigation_options)
-        if selected_option and change_screen.screen_mapping[selected_option] != st.session_state.screen:
-            change_screen.change_screen_navbar(selected_option)
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+            change_screen_.change_screen_navbar(selected_option)
         st.markdown(
             "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
             unsafe_allow_html=True
@@ -45,4 +45,4 @@ def show_transactions():
 
         # if st.button("Back"):
         #     with st.spinner("Please Wait"):
-        #         change_screen.change_screen("main_page")
+        #         change_screen_.change_screen("main_page")

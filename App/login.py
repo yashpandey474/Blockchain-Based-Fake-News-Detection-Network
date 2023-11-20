@@ -1,5 +1,5 @@
 import streamlit as st
-import change_screen
+import change_screen as change_screen_
 from enter import *
 import crypto_logic
 import time
@@ -25,7 +25,7 @@ def login():
                 # st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
                 with st.spinner("Please Wait"):
                     initialise(vc[2])
-                    change_screen.change_screen("main_page")
+                    change_screen_.change_screen("main_page")
 
             else:
                 # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
@@ -39,10 +39,10 @@ def login():
     
     if b1:
         with st.spinner("Please Wait"):
-            change_screen.change_screen("sign_up")
+            change_screen_.change_screen("sign_up")
     elif b2:
         with st.spinner("Please Wait"): 
-            change_screen.change_screen("enter")
+            change_screen_.change_screen("enter")
 
     # if st.button("Ba ck"):
-    #     with st.spinner("Please Wait"): change_screen.change_screen(st.session_state.previous_screen)
+    #     with st.spinner("Please Wait"): change_screen_.change_screen(st.session_state.previous_screen)
