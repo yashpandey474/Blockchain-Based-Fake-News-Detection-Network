@@ -10,6 +10,25 @@ def view_sent_blocks():
         selected_option = st.sidebar.radio("Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
+        # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        # if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+        #     change_screen.change_screen_navbar(nav_selection)
+        # st.title("Blocks Broadcasted by you.")
+        navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
+        st.markdown(
+            """
+            <style>
+            .stRadio p{
+                font-size: 20px;
+            }
+            .stRadio>label>div>p{
+                font-size: 24px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+        selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+            change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
             "<h1 style='text-align: center;'>Blocks Broadcasted by you</h1>",
