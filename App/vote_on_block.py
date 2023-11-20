@@ -17,7 +17,7 @@ def vote_on_block():
             </style>
             """, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
-        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
