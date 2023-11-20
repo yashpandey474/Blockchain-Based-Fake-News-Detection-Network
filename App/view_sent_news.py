@@ -22,9 +22,21 @@ def view_sent_news():
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
-            "<h1 style='text-align: center;'>News Broadcasted by you</h1>",
+            """
+            ## Current Transactions in Mempool
+
+            Welcome to the 'Current Transactions in Mempool' section.
+
+            - View the current transactions pending in the network's mempool.
+            - Each transaction contains various details such as the sender's reputation, stake, model score, etc.
+            - Review the transaction details and their associated content.
+            - Explore the titles and text to identify pending news in the network's mempool.
+            
+            Stay updated with the latest transactions within the network!
+            """,
             unsafe_allow_html=True
         )
+        
         sent_transactions = st.session_state.p2pserver.accounts.get_sent_transactions(
             st.session_state.p2pserver.wallet.get_public_key()
         )

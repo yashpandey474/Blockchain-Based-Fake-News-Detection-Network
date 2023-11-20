@@ -19,19 +19,8 @@ def vote_on_block():
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
+            
         st.markdown(
-            "<h1 style='text-align: center;'>Vote on Received Block</h1>",
-            unsafe_allow_html=True
-        )    # IF RECEIVED A BLOCK
-            
-        if st.session_state.voted:
-            st.write("You have already voted on the current proposed block.")
-            
-        if not st.session_state.p2pserver.received_block:
-            st.write("No valid block received yet.")
-        else:
-            block = st.session_state.p2pserver.received_block
-            st.markdown(
     """
     # Vote on Received Block
 
@@ -51,6 +40,16 @@ def vote_on_block():
 
     """
 )
+
+        if st.session_state.voted:
+            st.write("You have already voted on the current proposed block.")
+            
+        if not st.session_state.p2pserver.received_block:
+            st.write("No valid block received yet.")
+            
+        else:
+            block = st.session_state.p2pserver.received_block
+            
             st.header("Block Info")
             st.write("Validator:", block.validator)
             st.write("Timestamp:", block.timestamp)

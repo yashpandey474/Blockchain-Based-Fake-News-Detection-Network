@@ -5,10 +5,6 @@ import change_screen as change_screen_
 
 def show_account_info():
     if st.session_state.screen == "account_info":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
-        
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
             """
@@ -26,8 +22,20 @@ def show_account_info():
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
-            "<h1 style='text-align: center;'>ACCOUNT INFORMATION</h1>",
-            unsafe_allow_html=True
+            """
+            ## ACCOUNT INFORMATION
+
+            Welcome to the Account Information section.
+
+            Here, you can find details about your account on the network:
+            - **Reputation**: Your current reputation calculated as the sum of your balance and stake.
+            - **Balance**: The current balance available in your account.
+            - **Stake (for Auditors)**: If you're an auditor, this displays your stake in the network.
+            - **Private Key**: Click to view your private key (This should be kept confidential).
+            - **Public Key**: View your public key for identification in the network.
+
+            Keep your private key secure and never share it with anyone!
+            """
         )
         
         #GET USER'S DETAILS
@@ -50,7 +58,3 @@ def show_account_info():
             
         with st.expander("Click to view public key"):
             st.write(public_key)
-
-        # if st.button("Back"):
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen(st.session_state.previous_screen)

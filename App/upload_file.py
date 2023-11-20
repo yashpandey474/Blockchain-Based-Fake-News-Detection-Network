@@ -23,10 +23,6 @@ def upload_file():
         
     if st.session_state.screen == "upload_file":
         st.markdown(
-            "<h1 style='text-align: center;'>Upload New News to the network</h1>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
     """
     ## Upload News Guidelines
     

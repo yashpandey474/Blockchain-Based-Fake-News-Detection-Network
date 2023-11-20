@@ -8,9 +8,6 @@ from pyblock.ipfs.ipfs_handler import *
 
 def show_transactions():
     if st.session_state.screen == "show_transac":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
         
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
@@ -24,6 +21,7 @@ def show_transactions():
             }
             </style>
             """, unsafe_allow_html=True)
+        
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
