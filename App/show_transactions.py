@@ -7,6 +7,7 @@ from pyblock.ipfs.ipfs_handler import *
 
 
 def show_transactions():
+    
     if st.session_state.screen == "show_transac":
         st.markdown(
             "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",

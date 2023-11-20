@@ -18,7 +18,7 @@ from enter import *
 import time
 import asyncio
 
-change_screen.screen_functions = {
+screen_functions = {
     "enter": enter,
     "login": login,
     "main_page": main_page,
@@ -38,6 +38,23 @@ change_screen.screen_functions = {
     "view_log_reputation": view_log_reputation
 }
 
+entered_pages = set([
+    "main_page",
+    "account_info",
+    "show_transac"
+    "show_blocks",
+    "become_validator",
+    "vote_on_block",
+    "upload_file",
+    "view_sent_news",
+    "vote_on_block",
+    "view_block_status",
+    "propose_block",
+    "view_sent_blocks",
+    "view_log_reputation"
+])
+
+
 if "validator" not in st.session_state:
     st.session_state.validator = False
     
@@ -47,6 +64,21 @@ navigation_options = {
             "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
             ("Modify Stake" if st.session_state.validator else "Become a Validator"), "Current Block Status", "Broadcasted Blocks", "Enter Page"
         )
+}
+
+screen_mapping = {
+        "Main Page": "main_page",
+        "Upload News": "upload_file",
+        "Verified News": "show_blocks",
+        "Account Info": "account_info",
+        "Sent News": "view_sent_news",
+        "Reputation Log": "view_log_reputation",
+        "Transactions in Mempool": "show_transac",
+        "Modify Stake": "become_validator" if st.session_state.validator else None,
+        "Become a Validator": "become_validator" if not st.session_state.validator else None,
+        "Current Block Status": "view_block_status",
+        "Broadcasted Blocks": "view_sent_blocks",
+        "Enter Page": "enter"
     }
 
 def add_space():
@@ -56,38 +88,17 @@ def add_space():
         
 def change_screen_navbar(nav_selection):    
         # Map the nav_selection to corresponding actions
-    if nav_selection == "Upload News":
-        st.session_state.upload_file_executed = False
+    screen = screen_mapping.get(nav_selection)
+
+    if screen:
+        if nav_selection == "Modify Stake" or nav_selection == "Become a Validator":
+            st.session_state.stake_submitted = False
+            
+        if nav_selection == "Upload News":
+            st.session_state.upload_file_executed = False
+
         with st.spinner("Please Wait"):
-            change_screen("upload_file")
-    elif nav_selection == "Verified News":
-        with st.spinner("Please Wait"): 
-            change_screen("show_blocks")
-    elif nav_selection == "Account Info":
-        with st.spinner("Please Wait"): 
-            change_screen("account_info")
-    elif nav_selection == "Sent News":
-        with st.spinner("Please Wait"): 
-            change_screen("view_sent_news")
-    elif nav_selection == "Reputation Log":
-        with st.spinner("Please Wait"): 
-            change_screen("view_log_reputation")
-    elif nav_selection == "Transactions in Mempool":
-        with st.spinner("Please Wait"): 
-            change_screen("show_transac")
-    elif nav_selection == "Modify Stake" or nav_selection == "Become a Validator":
-        st.session_state.stake_submitted = False
-        with st.spinner("Please Wait"): 
-            change_screen("become_validator")
-    elif nav_selection == "Current Block Status":
-        with st.spinner("Please Wait"): 
-            change_screen("view_block_status")
-    elif nav_selection == "Broadcasted Blocks":
-        with st.spinner("Please Wait"): 
-            change_screen("view_sent_blocks")
-    elif nav_selection == "Enter Page":
-        with st.spinner("Please Wait"): 
-            change_screen("enter")
+            change_screen(screen)
             
 async def watch(test):
     while True:

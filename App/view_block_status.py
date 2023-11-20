@@ -11,6 +11,7 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
+    
     if st.session_state.screen == "propose_block":
         # st.title("You are the current block proposer.")
         st.markdown(

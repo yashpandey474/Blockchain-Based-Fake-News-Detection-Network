@@ -30,8 +30,9 @@ def login():
                 # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
                 st.error(vc[1])
         else:
-            st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
-
+            # st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
+            st.warning("Private Key Not Provided")
+            
     b1= st.button("Sign up instead")
     b2 = st.button("Exit Screen")
     

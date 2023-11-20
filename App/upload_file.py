@@ -5,6 +5,7 @@ import change_screen
 
 def upload_file():
     # st.title("Upload New News to the network.")
+    
     if st.session_state.screen == "upload_file":
         st.markdown(
             "<h1 style='text-align: center;'>Upload New News to the network</h1>",
