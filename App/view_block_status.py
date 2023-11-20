@@ -11,7 +11,6 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
-    
     if st.session_state.screen == "propose_block":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
@@ -26,7 +25,7 @@ def propose_block():
             </style>
             """, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
-        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
@@ -137,6 +136,7 @@ def propose_block():
 
     
 def view_block_status():
+    #RADIO BUTTONS FOR SIDEBAR
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     st.markdown(
             """
@@ -153,13 +153,8 @@ def view_block_status():
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
               
-    if st.session_state.screen == "view_block_status":
-        # IF USER IS THE CURRENT BLOCK PROPOSER
-        if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
-            with st.spinner("Please Wait"):
-                 change_screen_.change_screen("propose_block")
-
-        
+    #if 
+    if st.session_state.screen == "view_block_status":        
         st.title("View Current Block Status")
 
         if st.session_state.p2pserver.received_block and block_valid():
@@ -175,9 +170,6 @@ def view_block_status():
         else:
             st.write("No Valid Block Received yet.")
             
-        if st.button("Back"):
-            with st.spinner("Please Wait"): 
-                change_screen_.change_screen("main_page")
 
                 
         
