@@ -43,7 +43,6 @@ def show_blocks_news():
               - Sender's Public Key
               - Validator's Public Key
               - Sender's Reputation
-              - Sign of the Sender
             - Click the 'QR Code' button to generate a QR code for each transaction.
 
             Dive in to explore the verified news available in the blockchain and stay informed!
@@ -74,7 +73,6 @@ def show_blocks_news():
                         "Validator Public Key": block.validator,
                         # TODO: "Validator Reputation": st.session_state.accounts.get_
                         "Sender Reputation": transaction.sender_reputation,
-                        "Sign of sender": transaction.sign,
                         "qr code": st.button(f"QR for {transaction.id}", on_click = show_transaction, kwargs={"transaction": transaction, "show":1})
                     })
             df = pd.DataFrame(table_data)

@@ -102,36 +102,16 @@ class Accounts:
                 block.validator,
                 news_transaction.fee
             )
-            # IF NEWS WAS TRUE; REWARD SENDER
+            # IF MAJORITY VOTED "TRUE"
             if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
                 self.accounts[news_transaction.sender_address].balance += config.SENDER_REWARD
                 self.log_reputation_change(
                     news_transaction.sender_address, "News Broadcasted Voted True", config.SENDER_REWARD)
-
-            else:
-                # PERCENTAGE TO STOP RICH GETTING RICHER
-                penalty_amount = self.accounts[news_transaction.sender_address].balance * \
-                    config.SENDER_PENALTY_PERCENT//100
-
-                self.accounts[news_transaction.sender_address].balance -= (
-                    penalty_amount
-                )
-
-                print("BALANCE OF SENDER = ",
-                      self.accounts[news_transaction.sender_address].balance)
-
-                self.log_reputation_change(
-                    news_transaction.sender_address, "News Broadcasted Voted Fake", penalty_amount)
-
-            # IF MAJORITY VOTED "TRUE"
-            if len(news_transaction.positive_votes) > len(news_transaction.negative_votes):
                 # IF MODEL AGREED WITH MAJORITY
                 if news_transaction.model_score < 0.5:
-
                     # FOR THOSE THAT VOTED NEGATIVELY
                     for public_key in news_transaction.negative_votes:
-                        penalty_amount = self.accounts[public_key].stake * \
-                            config.PENALTY_STAKE_PERCENT//100
+                        penalty_amount = self.accounts[public_key].stake * config.PENALTY_STAKE_PERCENT//100
                         # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= (
                             penalty_amount)
@@ -142,6 +122,15 @@ class Accounts:
                         )
             # IF MAJORITY VOTED "FAKE"
             if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
+                penalty_amount = self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT//100
+
+                self.accounts[news_transaction.sender_address].balance -= (
+                    penalty_amount
+                )
+
+                self.log_reputation_change(
+                    news_transaction.sender_address, "News Broadcasted Voted Fake", penalty_amount)
+
                 # IF MODEL AGREED WITH MAJORITY
                 if news_transaction.model_score >= 0.5:
                     # FOR THOSE THAT VOTED POSITIVELY

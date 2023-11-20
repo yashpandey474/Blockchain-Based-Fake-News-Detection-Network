@@ -28,11 +28,12 @@ def become_validator():
             st.session_state.stake = 0
 
         #GET CURRENT BALANCE
+        
         st.session_state.balance = st.session_state.p2pserver.accounts.get_balance(
         st.session_state.wallet.get_public_key()
             )
         st.markdown(
-    """
+    f"""
     # Manage Stake in Network
 
     This section allows you to manage your stake in the network.
@@ -40,9 +41,9 @@ def become_validator():
 
     ## Your Current Status:
 
-    - **User Type:** [User Type: Reader/Auditor]
-    - **Current Balance:** [Your Current Balance]
-    - **Minimum Stake Required:** [Minimum Stake Required]
+    - **User Type:** {st.session_state.user_type}]
+    - **Current Balance:** {st.session_state.balance}
+    - **Minimum Stake Required:** {config.MIN_STAKE}
 
     ## Stake Management:
 
@@ -56,9 +57,6 @@ def become_validator():
             st.error(f"You don't have enough balance to stake. Minimum Stake Required: {config.MIN_STAKE}")
 
         else:
-            st.write("Minimum Stake Required: ", config.MIN_STAKE)
-            st.write("Your Current Balance: ", st.session_state.balance)
-                
             if st.session_state.validator:
                 st.write("Your Current Stake: ", st.session_state.stake)
                 
@@ -85,10 +83,10 @@ def become_validator():
                     st.session_state.stake = stake
                         
                         #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
-                    if old_stake != st.session_state.stake:
+                    if old_stake != stake:
                         with st.spinner("Please Wait.."):
                             st.session_state.p2pserver.broadcast_new_validator(
-                                        stake = st.session_state.stake
+                                        stake = stake
                             )
                             
                     st.session_state.stake_submitted = True

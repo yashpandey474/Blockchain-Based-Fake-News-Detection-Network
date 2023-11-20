@@ -69,16 +69,15 @@ def vote_on_block():
                 )
 
                 transaction_votes[transaction_id] = vote
-
+                
                 table_data.append({
-                    "ID": transaction.id,
-                    "IPFS Address": transaction.ipfs_address,
-                    "Sender Address": transaction.sender_address,
-                    "Sender Reputation": transaction.sender_reputation,
-                    "Model Score": transaction.model_score,
-                    "Sign of Sender": transaction.sign,
-                    "Vote": vote,
-                })
+                        "ID": transaction.id,
+                        "IPFS Address": transaction.ipfs_address,
+                        "Sender Address": transaction.sender_address,
+                        "Sender Reputation": transaction.sender_reputation,
+                        "Model Score": transaction.model_score,
+                        "Vote": vote,
+                    })
 
             st.table(table_data)
 

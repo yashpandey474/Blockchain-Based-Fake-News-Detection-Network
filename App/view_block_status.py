@@ -91,8 +91,6 @@ def propose_block():
 
 
                 # WARN USER IF MORE THAN ALLOWED TRANSACTIONS SELECTED
-                print(selected_transactions)
-                print(len(selected_transactions))
                 max_selections = config.BLOCK_TRANSACTION_LIMIT
                 
                 if len(selected_transactions) > max_selections:
@@ -101,7 +99,6 @@ def propose_block():
 
                 # CONFIRM THE SELECTION AND VOTES
                 if st.button("Create Block") and 1 <= len(selected_transactions) <= max_selections:
-                    print("BLOCK BEING CREATED")
                     for transaction in selected_transactions:
                         if votes[transaction.id] == "True":
                             transaction.positive_votes.add(public_key)
@@ -117,9 +114,6 @@ def propose_block():
                         blockchain=st.session_state.p2pserver.blockchain
                     )
                     
-                    
-                    print(block.transactions)
-                    
                     #ADD THE ADDRESS TO VOTE
                     block.votes.add(st.session_state.wallet.get_public_key())
 
@@ -130,8 +124,6 @@ def propose_block():
                     # CONFIRMATION MESSAGE
                     st.success("The created block was transmitted.")
                     
-                    
-                    st.session_state.created_block = True
                     st.rerun()
 
     
