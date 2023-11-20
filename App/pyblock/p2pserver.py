@@ -242,7 +242,7 @@ class P2pServer:
             print("REPLACED CHAIN")
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
-            print(self.accounts.accounts)
+            print(self.accounts.to_json())
             self.transaction_pool.from_json(
                 json_data=data["transaction_pool"])
             print("REPLACED TRANSACTION POOL")
@@ -270,6 +270,7 @@ class P2pServer:
             # CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
                     block, self.transaction_pool, self.accounts)):
+                
 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
