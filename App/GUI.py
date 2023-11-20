@@ -2,7 +2,7 @@ import streamlit as st
 from pyblock.blockchain.blockchain import *
 from pyblock.blockchain.block import *
 from pyblock.blockchain.account import *
-import change_screen
+import change_screen as change_screen_
 
 import asyncio
 
@@ -18,16 +18,16 @@ background-position: center;
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
-    if st.session_state.screen in change_screen.screen_functions:
-        change_screen.screen_functions[st.session_state.screen]()
+    if st.session_state.screen in change_screen_.screen_functions:
+        change_screen_.screen_functions[st.session_state.screen]()
         t = st.empty()
-        change_screen.add_space()
-        change_screen.add_space()
+        change_screen_.add_space()
+        change_screen_.add_space()
         st.session_state.screen_changed = False       
-        asyncio.run(change_screen.watch(t))
+        asyncio.run(change_screen_.watch(t))
         
     else:
-        change_screen.screen_functions["enter"]()
+        change_screen_.screen_functions["enter"]()
 
 
         

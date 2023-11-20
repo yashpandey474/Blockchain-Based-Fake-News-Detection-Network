@@ -31,7 +31,7 @@ def sign_up_generate():
                      """)  # Modify this with your intended text
                 
             else:
-                st.markdown(change_screen.readers_guidelines)
+                st.markdown(change_screen_.readers_guidelines)
                 
 
                 
@@ -57,14 +57,14 @@ def sign_up_generate():
         if st.session_state.gen_key_pressed:
             if st.button("Go to main"):
                 with st.spinner("Please Wait"):
-                     change_screen.change_screen("main_page")
+                     change_screen_.change_screen("main_page")
                 st.session_state.gen_key_pressed = False
 
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen.change_screen("sign_up")
+                change_screen_.change_screen("sign_up")
                 
-        change_screen.add_space()
+        change_screen_.add_space()
 
 def sign_up():
     if st.session_state.screen == "sign_up":
@@ -93,10 +93,10 @@ def sign_up():
                     st.session_state.name = name
                     st.session_state.email = email
                     with st.spinner("Please Wait"):
-                         change_screen.change_screen("sign_up_generate")
+                         change_screen_.change_screen("sign_up_generate")
 
         # GO TO PREVIOUS SCREEN
         if st.button("Back"):
             with st.spinner("Please Wait"):
-                 change_screen.change_screen("login")
+                 change_screen_.change_screen("login")
             

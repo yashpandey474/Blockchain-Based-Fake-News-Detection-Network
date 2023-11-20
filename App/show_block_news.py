@@ -1,6 +1,6 @@
 #SHOW ALL NEWS ARTICLES ADDED TO BLOCKCHAIN
 import streamlit as st
-import change_screen
+import change_screen as change_screen_
 import pandas as pd
 from datetime import datetime
 from pyblock.qr.transactions_info import *
@@ -8,10 +8,10 @@ from pyblock.qr.transactions_info import *
 
 
 def show_blocks_news():
-    navigation_options = change_screen.navigation_options.get(st.session_state.user_type, ())
+    navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     selected_option = st.sidebar.radio("Navigation", navigation_options)
-    if selected_option and change_screen.screen_mapping[selected_option] != st.session_state.screen:
-        change_screen.change_screen_navbar(selected_option)
+    if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+        change_screen_.change_screen_navbar(selected_option)
         
     if st.session_state.screen == "show_blocks":
         chain = st.session_state.p2pserver.blockchain.chain
@@ -54,4 +54,4 @@ def show_blocks_news():
         # if st.button("Back"):
         #     # Set the previous screen in the session state
         #     with st.spinner("Please Wait"): 
-        #         change_screen.change_screen("main_page")
+        #         change_screen_.change_screen("main_page")

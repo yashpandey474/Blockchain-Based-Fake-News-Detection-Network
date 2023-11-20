@@ -1,6 +1,6 @@
 # from your_module import Block, config  # Import necessary modules
 import streamlit as st
-import change_screen
+import change_screen as change_screen_
 import pyblock.config as config
 from pyblock.blockchain.block import *
 import time
@@ -13,15 +13,15 @@ def block_valid():
 def propose_block():
     
     if st.session_state.screen == "propose_block":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen.change_screen_navbar(nav_selection)
+        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
+        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
+        #     change_screen_.change_screen_navbar(nav_selection)
         # st.title("You are the current block proposer.")
         
-        navigation_options = change_screen.navigation_options.get(st.session_state.user_type, ())
+        navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         selected_option = st.sidebar.radio("Navigation", navigation_options)
-        if selected_option and change_screen.screen_mapping[selected_option] != st.session_state.screen:
-            change_screen.change_screen_navbar(selected_option)
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+            change_screen_.change_screen_navbar(selected_option)
         st.markdown(
             "<h1 style='text-align: center;'>You are the current block proposer</h1>",
             unsafe_allow_html=True
@@ -113,16 +113,20 @@ def propose_block():
 
         # if st.button("Back"):
         #     with st.spinner("Please Wait"):
-        #          change_screen.change_screen("main_page")
+        #          change_screen_.change_screen("main_page")
 
 
     
 def view_block_status():
+    navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
+    selected_option = st.sidebar.radio("Navigation", navigation_options)
+    if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+        change_screen_.change_screen_navbar(selected_option)
     if st.session_state.screen == "view_block_status":
         # IF USER IS THE CURRENT BLOCK PROPOSER
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
             with st.spinner("Please Wait"):
-                 change_screen.change_screen("propose_block")
+                 change_screen_.change_screen("propose_block")
 
         
         st.title("View Current Block Status")
@@ -131,7 +135,7 @@ def view_block_status():
             st.write("A valid block has been received.")
             if st.button("Vote on Received Block"):
                 with st.spinner("Please Wait"): 
-                    change_screen.change_screen("vote_on_block")
+                    change_screen_.change_screen("vote_on_block")
 
             
         st.write("Current Block Proposer Public Key: ", st.session_state.p2pserver.block_proposer)
@@ -142,7 +146,7 @@ def view_block_status():
             
         if st.button("Back"):
             with st.spinner("Please Wait"): 
-                change_screen.change_screen("main_page")
+                change_screen_.change_screen("main_page")
 
                 
         
