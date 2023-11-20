@@ -55,12 +55,23 @@ class Accounts:
             self.accounts[address] = Account(
                 balance=balance, stake=stake, clientPort=clientPort)
 
-    def decrement_amount(self, address, amount):
-        if (amount > self.accounts[address].balance):
-            return False
+    def reduce_balance(self, address, amount, reason):
+        # Check if the decrement is successful
+        if self.decrement_amount(address, amount):
+            # Log the reputation change if the amount was successfully decremented
+            self.log_reputation_change(address, reason, amount)
+        else:
+            # Handle the case when decrement fails (e.g., due to insufficient balance)
+            print(
+                f"Failed to reduce balance for {address} due to insufficient funds.")
 
-        self.accounts[address].balance -= amount
-        return True
+    def decrement_amount(self, address, amount):
+        # Check if the account exists and has sufficient balance
+        if address in self.accounts and amount <= self.accounts[address].balance:
+            self.accounts[address].balance -= amount
+            return True
+        else:
+            return False
 
     def send_amount(self, fromaddress, toaddress, amount):
         if (amount > self.accounts[fromaddress].balance):
@@ -174,10 +185,6 @@ class Accounts:
     def add_transaction(self, transaction):
         self.accounts[transaction.sender_address].sent_transactions.add(
             transaction)
-
-    def reduce_balance(self, address, amount, reason):
-        self.accounts[address].balance -= amount
-        self.log_reputation_change(address, reason, amount)
 
     def log_reputation_change(self, address, change_string, change_amount):
         self.accounts[address].reputation_changes.append(
