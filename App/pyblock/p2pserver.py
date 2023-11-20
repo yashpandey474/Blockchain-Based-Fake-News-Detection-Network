@@ -319,13 +319,14 @@ class P2pServer:
 
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
         self.received_block.votes.add(data["address"])
+        votes = data["votes"]
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
             transaction.id: transaction for transaction in self.received_block.transactions
         }
 
-        for key, value in self.received_block.transactions:
+        for key, value in votes:
             if value == "True":
                 transactions_dict[key].positive_votes.add(data["address"])
             else:
@@ -333,7 +334,7 @@ class P2pServer:
 
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(self.received_block.transactions):
-            self.received_block.transactions[index] = transactions_dict[transaction.id]
+            self.received_block.transactions[index] = self.trasaction_dict[transaction.id]
 
     def broadcast_new_validator(self, stake):
         """
