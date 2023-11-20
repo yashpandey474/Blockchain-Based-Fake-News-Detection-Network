@@ -1,5 +1,5 @@
 import streamlit as st
-from  change_screen import *
+import change_screen
 import pandas as pd
 from datetime import datetime
 from pyblock.ipfs.ipfs_handler import *

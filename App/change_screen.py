@@ -117,6 +117,7 @@ async def watch(test):
         await asyncio.sleep(1)
         
 def change_screen(input_string):
+    print("CHANGE SCREEN CALLED ", input_string)
     if input_string == "enter":
         st.session_state.gen_key_pressed = False
         st.session_state.name = ""

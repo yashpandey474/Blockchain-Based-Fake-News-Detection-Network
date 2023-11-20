@@ -3,6 +3,10 @@ import change_screen
 
 def vote_on_block():
     if st.session_state.screen == "vote_on_block":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
+            
         # st.title("Vote on Recieved Block News.")
         st.markdown(
             "<h1 style='text-align: center;'>Vote on Received Block</h1>",

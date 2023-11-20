@@ -14,9 +14,12 @@ def reader_navbar():
 def main_page():
     user_type = st.session_state.user_type
     st.write("Welcome, " + st.session_state.name)
-    # nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
-    # if nav_selection:
-    #     change_screen.change_screen_navbar(nav_selection)
+    
+    
+    nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+    if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+        change_screen.change_screen_navbar(nav_selection)
+    
     if user_type == "Auditor":
         st.write("""As an auditor, you participate in our trusted private network. 
                      You must stake some "reputation" to become a validtor in the network. 

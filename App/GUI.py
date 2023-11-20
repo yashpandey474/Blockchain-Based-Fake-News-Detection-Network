@@ -22,17 +22,8 @@ def main():
         change_screen.screen_functions[st.session_state.screen]()
         t = st.empty()
         change_screen.add_space()
-        st.session_state.screen_changed = False
-        
-        if st.session_state.screen in change_screen.entered_pages:
-            if "selectbox" not in st.session_state:
-                st.session_state.selectbox = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()), key = f"{time.time()}")
-                
-            nav_selection = st.session_state.selectbox
-            if nav_selection:
-                print(nav_selection)
-                if change_screen.screen_mapping[nav_selection] != st.session_state.screen:
-                    change_screen.change_screen_navbar(nav_selection)
+        change_screen.add_space()
+        st.session_state.screen_changed = False       
         asyncio.run(change_screen.watch(t))
         
     else:

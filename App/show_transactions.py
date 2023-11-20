@@ -9,6 +9,9 @@ from pyblock.ipfs.ipfs_handler import *
 def show_transactions():
     
     if st.session_state.screen == "show_transac":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
         st.markdown(
             "<h1 style='text-align: center;'>Current Transactions in Mempool</h1>",
             unsafe_allow_html=True

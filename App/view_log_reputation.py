@@ -7,6 +7,9 @@ from pyblock.ipfs.ipfs_handler import *
 
 def view_log_reputation():
     if st.session_state.screen == "view_log_reputation":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
         # st.title("Log of Your Reputation Changes")
         st.markdown(
             "<h1 style='text-align: center;'>Log of Your Reputation Changes</h1>",

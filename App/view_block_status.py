@@ -13,6 +13,9 @@ def block_valid():
 def propose_block():
     
     if st.session_state.screen == "propose_block":
+        nav_selection = st.sidebar.selectbox("Navigation", change_screen.navigation_options.get(st.session_state.user_type, ()))
+        if nav_selection and change_screen.screen_mapping[nav_selection] != st.session_state.screen:
+            change_screen.change_screen_navbar(nav_selection)
         # st.title("You are the current block proposer.")
         st.markdown(
             "<h1 style='text-align: center;'>You are the current block proposer</h1>",
