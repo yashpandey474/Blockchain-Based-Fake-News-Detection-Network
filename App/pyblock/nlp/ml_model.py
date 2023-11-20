@@ -127,31 +127,17 @@ def calculate_lexical_diversity(text):
 
 
 def get_score(content):
-    # if "model" not in st.session_state:
-    # nlp = spacy.load('en_core_web_sm')
-    # nlp = nlp
-    # stemmer = PorterStemmer()
-    # stop_words = nlp.Defaults.stop_words
-    # sid = SentimentIntensityAnalyzer()
-    # # nltk.download('vader_lexicon')
-    # current_dir = os.path.dirname(os.path.abspath(__file__))
-    # model_file_path = os.path.join(current_dir, "model_1.pkl")
-
-    # with open(model_file_path, "rb") as file:
-    #     data = pickle.load(file)
-
-    # model = data["MODEL"]
-    # scaler = data["SCALER"]
     global nlp, stemmer, stop_words, sid, model, scaler
     nlp = spacy.load('en_core_web_sm')
     stemmer = PorterStemmer()
     stop_words = nlp.Defaults.stop_words
     sid = SentimentIntensityAnalyzer()
-    # nltk.download('vader_lexicon')
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    
     model_file_path = os.path.join(current_dir, "model_1.pkl")
     with open(model_file_path, "rb") as file:
         data = pickle.load(file)
+        
     model = data["MODEL"]
     scaler = data["SCALER"]
 

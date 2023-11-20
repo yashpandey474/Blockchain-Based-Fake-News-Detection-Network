@@ -44,5 +44,3 @@ def login():
         with st.spinner("Please Wait"): 
             change_screen_.change_screen("enter")
 
-    # if st.button("Ba ck"):
-    #     with st.spinner("Please Wait"): change_screen_.change_screen(st.session_state.previous_screen)

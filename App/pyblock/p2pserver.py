@@ -274,6 +274,7 @@ class P2pServer:
 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
+                self.voted = False
                 self.received_block = block
                 self.accounts.add_sent_block(block.validator, block)
 

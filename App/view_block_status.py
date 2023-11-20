@@ -11,21 +11,44 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
-    
     if st.session_state.screen == "propose_block":
-        # nav_selection = st.sidebar.selectbox("Navigation", change_screen_.navigation_options.get(st.session_state.user_type, ()))
-        # if nav_selection and change_screen_.screen_mapping[nav_selection] != st.session_state.screen:
-        #     change_screen_.change_screen_navbar(nav_selection)
-        # st.title("You are the current block proposer.")
-        
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
-        selected_option = st.sidebar.radio("Navigation", navigation_options)
-        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
+        st.markdown(
+            """
+            <style>
+            .stRadio p{
+                font-size: 20px;
+            }
+            .stRadio>label>div>p{
+                font-size: 24px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+        selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
+        if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
+            
         st.markdown(
             "<h1 style='text-align: center;'>You are the current block proposer</h1>",
             unsafe_allow_html=True
         )
+        
+        st.markdown(
+            """
+            ## Block Proposer Responsibilities
+            
+            As the block proposer in our trusted network, your role is crucial:
+            
+            - **Transaction Selection:** Choose credible transactions relevant to the network. 
+            
+            - **News Voting:** Ensure fair and accurate voting on news credibility.
+            
+            - **Block Creation:** Once satisfied, create and broadcast the block to the network.
+            
+            Remember, your actions shape the integrity of the network's information.
+            """
+        )
+        
         if st.session_state.p2pserver.received_block:
             st.write("You have already transmitted the block")
             st.write("Current Confirmations on Block: ", len(
@@ -111,27 +134,35 @@ def propose_block():
                     st.session_state.created_block = True
                     st.rerun()
 
-        # if st.button("Back"):
-        #     with st.spinner("Please Wait"):
-        #          change_screen_.change_screen("main_page")
-
-
     
 def view_block_status():
+    #RADIO BUTTONS FOR SIDEBAR
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
-    selected_option = st.sidebar.radio("Navigation", navigation_options)
+    st.markdown(
+            """
+            <style>
+            .stRadio p{
+                font-size: 20px;
+            }
+            .stRadio>label>div>p{
+                font-size: 24px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+    selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
-    if st.session_state.screen == "view_block_status":
-        # IF USER IS THE CURRENT BLOCK PROPOSER
+              
+    
+    if st.session_state.screen == "view_block_status":        
+        st.title("View Current Block Status")
+        
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
             with st.spinner("Please Wait"):
-                 change_screen_.change_screen("propose_block")
+                change_screen_.change_screen("propose_block")
 
         
-        st.title("View Current Block Status")
-
-        if st.session_state.p2pserver.received_block and block_valid():
+        if st.session_state.p2pserver.received_block and block_valid() and st.session_state.validator:
             st.write("A valid block has been received.")
             if st.button("Vote on Received Block"):
                 with st.spinner("Please Wait"): 
@@ -144,9 +175,6 @@ def view_block_status():
         else:
             st.write("No Valid Block Received yet.")
             
-        if st.button("Back"):
-            with st.spinner("Please Wait"): 
-                change_screen_.change_screen("main_page")
 
                 
         

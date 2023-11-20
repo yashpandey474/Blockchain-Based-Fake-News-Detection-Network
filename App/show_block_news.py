@@ -9,7 +9,18 @@ from pyblock.qr.transactions_info import *
 
 def show_blocks_news():
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
-    selected_option = st.sidebar.radio("Navigation", navigation_options)
+    st.markdown(
+            """
+            <style>
+            .stRadio p{
+                font-size: 20px;
+            }
+            .stRadio>label>div>p{
+                font-size: 24px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+    selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
         
@@ -17,9 +28,29 @@ def show_blocks_news():
         chain = st.session_state.p2pserver.blockchain.chain
         
         st.markdown(
-            "<h1 style='text-align: center;'>View All Verified News</h1>",
+            """
+            ## View All Verified News
+
+            Welcome to the 'View All Verified News' section.
+
+            - Navigate through the sidebar options to explore.
+            - This section presents details of all verified news available in the blockchain.
+            - The table showcases various information:
+              - Model Fake Score
+              - Percentage of Fake and True Votes
+              - Transaction and Block Creation Times
+              - IPFS Address
+              - Sender's Public Key
+              - Validator's Public Key
+              - Sender's Reputation
+              - Sign of the Sender
+            - Click the 'QR Code' button to generate a QR code for each transaction.
+
+            Dive in to explore the verified news available in the blockchain and stay informed!
+            """,
             unsafe_allow_html=True
         )
+        
         if len(chain) < 2:
             st.write("The current ledger holds no news. Please return later")
         
@@ -50,8 +81,3 @@ def show_blocks_news():
 
             st.dataframe(df, height=500)
             
-
-        # if st.button("Back"):
-        #     # Set the previous screen in the session state
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen("main_page")
