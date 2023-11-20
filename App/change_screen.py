@@ -149,7 +149,7 @@ async def watch(test):
         test.markdown(
             f"""
             <div class="time" style="font-size: 25px;text-align: center;color: black; background-color: white; style:bold;">
-                Time Remaining in Curvrent Block Proposing Period: {str(time_remaining)}
+                Time Remaining in Current Block Proposing Period: {str(time_remaining)}
             </div>
             """, unsafe_allow_html=True)
         await asyncio.sleep(1)

@@ -28,9 +28,29 @@ def show_blocks_news():
         chain = st.session_state.p2pserver.blockchain.chain
         
         st.markdown(
-            "<h1 style='text-align: center;'>View All Verified News</h1>",
+            """
+            ## View All Verified News
+
+            Welcome to the 'View All Verified News' section.
+
+            - Navigate through the sidebar options to explore.
+            - This section presents details of all verified news available in the blockchain.
+            - The table showcases various information:
+              - Model Fake Score
+              - Percentage of Fake and True Votes
+              - Transaction and Block Creation Times
+              - IPFS Address
+              - Sender's Public Key
+              - Validator's Public Key
+              - Sender's Reputation
+              - Sign of the Sender
+            - Click the 'QR Code' button to generate a QR code for each transaction.
+
+            Dive in to explore the verified news available in the blockchain and stay informed!
+            """,
             unsafe_allow_html=True
         )
+        
         if len(chain) < 2:
             st.write("The current ledger holds no news. Please return later")
         
