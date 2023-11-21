@@ -79,6 +79,9 @@ class Accounts:
 
         self.log_reputation_change(
             toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
+        self.log_reputation_change(
+            fromaddress, f"Transaction Fee deducted",  -amount)
+        
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
