@@ -69,9 +69,7 @@ class P2pServer:
             reply = zmq_socket.recv_string()
             print(f"Received reply from {clientPort}: {reply}")
         except Exception as e:
-            # if e.errno == zmq.ETIMEDOUT:
-            #     print("TIMED OUT\n")
-            logging.error(f"Error communicating with {clientPort}: {e}")
+            reply = f"Failed to send message {message} to {clientPort}: {e}"
         finally:
             zmq_socket.close()
         return reply
@@ -165,9 +163,21 @@ class P2pServer:
         encrypted_message = self.get_encrypted_message(message)
         print(f"Peers: {self.peers}")
         for (clientPort, data) in self.peers.copy().items():
-            responses.append(self.private_send_message(
-                clientPort, encrypted_message))
+            if (clientPort != self.myClientPort):
+                responses.append(self.private_send_message(
+                    clientPort, encrypted_message))
+            else:
+                responses.append(self.privateSendToSelf(encrypted_message))
+
         return responses
+
+    def privateSendToSelf(self, message):
+        print("Sending private message to self")
+        try:
+            self.message_received(message)
+            return f"Private..Successfully received message {message}. Sent from {self.myClientPort}"
+        except Exception as e:
+            return f"Failed to send message {message} to self: {e}"
 
     def send_direct_encrypted_message(self, message, clientPort):
         print("Sending direct message")
