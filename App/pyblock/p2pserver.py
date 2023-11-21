@@ -253,8 +253,7 @@ class P2pServer:
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
             print(self.accounts.to_json())
-            self.transaction_pool.from_json(
-                json_data=data["transaction_pool"])
+            self.transaction_pool = TransactionPool.from_json(data["transaction_pool"])
             print("REPLACED TRANSACTION POOL")
             print(self.transaction_pool)
 
