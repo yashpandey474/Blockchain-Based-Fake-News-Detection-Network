@@ -34,7 +34,6 @@ logging.basicConfig(level=logging.INFO)
 server_url = 'http://65.1.130.255/app'  # Local server URL
 send_timeout = 5000
 receive_timeout = 5000
-heartbeat_interval = 10
 heartbeat_timeout = 30  # seconds, adjust as needed
 
 
@@ -52,6 +51,7 @@ class P2pServer:
         self.myClientPort = 0
         self.context = zmq.Context()
         self.heartbeat_manager = None
+        self.isUsingTCP = False
 
     def private_send_message(self, clientPort, message):
         reply = None

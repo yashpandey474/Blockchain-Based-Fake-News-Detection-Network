@@ -7,7 +7,7 @@ import logging
 from pyblock.blockchain.account import *
 receive_timeout = 1000
 send_timeout = 1000
-heartbeat_interval = 5
+heartbeat_interval = 10
 logging.basicConfig(level=logging.INFO)
 
 
