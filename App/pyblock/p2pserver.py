@@ -307,28 +307,34 @@ class P2pServer:
             self.block_proposer = data["address"]
 
     def handle_votes(self, data):
-        # Check if the vote is valid [from an active validator]
+        # CHECK IF THE VOTE IS VALID [FROM AN ACTIVE VALIDATOR]
         if not self.accounts.accounts[data["address"]].isActive or not self.accounts.accounts[data["address"]].isValidator:
             print("INVALID VOTE")
             return
 
-        # If not current block
+        # IF NOT CURRENT BLOCK
         if data["block_index"] != self.received_block.index:
             print("OLD VOTE RECEIVED")
             return
 
-        # Increment number of votes for the block
+        # INCREMENT NUMBER OF VOTES FOR THE BLOCK
         self.received_block.votes.add(data["address"])
         votes = data["votes"]
 
-        # Increment votes for the transactions
+        # INCREMENT VOTES FOR THE TRANSACTIONS
+        transactions_dict = {
+            transaction.id: transaction for transaction in self.received_block.transactions
+        }
+
         for key, value in votes:
             if value == "True":
-                self.received_block.transactions_dict[key].positive_votes.add(
-                    data["address"])
+                transactions_dict[key].positive_votes.add(data["address"])
             else:
-                self.received_block.transactions_dict[key].negative_votes.add(
-                    data["address"])
+                transactions_dict[key].negative_votes.add(data["address"])
+
+        # JUST IN CASE OF PASS BY VALUE
+        for index, transaction in enumerate(self.received_block.transactions):
+            self.received_block.transactions[index] = self.trasaction_dict[transaction.id]
 
     def broadcast_new_validator(self, stake):
         """

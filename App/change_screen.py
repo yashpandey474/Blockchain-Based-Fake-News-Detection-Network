@@ -97,7 +97,7 @@ if "validator" not in st.session_state:
     st.session_state.validator = False
 
 navigation_options = {
-    "Reader": ("Main Page", "Upload News", "View Verified News", "View Account Info", "View Sent News", "View Reputation Log", "Enter Page"),
+    "Reader": ("Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Enter Page"),
     "Auditor": (
         "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
         ("Modify Stake" if st.session_state.validator else "Become a Validator"),
