@@ -59,7 +59,7 @@ class Accounts:
         # Check if the decrement is successful
         if self.decrement_amount(address, amount):
             # Log the reputation change if the amount was successfully decremented
-            self.log_reputation_change(address, reason, amount)
+            self.log_reputation_change(address, reason, -amount)
         else:
             # Handle the case when decrement fails (e.g., due to insufficient balance)
             print(
@@ -132,7 +132,7 @@ class Accounts:
                 )
 
                 self.log_reputation_change(
-                    news_transaction.sender_address, "News Broadcasted Voted Fake", penalty_amount)
+                    news_transaction.sender_address, "News Broadcasted Voted Fake", -penalty_amount)
 
                 # IF MODEL AGREED WITH MAJORITY
                 if news_transaction.model_score >= 0.5:
