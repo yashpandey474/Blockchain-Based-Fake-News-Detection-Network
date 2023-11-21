@@ -270,7 +270,6 @@ class P2pServer:
             # CHECK VALIDITY OF BLOCK & ITS TRANSACTIONS
             if (self.blockchain.is_valid_block(
                     block, self.transaction_pool, self.accounts)):
-                
 
                 # SET RECIEVED FLAG TO ALLOW VOTING
                 self.block_received = True
@@ -308,8 +307,8 @@ class P2pServer:
             self.block_proposer = data["address"]
 
     def handle_votes(self, data):
-        # CHECK IF THE VOTE IS VALID
-        if not self.accounts.check_if_active(data["address"]):
+        # CHECK IF THE VOTE IS VALID [FROM AN ACTIVE VALIDATOR]
+        if not self.accounts.accounts[data["address"]].isActive or not self.accounts.accounts[data["address"]].isValidator:
             print("INVALID VOTE")
             return
 
@@ -320,13 +319,14 @@ class P2pServer:
 
         # INCREMENT NUMBER OF VOTES FOR THE BLOCK
         self.received_block.votes.add(data["address"])
+        votes = data["votes"]
 
         # INCREMENT VOTES FOR THE TRANSACTIONS
         transactions_dict = {
             transaction.id: transaction for transaction in self.received_block.transactions
         }
 
-        for key, value in self.received_block.transactions:
+        for key, value in votes:
             if value == "True":
                 transactions_dict[key].positive_votes.add(data["address"])
             else:
@@ -334,7 +334,7 @@ class P2pServer:
 
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(self.received_block.transactions):
-            self.received_block.transactions[index] = transactions_dict[transaction.id]
+            self.received_block.transactions[index] = self.trasaction_dict[transaction.id]
 
     def broadcast_new_validator(self, stake):
         """
@@ -424,3 +424,19 @@ class P2pServer:
         # self.message_received(None, None, message)
 
         self.broadcast_message(message_content)
+
+    def endserver(self):
+        self.heartbeat_manager.stop()
+        self.heartbeat_manager = None
+        self.peers = {}
+        self.myClientPort = 0
+        self.block_proposer = None
+        self.block_received = None
+        self.received_block = None
+        self.blockchain = Blockchain()
+        self.transaction_pool = TransactionPool()
+        self.wallet = Wallet(
+            private_key=None, name=None, email=None
+        )
+        self.context.destroy()
+        self.accounts = Accounts()

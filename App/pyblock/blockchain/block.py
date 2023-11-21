@@ -110,7 +110,7 @@ class Block:
         - Block: The genesis block.
         """
         return Block(
-            timestamp=1700289379.599529,
+            timestamp=1700289379,
             last_hash="0000",
             transactions=[],
             validator="Creators",
@@ -148,11 +148,12 @@ class Block:
         - ValueError: If the input parameters are invalid.
         """
         try:
-            timestamp = time.time()
+            timestamp = int(time.time())
             last_hash = Block.block_hash(lastBlock)
             validator = wallet.get_public_key()
             block = Block(timestamp, last_hash, data,
                           validator, len(blockchain.chain) + 1)
+            block.transactions = data
             block.signature = Block.getBlockSignature(block, wallet)
             logging.info(f"Block {block.index} created.")
             return block

@@ -172,3 +172,8 @@ class HeartbeatManager:
 
     def run(self):
         self.start_heartbeat_server()
+
+    def stop(self):
+        print("Stopping heartbeat manager")
+        self.context.destroy()
+        print("Heartbeat manager stopped")

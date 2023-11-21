@@ -18,7 +18,7 @@ from enter import *
 import time
 import asyncio
 
-auditors_guidelines =         """
+auditors_guidelines = """
         ### Auditor Guidelines
         
         As an auditor, you play a vital role in our trusted private network. Here's what you do:
@@ -31,7 +31,7 @@ auditors_guidelines =         """
         
         Your contributions help maintain network integrity and ensure the authenticity of shared news.
 """
-    
+
 
 readers_guidelines = """
 ### Guidelines for Readers:
@@ -95,9 +95,9 @@ entered_pages = set([
 
 if "validator" not in st.session_state:
     st.session_state.validator = False
-    
+
 navigation_options = {
-    "Reader": ("Main Page", "Upload News", "View Verified News", "View Account Info", "View Sent News", "View Reputation Log", "Enter Page"),
+    "Reader": ("Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Enter Page"),
     "Auditor": (
         "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
         ("Modify Stake" if st.session_state.validator else "Become a Validator"),
@@ -107,47 +107,51 @@ navigation_options = {
 }
 
 screen_mapping = {
-        "Main Page": "main_page",
-        "Upload News": "upload_file",
-        "Verified News": "show_blocks",
-        "Account Info": "account_info",
-        "Sent News": "view_sent_news",
-        "Reputation Log": "view_log_reputation",
-        "Transactions in Mempool": "show_transac",
-        "Modify Stake": "become_validator" if st.session_state.validator else None,
-        "Become a Validator": "become_validator" if not st.session_state.validator else None,
-        "Current Block Status": "view_block_status",
-        "Broadcasted Blocks": "view_sent_blocks",
-        "Enter Page": "enter"
-    }
+    "Main Page": "main_page",
+    "Upload News": "upload_file",
+    "Verified News": "show_blocks",
+    "Account Info": "account_info",
+    "Sent News": "view_sent_news",
+    "Reputation Log": "view_log_reputation",
+    "Transactions in Mempool": "show_transac",
+    "Modify Stake": "become_validator",
+    "Become a Validator": "become_validator",
+    "Current Block Status": "view_block_status",
+    "Broadcasted Blocks": "view_sent_blocks",
+    "Enter Page": "enter"
+}
+
 
 def add_space():
-    #ADD SPACE
+    # ADD SPACE
     for i in range(30):
         st.empty()
-        
-def change_screen_navbar(nav_selection):    
-        # Map the nav_selection to corresponding actions
+
+
+def change_screen_navbar(nav_selection):
+    # Map the nav_selection to corresponding actions
     screen = screen_mapping.get(nav_selection)
 
     if screen:
         if nav_selection == "Modify Stake" or nav_selection == "Become a Validator":
             st.session_state.stake_submitted = False
-            
+
         if nav_selection == "Upload News":
             st.session_state.upload_file_executed = False
 
         with st.spinner("Please Wait"):
             change_screen(screen)
-            
+
+
 async def watch(test):
     while True:
         if st.session_state.screen_changed:
             break
-        
+
         current_time = int(time.time())
         time_elapsed = current_time - START_TIME.timestamp()
-        time_remaining = BLOCK_VALIDATOR_CHOOSE_INTERVAL - (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
+        time_remaining = BLOCK_VALIDATOR_CHOOSE_INTERVAL - \
+            (time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL)
         test.markdown(
             f"""
             <div class="time" style="font-size: 25px;text-align: center;color: black; background-color: white; style:bold;">
@@ -155,7 +159,8 @@ async def watch(test):
             </div>
             """, unsafe_allow_html=True)
         await asyncio.sleep(1)
-        
+
+
 def change_screen(input_string):
     print("CHANGE SCREEN CALLED ", input_string)
     if input_string == "enter":
@@ -164,7 +169,7 @@ def change_screen(input_string):
         st.session_state.email = ""
         st.session_state.initialise = False
         st.session_state.user_type = "Reader"
-    
+
     st.session_state.screen_changed = True
     st.session_state.previous_screen = st.session_state.screen
     st.session_state.screen = input_string
