@@ -18,8 +18,11 @@ class TransactionPool:
         return False if len(self.transactions) == 0 else (min(self.transactions, key=lambda tx: tx.timestamp).timestamp <= timestamp)
 
     @staticmethod
-    def from_json(self, json_data):
-        self.transactions = {Transaction.from_json(tx) for tx in json_data}
+    def from_json(json_data):
+        transactions = set([Transaction.from_json(tx) for tx in json_data])
+        pool = TransactionPool()
+        pool.transactions = transactions
+        return pool
 
     def add_transaction(self, transaction):
         # ADD A TRANSACTION TO SET
