@@ -23,16 +23,13 @@ def view_sent_news():
             
         st.markdown(
             """
-            ## Current Transactions in Mempool
+            ## News Broadcasted by You
 
-            Welcome to the 'Current Transactions in Mempool' section.
+            Welcome to the 'News Broadcasted' section.
 
-            - View the current transactions pending in the network's mempool.
-            - Each transaction contains various details such as the sender's reputation, stake, model score, etc.
+            - View the transactions you have broadcasted to the network.
             - Review the transaction details and their associated content.
-            - Explore the titles and text to identify pending news in the network's mempool.
             
-            Stay updated with the latest transactions within the network!
             """,
             unsafe_allow_html=True
         )
