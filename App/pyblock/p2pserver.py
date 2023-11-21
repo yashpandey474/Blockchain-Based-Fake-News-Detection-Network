@@ -390,7 +390,7 @@ class P2pServer:
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
             "accounts": self.accounts.to_json(),
-            "transaction_pool": TransactionPool.to_json(self.transaction_pool)
+            "transaction_pool": self.transaction_pool.to_json()
         }
         self.send_direct_encrypted_message(
             message=message, clientPort=clientPort)

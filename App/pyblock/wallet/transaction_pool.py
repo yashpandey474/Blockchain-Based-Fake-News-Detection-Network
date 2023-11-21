@@ -9,6 +9,7 @@ class TransactionPool:
         # SET OF TRANSACTIONS
         self.transactions = set()
 
+    @staticmethod
     def to_json(self):
         return [tx.to_json() for tx in self.transactions]
 
@@ -16,6 +17,7 @@ class TransactionPool:
         # GET THE OLDEST TRANSACTION
         return False if len(self.transactions) == 0 else (min(self.transactions, key=lambda tx: tx.timestamp).timestamp <= timestamp)
 
+    @staticmethod
     def from_json(self, json_data):
         self.transactions = {Transaction.from_json(tx) for tx in json_data}
 

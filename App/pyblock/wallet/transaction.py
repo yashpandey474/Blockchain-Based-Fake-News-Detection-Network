@@ -20,6 +20,7 @@ class Transaction:
         self.timestamp = int(time.time())
         self.fee = 0
 
+    
     def to_json(self):
         return {
             "id": str(self.id),
