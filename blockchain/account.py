@@ -1,4 +1,5 @@
 import random
+from blockchain.block import Block
 import extra.config as config
 import logging
 from wallet.transaction import Transaction
@@ -48,8 +49,9 @@ class Accounts:
             deserialized_transactions = [
                 Transaction.from_json(tx_json) for tx_json in serialized_transactions]
             account_data['sent_transactions'] = set(deserialized_transactions)
-            account_data['sent_blocks'] = set(
-                account_data.get('sent_blocks', []))
+            serialized_blocks = account_data.get("sent_blocks", [])
+            deserialized_blocks = [Block.from_jsono(block) for block in serialized_blocks]
+            account_data['sent_blocks'] = set(deserialized_blocks)
             self.accounts[address] = Account(**account_data)
 
     def initialize(self, address, balance=config.DEFAULT_BALANCE["Reader"], stake=0, clientPort=None):
