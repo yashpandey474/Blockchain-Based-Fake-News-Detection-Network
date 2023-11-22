@@ -166,7 +166,6 @@ blocks_broadcasted_message = """
 
             """
 
-# General Message for the Enter Page
 navbar_style = """
             <style>
             .stRadio p{
@@ -202,6 +201,7 @@ reputation_log_message = """
     Below is a table displaying the details of your reputation changes:
     """
     
+# General Message for the Enter Page
 enter_page_message = """
 ### Welcome to our Consortium Blockchain Network!
 
