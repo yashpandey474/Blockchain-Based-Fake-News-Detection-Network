@@ -46,7 +46,9 @@ def view_sent_news():
             table_data = []
             for transaction in sent_transactions:
                 content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
+                status = st.session_state.p2pserver.transaction_pool.transaction_exist(transaction)
                 table_data.append({
+                    "Status": ("Unconfirmed" if status else "Added To Network Blockchain."),
                     "Model Score": transaction.model_score,
                     "Transaction Fee": transaction.fee,
                     "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),

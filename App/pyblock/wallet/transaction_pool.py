@@ -36,13 +36,18 @@ class TransactionPool:
 
         return True
 
+    def transaction_exist(self, transaction):
+        if transaction.id not in set(t.id for t in self.transactions):
+            return False
+
+        return True
     def verify_transactions_exist(self, transactions):
         # VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED
         for transaction in transactions:
             # IF NOT IN MEMPOOL OR NOT VALID
-            if transaction.id not in set(t.id for t in self.transactions):
-                print("TRANSACTION NOT IN SET")
+            if not self.transaction_exist(transaction):
                 return False
+            
 
             if not Transaction.verify_transaction(transaction):
                 print("VERIFICATION OF TRANSACTION FAILED")
