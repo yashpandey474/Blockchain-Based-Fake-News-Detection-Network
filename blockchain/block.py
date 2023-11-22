@@ -117,7 +117,6 @@ class Block:
             index=1
         )
 
-
     @staticmethod
     def create_block(lastBlock, data, wallet, blockchain):
         """
