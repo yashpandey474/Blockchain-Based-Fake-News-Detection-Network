@@ -44,7 +44,7 @@ screen_functions = {
 
 background_style = '''<style>
 div appview-container{
-background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTILWV2p_g-wlz5kLtOQKt_Lu49kR52EJbMf1eDIhBgGM_qocx4Ye5YLdsDBb4IuNyhYEw");
+background-image: url("https://i.gifer.com/5ARz.gif");
 background-size: cover;
 background-position: center;
 }
@@ -60,7 +60,7 @@ def main():
         change_screen_.add_space()
         change_screen_.add_space()
         st.session_state.screen_changed = False       
-        # asyncio.run(change_screen_.watch(t))
+        asyncio.run(change_screen_.watch(t))
         
     else:
         change_screen_.screen_functions["enter"]()
