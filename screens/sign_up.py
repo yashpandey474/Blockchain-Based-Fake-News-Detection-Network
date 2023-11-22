@@ -3,8 +3,10 @@ import re
 from extra import crypto_logic
 from enter import initialise
 import screens.change_screen as change_screen_
+import time
 
 def sign_up_generate():
+    
     if st.session_state.screen == "sign_up_generate":
         st.markdown(
             f"<h1 style='text-align: center;'>Sign Up as a {st.session_state.user_type}</h1>",
