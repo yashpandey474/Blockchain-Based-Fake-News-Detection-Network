@@ -130,8 +130,7 @@ class Accounts:
                         )
             # IF MAJORITY VOTED "FAKE"
             if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
-                penalty_amount = self.accounts[news_transaction.sender_address].balance * \
-                    config.SENDER_PENALTY_PERCENT//100
+                penalty_amount = self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT//100
 
                 self.accounts[news_transaction.sender_address].balance -= (
                     penalty_amount
