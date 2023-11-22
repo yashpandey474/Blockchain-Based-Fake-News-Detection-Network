@@ -36,16 +36,17 @@ class Blockchain:
         #IF SMALLER CHAIN; NEVER REPLACE
         if len(new_chain) <= len(self.chain):
             print("Received chain is not longer than the current chain")
-            return
+            return False
         
         #CHECK IF CHAIN IS VALID
         elif not self.is_valid_chain(new_chain):
             print("Received chain is invalid")
-            return
+            return False
 
         print("Replacing the current chain with new chain")
         #REPLACE THE CHAIN
         self.chain = new_chain
+        return True
 
     #GET ACCOUNT BALANCE FROM PUBLIC KEY
     def get_balance(self, public_key):

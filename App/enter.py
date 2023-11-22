@@ -66,8 +66,15 @@ def initialise(private_key=None):
 
         p2p_thread.start()
         background_thread.start()
-
+        
         st.session_state.initialise = True
+        
+        #ALSO WAIT TILL P2PSERVER GETS THE INITIALISED TRANSACTION POOL
+        # while not st.session_state.p2pserver.initialised:
+        #     time.sleep(1)
+
+        #STANDARD SLEEP TIME TO GET LATEST ACCOUNTS AND TRANSACTION POOL
+        time.sleep(4)
 
         print("EVERYTHING INITIALIZED")
 
