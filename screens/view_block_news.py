@@ -39,6 +39,7 @@ def show_blocks_news():
                         "Total Votes": len(transaction.positive_votes) + len(transaction.negative_votes),
                         "Percent of Fake Votes": str(percent_fake_votes) + "%",
                         "Percent of True Votes": str(100 - percent_fake_votes)  + "%",
+                        "Content URL": "https://" + transaction.ipfs_address + ".ipfs.dweb.link",
                         "ID": transaction.id,
                         "Transaction Creation Time": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                         "Block Creation Time": datetime.fromtimestamp(block.timestamp).strftime("%I:%M %p on %d %B, %Y"),
