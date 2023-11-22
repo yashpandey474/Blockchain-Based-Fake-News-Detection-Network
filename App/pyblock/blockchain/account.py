@@ -27,9 +27,8 @@ class Account:
             "stake": self.stake,
             "clientPort": self.clientPort,
             "isValidator": self.isValidator,
-            # Convert set to list for JSON serialization
             "sent_transactions": [tx.to_json() for tx in self.sent_transactions],
-            "sent_blocks": list(self.sent_blocks),
+            "sent_blocks": [block.to_json()for block in self.sent_blocks],
             "reputation_changes": self.reputation_changes
         }
 
