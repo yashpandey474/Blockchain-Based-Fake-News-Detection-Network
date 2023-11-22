@@ -191,7 +191,7 @@ class Block:
 
     @staticmethod
     def verify_block(block):
-
+        print("VERIFYING BLOCK " + str(block.index) + "...")
         block_data = {
             "timestamp": block.timestamp,
             "last_hash": block.last_hash,
