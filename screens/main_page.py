@@ -14,6 +14,7 @@ def main_page():
     st.markdown(
             change_screen_.navbar_style, unsafe_allow_html=True)
     selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
+    
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
         

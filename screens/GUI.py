@@ -42,15 +42,15 @@ screen_functions = {
 
 
 
-background_style = '''<style>
-div appview-container{
-background-image: url("https://i.gifer.com/5ARz.gif");
-background-size: cover;
-background-position: center;
-}
-</style>
+background_style = '''
+    <style>
+       div .appview-content {
+            background-image: url("https://i.gifer.com/5ARz.gif");
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 '''
-
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
@@ -70,7 +70,7 @@ def main():
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
-    st.markdown(background_style, unsafe_allow_html=True)
+
     st.markdown(
         "<h1 style='text-align: center;'>Fake News Detection System Utilising Blockchain</h1>",
         unsafe_allow_html=True
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     st.markdown(
     """
     <style>
-    stButton>button {
+    .stButton>button {
         width: 350px;
         height: 100px;
         text-align: center;
@@ -86,16 +86,25 @@ if __name__ == "__main__":
         margin: 0 auto;
         padding: 0;
     }
-    stButton p{
+    .stButton p{
         font-size: 20px;
         style: bold;
         font-weight: 800;
         font-family: "Calibri";
     }
+    
+    div .appview-container {
+            background-image: url("https://i.gifer.com/5ARz.gif");
+            background-size: cover;
+            background-position: center;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
-)
+    )
+    
+    
     
     
     if "screen" not in st.session_state:
