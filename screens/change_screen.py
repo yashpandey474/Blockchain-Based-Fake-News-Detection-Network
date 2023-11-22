@@ -219,7 +219,7 @@ navigation_options = {
     "Reader": ("Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log"),
     "Auditor": (
         "Main Page", "Upload News", "Verified News", "Account Info", "Sent News", "Reputation Log", "Transactions in Mempool",
-        ("Modify Stake" if st.session_state.validator else "Become a Validator"),
+        "Manage Stake in Network",
         "Current Block Status", "Broadcasted Blocks"
     )
 }

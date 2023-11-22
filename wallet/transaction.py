@@ -118,7 +118,7 @@ class Transaction:
                         "Transaction Creation Time": {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},
                         "Sender Reputation": {transaction.sender_reputation}
                 """
-
+    
     @staticmethod
     def verify_transaction(transaction, error_bound: float = 0.1):
         # HASH THE TRANSACTION WITH SIGNATURE AS NONE

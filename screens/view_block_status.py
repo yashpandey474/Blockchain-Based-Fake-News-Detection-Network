@@ -53,9 +53,11 @@ def propose_block():
                     
                     #SHOW IMPORTANT DATA RELATED TO TRANSACTION
                     st.markdown(
-                        f"""<span><b>Model Fake Score: {transaction.model_score},<br>
+                        f"""<span><b>
+                            Model Fake Score: {transaction.model_score},<br>
                             Transaction Creation Time: {datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y")},<br>
-                            Sender Reputation: {transaction.sender_reputation}</b></span>"""       , unsafe_allow_html=True)
+                            Sender Reputation: {transaction.sender_reputation}<br>
+                            Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link</b></span>"""       , unsafe_allow_html=True)
 
                     #WHETHER TO INCLUDE IN BLOCK OR NOT
                     include_value = st.radio("Include Transaction in Block?", [
