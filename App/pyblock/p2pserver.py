@@ -256,7 +256,6 @@ class P2pServer:
             if not ret:
                 return
             
-            
             print("REPLACED CHAIN")
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
@@ -318,9 +317,10 @@ class P2pServer:
             self.heartbeat_manager.addToClients(clientPort, data["public_key"])
             self.accounts.addANewClient(
                 address=data["public_key"], clientPort=clientPort, userType=self.user_type)
+            
             if (clientPort != self.myClientPort):
                 self.send_chain(clientPort)
-                self.send_current_block_proposer(clientPort)
+
 
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)

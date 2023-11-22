@@ -8,41 +8,13 @@ def vote_on_block():
         navigation_options = change_screen_.navigation_options.get(
             st.session_state.user_type, ())
         st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio(
             "\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
 
-        st.markdown(
-            """
-    # Vote on Received Block
-
-    This section allows you to vote on the block proposed within the network.
-
-    ## Block Information:
-
-    Here are the details of the proposed block:
-
-    - **Validator:** [Validator's Public Key]
-    - **Timestamp:** [Timestamp of Block]
-    - **Validator Reputation:** [Validator's Reputation]
-
-    ## Transactions in Block:
-
-    Below, you'll find the transactions included in the proposed block along with their details:
-
-    """
-        )
+        st.markdown(change_screen_.vote_on_block_message)
 
         if not st.session_state.p2pserver.received_block:
             st.write("No valid block received yet.")

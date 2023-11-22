@@ -7,35 +7,13 @@ def show_account_info():
     if st.session_state.screen == "account_info":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
-            """
-            ## ACCOUNT INFORMATION
-
-            Welcome to the Account Information section.
-
-            Here, you can find details about your account on the network:
-            - **Reputation**: Your current reputation calculated as the sum of your balance and stake.
-            - **Balance**: The current balance available in your account.
-            - **Stake (for Auditors)**: If you're an auditor, this displays your stake in the network.
-            - **Private Key**: Click to view your private key (This should be kept confidential).
-            - **Public Key**: View your public key for identification in the network.
-
-            Keep your private key secure and never share it with anyone!
-            """
+            change_screen_.view_account_info_message
         )
         
         #GET USER'S DETAILS

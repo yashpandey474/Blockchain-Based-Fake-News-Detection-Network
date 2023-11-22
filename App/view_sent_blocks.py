@@ -8,31 +8,13 @@ def view_sent_blocks():
     if st.session_state.screen == "view_sent_blocks":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
             
         st.markdown(
-            """
-            # Blocks Broadcasted by You
-
-            This page displays the blocks that you have broadcasted within the network.
-
-            ## Block Broadcast Log:
-
-            Below is a log containing the details of blocks you've broadcasted:
-
-            """
+            change_screen_.blocks_broadcasted_message
         )
         
         blocks = st.session_state.p2pserver.accounts.accounts[
@@ -56,11 +38,8 @@ def view_sent_blocks():
         """
         The table showcases each block's timestamp, the number of votes it received, and its current status within the network.
         """
-    )
+        )
             
-        # if st.button("Back"):
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen("main_page")
             
             
         

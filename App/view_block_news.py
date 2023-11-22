@@ -10,16 +10,7 @@ from pyblock.qr.transactions_info import *
 def show_blocks_news():
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
     selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
@@ -28,25 +19,7 @@ def show_blocks_news():
         chain = st.session_state.p2pserver.blockchain.chain
         
         st.markdown(
-            """
-            ## View All Verified News
-
-            Welcome to the 'View All Verified News' section.
-
-            - Navigate through the sidebar options to explore.
-            - This section presents details of all verified news available in the blockchain.
-            - The table showcases various information:
-              - Model Fake Score
-              - Percentage of Fake and True Votes
-              - Transaction and Block Creation Times
-              - IPFS Address
-              - Sender's Public Key
-              - Validator's Public Key
-              - Sender's Reputation
-            - Click the 'QR Code' button to generate a QR code for each transaction.
-
-            Dive in to explore the verified news available in the blockchain and stay informed!
-            """,
+            change_screen_.view_block_news_message,
             unsafe_allow_html=True
         )
         
