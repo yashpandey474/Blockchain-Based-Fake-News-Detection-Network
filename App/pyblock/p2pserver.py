@@ -51,7 +51,6 @@ class P2pServer:
         self.myClientPort = 0
         self.context = zmq.Context()
         self.heartbeat_manager = None
-        self.isUsingTCP = False
 
     def private_send_message(self, clientPort, message):
         reply = None
@@ -138,7 +137,7 @@ class P2pServer:
         self.get_peers()
         print("Starting heartbeat manager")
         self.heartbeat_manager = HeartbeatManager(
-            myClientPort=self.myClientPort, context=self.context, peers=self.peers, server_url=server_url, accounts=self.accounts)
+            myClientPort=self.myClientPort, peers=self.peers, server_url=server_url, accounts=self.accounts)
         heartbeat_thread = threading.Thread(
             target=self.heartbeat_manager.run, daemon=True)
         heartbeat_thread.start()
