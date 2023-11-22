@@ -54,7 +54,7 @@ def show_account_info():
         
         
         with st.expander("Click to view private key"):
-            st.write(private_key)
+            st.write(private_key.replace("\n", "<br>"))
             
         with st.expander("Click to view public key"):
-            st.write(public_key)
+            st.write(public_key.replace("\n", "<br>"))
