@@ -1,6 +1,5 @@
 # SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
 from datetime import datetime
-import streamlit as st
 from .qr_handler import make_qr
 
 def show_transaction(transaction, show = 0):
@@ -16,4 +15,4 @@ Sender Reputation: {transaction.sender_reputation},
 Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link
     """
 
-    return make_qr(data, show)
+    return make_qr(data, show, transaction.ipfs_address)

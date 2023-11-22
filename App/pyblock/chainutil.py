@@ -1,7 +1,5 @@
-from nacl.secret import SecretBox
-from nacl.utils import random
-from nacl.encoding import HexEncoder, RawEncoder
-from nacl.signing import SigningKey, VerifyKey
+from nacl.encoding import HexEncoder
+from nacl.signing import SigningKey
 import hashlib
 import time
 import uuid
@@ -11,9 +9,7 @@ import pyblock.config as config
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
 import binascii
-# from blockchain.block import *
 
 
 class ChainUtil:

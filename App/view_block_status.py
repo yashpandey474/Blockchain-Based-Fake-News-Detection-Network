@@ -14,16 +14,7 @@ def propose_block():
     if st.session_state.screen == "propose_block":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
@@ -34,19 +25,7 @@ def propose_block():
         )
         
         st.markdown(
-            """
-            ## Block Proposer Responsibilities
-            
-            As the block proposer in our trusted network, your role is crucial:
-            
-            - **Transaction Selection:** Choose credible transactions relevant to the network. 
-            
-            - **News Voting:** Ensure fair and accurate voting on news credibility.
-            
-            - **Block Creation:** Once satisfied, create and broadcast the block to the network.
-            
-            Remember, your actions shape the integrity of the network's information.
-            """
+            change_screen_.view_block_status_message
         )
         
         if st.session_state.p2pserver.received_block:
@@ -131,16 +110,7 @@ def view_block_status():
     #RADIO BUTTONS FOR SIDEBAR
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
     selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)

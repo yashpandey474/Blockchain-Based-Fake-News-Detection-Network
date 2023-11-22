@@ -1,14 +1,6 @@
 from Crypto.PublicKey import RSA
-from ..chainutil import ChainUtil
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
-# from .transaction import Transaction
-# from .transaction_pool import TransactionPool
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pyblock.blockchain.blockchain import Blockchain
 
 
 class Wallet:

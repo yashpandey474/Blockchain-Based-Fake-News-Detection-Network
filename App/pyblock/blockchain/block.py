@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import numpy as np
 # Assuming ChainUtil.py exists in the same directory
 from pyblock.chainutil import ChainUtil
 import time

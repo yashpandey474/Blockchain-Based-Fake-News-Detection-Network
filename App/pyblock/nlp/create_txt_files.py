@@ -1,5 +1,5 @@
 import pandas as pd
-df = pd.read_csv("/Users/kpandey/Desktop/3-1/Blockchain Technology/Project/BlockchainProject2/WELFake_Dataset.csv")
+df = pd.read_csv("./WELFake_Dataset.csv")
 n = 4
 for index, row in df.iterrows():
     if index >= n:

@@ -7,16 +7,7 @@ def become_validator():
         
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
@@ -41,7 +32,7 @@ def become_validator():
 
     ## Your Current Status:
 
-    - **User Type:** {st.session_state.user_type}]
+    - **User Type:** {st.session_state.user_type}
     - **Current Balance:** {st.session_state.balance}
     - **Minimum Stake Required:** {config.MIN_STAKE}
 

@@ -7,37 +7,14 @@ def upload_file():
 
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
     st.markdown(
-            """
-            <style>
-            .stRadio p{
-                font-size: 20px;
-            }
-            .stRadio>label>div>p{
-                font-size: 24px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            change_screen_.navbar_style, unsafe_allow_html=True)
     selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
     if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
         change_screen_.change_screen_navbar(selected_option)
         
     if st.session_state.screen == "upload_file":
         st.markdown(
-    """
-    ## Upload News Guidelines
-    
-    As an anonymous user or an auditor of the network, you have the privilege to upload news to the network. 
-    Please ensure the following when uploading news:
-    
-    - **File Format:** Upload a text file (.txt) containing the news article or information.
-    
-    - **Transaction Fee:** Optionally, you can include a transaction fee to prioritize your news on the network. 
-      Ensure the fee is within your available balance.
-    
-    - **Authentication:** Anonymous uploaders must abide by network guidelines and refrain from uploading fake news as this would lead to reputation penalties.
-    
-    By contributing news, you help maintain a diverse and informative network for all users.
-    """
+            change_screen_.upload_file_message
         )
         if not st.session_state.get("upload_file_executed", False):
             uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
