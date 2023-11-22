@@ -2,14 +2,13 @@
 .vscode
 __pycache__/
 venv/
-pyblock/config.py
 wallet/__pycache__
 WELFake_Dataset.csv
 temp.txt
 App/pyblock/peers.py
 App/pyblock/ipfs/nan.txt
 test/
-qr.png
+*.png
 Dataset/
 test.py
-config.py
+.idea/
