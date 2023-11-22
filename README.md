@@ -7,9 +7,18 @@ This project develops a blockchain-based network for detecting fake news, levera
 ## Running the Project
 
 1. Clone the repository locally.
-2. Run the following command in your command line interface: streamlit run App/GUI.py
-3. Choose to act in the network as an auditor or reader
-4. For a proof-of-concept authentication as an auditor, provide a certificate-id starting with "ABCD" to sign-up.
+2. Install dependencies by running the command  (you can make a virtual env if you like)
+```
+pip install -r requirements.txt
+```
+3. Run the following command in your command line interface: 
+
+```
+streamlit run App/GUI.py 
+```
+
+4. Choose to act in the network as an auditor or reader
+5. For a proof-of-concept authentication as an auditor, provide a certificate-id starting with "ABCD" to sign-up.
    
 ### Key Features
 
