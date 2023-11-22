@@ -4,7 +4,6 @@ from pyblock.blockchain.block import *
 from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from pyblock.p2pserver import P2pServer
-from pyblock.peers import *
 import threading
 from pyblock.blockchain.account import *
 import change_screen as change_screen_

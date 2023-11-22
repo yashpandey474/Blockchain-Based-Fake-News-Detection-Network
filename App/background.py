@@ -1,9 +1,7 @@
 from pyblock.blockchain.account import Accounts
 from pyblock.config import *
-from pyblock.peers import PEERS
 import time
 import streamlit as st
-from pyblock.peers import *
 from pyblock.blockchain.account import *
 from pyblock.blockchain.block import *
 

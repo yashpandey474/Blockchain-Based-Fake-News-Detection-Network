@@ -7,7 +7,6 @@ from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import TransactionPool
 from typing import Type
 from pyblock.chainutil import *
-from pyblock.peers import *
 from pyblock.wallet.transaction import *
 from pyblock.blockchain.account import *
 from pyblock.heartbeat_manager import *
