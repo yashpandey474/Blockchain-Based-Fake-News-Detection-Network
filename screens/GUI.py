@@ -42,15 +42,15 @@ screen_functions = {
 
 
 
-background_style = '''<style>
-div appview-container{
-background-image: url("https://i.gifer.com/5ARz.gif");
-background-size: cover;
-background-position: center;
-}
-</style>
+background_style = '''
+    <style>
+       div .appview-content {
+            background-image: url("https://i.gifer.com/5ARz.gif");
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 '''
-
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
@@ -70,7 +70,7 @@ def main():
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
-    st.markdown(background_style, unsafe_allow_html=True)
+
     st.markdown(
         "<h1 style='text-align: center;'>Fake News Detection System Utilising Blockchain</h1>",
         unsafe_allow_html=True
@@ -92,6 +92,13 @@ if __name__ == "__main__":
         font-weight: 800;
         font-family: "Calibri";
     }
+    
+    div .appview-container {
+            background-image: url("https://i.gifer.com/5ARz.gif");
+            background-size: cover;
+            background-position: center;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
