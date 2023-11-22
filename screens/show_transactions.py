@@ -24,7 +24,7 @@ def show_transactions():
         transac_pool = st.session_state.p2pserver.transaction_pool.transactions
         
         if len(transac_pool) < 1:
-            st.write("The network doesn't have any mempool transactions currently. Please come back later.")
+            st.warning("The network doesn't have any mempool transactions currently. Please come back later.")
         
         else:
             table_data = []

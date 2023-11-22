@@ -2,7 +2,6 @@ import streamlit as st
 from wallet.transaction import Transaction
 import change_screen as change_screen_
 
-
 def upload_file():
 
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
@@ -45,7 +44,7 @@ def upload_file():
                     st.session_state.upload_file_executed = True
                     
                     # BROADCASE NEWLY CREATED TRANSACTION
-                    with st.spinner("Please Wait.."):
+                    with st.spinner("Broadcasting Transaction.."):
                         st.session_state.p2pserver.broadcast_transaction(
                             transaction
                         )
@@ -54,9 +53,3 @@ def upload_file():
                     
         else:
             st.success("File successfully uploaded.")
-
-        # GO TO PREVIOUS SCREEN
-        # if st.button("Back"):
-        #     # Set the previous screen in the session state
-        #     with st.spinner("Please Wait"): 
-        #         change_screen_.change_screen("main_page")

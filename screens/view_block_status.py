@@ -6,12 +6,12 @@ from blockchain.block import Block
 import time
 from datetime import datetime
 
-
 def block_valid():
     return int(time.time()) - st.session_state.p2pserver.received_block.timestamp <= config.BLOCK_VALIDATOR_CHOOSE_INTERVAL
 
 #CREATE A NEW BLOCK
 def propose_block():
+    
     if st.session_state.screen == "propose_block":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
@@ -30,7 +30,7 @@ def propose_block():
         )
         
         if st.session_state.p2pserver.received_block:
-            st.write("You have already transmitted the block")
+            st.warning("You have already transmitted the block")
             st.write("Current Confirmations on Block: ", len(
                 st.session_state.p2pserver.received_block.votes))
         
@@ -98,7 +98,7 @@ def propose_block():
                     block.votes.add(st.session_state.wallet.get_public_key())
 
                     # BROADCAST THE BLOCK
-                    with st.spinner("Please Wait.."):
+                    with st.spinner("Broadcasting Block.."):
                         st.session_state.p2pserver.broadcast_block(block)
 
                     # CONFIRMATION MESSAGE
@@ -117,11 +117,14 @@ def view_block_status():
         change_screen_.change_screen_navbar(selected_option)
               
     
-    if st.session_state.screen == "view_block_status":        
+    if st.session_state.screen == "view_block_status":  
+              
         st.title("View Current Block Status")
         
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
+            
             with st.spinner("Please Wait"):
+                st.balloons()
                 change_screen_.change_screen("propose_block")
 
         

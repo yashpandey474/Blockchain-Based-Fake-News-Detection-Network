@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import datetime
 
 
+
+
 def view_sent_blocks():
     if st.session_state.screen == "view_sent_blocks":
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
@@ -22,7 +24,7 @@ def view_sent_blocks():
         ].sent_blocks
         
         if len(blocks) == 0:
-            st.write("You haven't broadcasted any blocks.")
+            st.warning("You haven't broadcasted any blocks.")
         
         else:
             table_data = []
@@ -40,6 +42,17 @@ def view_sent_blocks():
         """
         )
             
+            
+            
+        
+        
+        
+         
+            
+        
+        
+        
+        
             
             
         
