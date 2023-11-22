@@ -52,6 +52,9 @@ class P2pServer:
         self.context = zmq.Context()
         self.heartbeat_manager = None
         self.isUsingTCP = False
+        
+        #IF THE P2PSERVER HAS RECEIVED CURRENT TRANSACTION POOL & CHAIN ETC.
+        self.initialised = False
 
     def private_send_message(self, clientPort, message):
         reply = None
@@ -250,16 +253,27 @@ class P2pServer:
         # IF BLOCKCAIN RECIEVED
         if data["type"] == MESSAGE_TYPE["chain"]:
             # TRY TO REPLACE IF LONGER CHAIN
-            self.blockchain.replace_chain(data["chain"])
-            # TODO: SUS
+            
+            ret = self.blockchain.replace_chain(data["chain"])
+            
+            # IF NOT THE LONGEST CHAIN; DONT REPLACE ANYTHING ELSE AS THIS NODE'S DATA IS CLEARLY OUTDATED
+            if not ret:
+                return
+            
+            
             print("REPLACED CHAIN")
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
             print(self.accounts.to_json())
+            
             self.transaction_pool = TransactionPool.from_json(
                 data["transaction_pool"])
             print("REPLACED TRANSACTION POOL")
             print(self.transaction_pool)
+            
+            # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
+            if not self.initialised:
+                self.initialised = True
 
         elif data["type"] == MESSAGE_TYPE["transaction"]:
             # CREATE TRANSACTION FROM JSON FORM
