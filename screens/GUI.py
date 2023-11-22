@@ -42,15 +42,6 @@ screen_functions = {
 
 
 
-background_style = '''
-    <style>
-       div .appview-content {
-            background-image: url("https://i.gifer.com/5ARz.gif");
-            background-size: cover;
-            background-position: center;
-        }
-    </style>
-'''
 def main():
     print("CURRENT SCREEN = ", st.session_state.screen)
     
