@@ -53,6 +53,7 @@ class ChainUtil:
             data_str = json.dumps(data, cls=CustomJSONEncoder)
             data_hash = SHA256.new(data_str.encode())
             pkcs1_15.new(public_key_RSA).verify(data_hash, signature)
+            print("Verification successful")
             return True  # Signature is valid
 
         except (ValueError, TypeError) as e:
@@ -61,7 +62,8 @@ class ChainUtil:
 
     @staticmethod
     def encryptWithSoftwareKey(data):
-        signature = ChainUtil.sign(config.VM_PRIVATE_KEY, data)
+        signature = ChainUtil.sign(
+            config.VM_PRIVATE_KEY, data)
         data["VM_signature"] = signature
         return json.dumps(data, cls=CustomJSONEncoder)
 
@@ -69,7 +71,6 @@ class ChainUtil:
     def decryptWithSoftwareKey(data):
         signature_hex = data["VM_signature"]
         signature = binascii.unhexlify(signature_hex)
-
         del data["VM_signature"]
 
         if ChainUtil.verify_signature(config.VM_PUBLIC_KEY, signature, data):

@@ -68,7 +68,7 @@ class HeartbeatManager:
 
         try:
             response = requests.post(url, json=clientPorts)
-            print(f"Response from server: {response.json()}")
+            print(f"Remove api. Response from server: {response.json()}")
             return response.json()
         except requests.RequestException as e:
             logging.error(f"Remove failed: {e}")

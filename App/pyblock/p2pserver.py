@@ -85,7 +85,7 @@ class P2pServer:
         data = {'public_key': public_key, 'address': clientPort}
         try:
             response = requests.post(f'{server_url}/register', json=data)
-            print(f"Response from server: {response}")
+            print(f"Register api. Response from server: {response}")
             return response.json()
         except requests.RequestException as e:
             logging.error(f"Registration failed: {e}")
@@ -152,7 +152,6 @@ class P2pServer:
         print("New thread started")
         while True:
             message = zmq_socket.recv_string()
-            print(f"Received message: {message}")
             zmq_socket.send_string(
                 f"Successfully received message {message}. Sent from {self.myClientPort}")
             self.message_received(message)
@@ -182,6 +181,8 @@ class P2pServer:
     def send_direct_encrypted_message(self, message, clientPort):
         print("Sending direct message")
         encrypted_message = self.get_encrypted_message(message)
+        if (clientPort == self.myClientPort):
+            return self.privateSendToSelf(encrypted_message)
         return self.private_send_message(clientPort, encrypted_message)
 
     def get_peers(self):
@@ -227,6 +228,8 @@ class P2pServer:
 
     # FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
     def message_received(self, message):
+        print(f"Received message: {message}")
+
         try:
             # CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
@@ -253,7 +256,8 @@ class P2pServer:
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
             print(self.accounts.to_json())
-            self.transaction_pool = TransactionPool.from_json(data["transaction_pool"])
+            self.transaction_pool = TransactionPool.from_json(
+                data["transaction_pool"])
             print("REPLACED TRANSACTION POOL")
             print(self.transaction_pool)
 
@@ -391,6 +395,10 @@ class P2pServer:
             "accounts": self.accounts.to_json(),
             "transaction_pool": self.transaction_pool.to_json()
         }
+        print(message["transaction_pool"])
+        # also print its type
+        print("\n \n type of transaction pool")
+        print(type(message["transaction_pool"]))
         self.send_direct_encrypted_message(
             message=message, clientPort=clientPort)
 

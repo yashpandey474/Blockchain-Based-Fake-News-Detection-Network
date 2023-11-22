@@ -1,6 +1,7 @@
 import random
 import pyblock.config as config
 import logging
+from pyblock.wallet.transaction import Transaction
 
 # Setting up basic configuration for logging
 logging.basicConfig(level=logging.INFO,
@@ -27,7 +28,7 @@ class Account:
             "clientPort": self.clientPort,
             "isValidator": self.isValidator,
             # Convert set to list for JSON serialization
-            "sent_transactions": list(self.sent_transactions),
+            "sent_transactions": [tx.to_json() for tx in self.sent_transactions],
             "sent_blocks": list(self.sent_blocks),
             "reputation_changes": self.reputation_changes
         }
@@ -44,8 +45,10 @@ class Accounts:
         self.accounts = {}
 
         for address, account_data in json_data.items():
-            account_data['sent_transactions'] = set(
-                account_data.get('sent_transactions', []))
+            serialized_transactions = account_data.get('sent_transactions', [])
+            deserialized_transactions = [
+                Transaction.from_json(tx_json) for tx_json in serialized_transactions]
+            account_data['sent_transactions'] = set(deserialized_transactions)
             account_data['sent_blocks'] = set(
                 account_data.get('sent_blocks', []))
             self.accounts[address] = Account(**account_data)
@@ -81,7 +84,7 @@ class Accounts:
             toaddress, f"Transaction Fee Reward from {fromaddress}",  amount)
         self.log_reputation_change(
             fromaddress, f"Transaction Fee deducted",  -amount)
-        
+
         self.accounts[fromaddress].balance -= amount
         self.accounts[toaddress].balance += amount
         return True
@@ -114,7 +117,8 @@ class Accounts:
                 if news_transaction.model_score < 0.5:
                     # FOR THOSE THAT VOTED NEGATIVELY
                     for public_key in news_transaction.negative_votes:
-                        penalty_amount = self.accounts[public_key].stake * config.PENALTY_STAKE_PERCENT//100
+                        penalty_amount = self.accounts[public_key].stake * \
+                            config.PENALTY_STAKE_PERCENT//100
                         # PENALISE BY % OF STAKE
                         self.accounts[public_key].stake -= (
                             penalty_amount)
@@ -125,7 +129,8 @@ class Accounts:
                         )
             # IF MAJORITY VOTED "FAKE"
             if len(news_transaction.negative_votes) > len(news_transaction.positive_votes):
-                penalty_amount = self.accounts[news_transaction.sender_address].balance * config.SENDER_PENALTY_PERCENT//100
+                penalty_amount = self.accounts[news_transaction.sender_address].balance * \
+                    config.SENDER_PENALTY_PERCENT//100
 
                 self.accounts[news_transaction.sender_address].balance -= (
                     penalty_amount
