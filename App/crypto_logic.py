@@ -1,5 +1,4 @@
 from Crypto.PublicKey import RSA
-import re
 
 def verify(private_key):
 

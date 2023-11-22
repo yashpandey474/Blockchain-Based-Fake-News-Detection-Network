@@ -1,5 +1,3 @@
-import numpy as np
-import streamlit as st
 import json
 from pyblock.blockchain.blockchain import Blockchain
 from pyblock.blockchain.block import *
@@ -10,13 +8,13 @@ from pyblock.chainutil import *
 from pyblock.wallet.transaction import *
 from pyblock.blockchain.account import *
 from pyblock.heartbeat_manager import *
-import streamlit as st
 import requests
 import zmq
 import logging
 import threading
 import socket
 import random as random
+
 
 MESSAGE_TYPE = {
     'chain': 'CHAIN',

@@ -1,6 +1,5 @@
 # SHOW ALL CURRENT TRANSACTIONS IN MEMPOOL
 from datetime import datetime
-import streamlit as st
 from .qr_handler import make_qr
 
 def show_transaction(transaction, show = 0):
