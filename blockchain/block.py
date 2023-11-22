@@ -117,17 +117,6 @@ class Block:
             index=1
         )
 
-    # HASH THE TRANSACTIONS IN BLOCK WITHOUT CONSIDERING THE VOTES
-
-    @staticmethod
-    def hash_transactions(transactions):
-        # Create a new list of transactions with votes set to None
-        transactions_for_hashing = [
-            {**transaction.to_json(), "votes": None} for transaction in transactions
-        ]
-
-        # Hash the modified list of transactions
-        return hashlib.sha256(json.dumps(transactions_for_hashing).encode('utf-8')).hexdigest()
 
     @staticmethod
     def create_block(lastBlock, data, wallet, blockchain):
@@ -165,7 +154,7 @@ class Block:
         block_data = {
             "timestamp": block.timestamp,
             "last_hash": block.last_hash,
-            "transactions": [transaction.to_json() for transaction in block.transactions],
+            "transactions": [transaction.sign for transaction in block.transactions],
             "validator": block.validator
         }
 
@@ -184,7 +173,7 @@ class Block:
         data = {
             "timestamp": timestamp,
             "last_hash": last_hash,
-            "transactions": [transaction.to_json() for transaction in transactions]
+            "transactions": [transaction.sign for transaction in transactions]
         }
 
         # Serialize the dictionary to a JSON string
@@ -207,7 +196,7 @@ class Block:
         block_data = {
             "timestamp": block.timestamp,
             "last_hash": block.last_hash,
-            "transactions": [transaction.to_json() for transaction in block.transactions],
+            "transactions": [transaction.sign for transaction in block.transactions],
             "validator": block.validator
         }
 
