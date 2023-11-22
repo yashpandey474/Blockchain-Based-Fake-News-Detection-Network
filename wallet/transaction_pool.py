@@ -47,5 +47,5 @@ class TransactionPool:
             # IF NOT IN MEMPOOL OR NOT VALID
             if not self.transaction_exist(transaction):
                 return False
-
+            
         return True
