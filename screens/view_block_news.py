@@ -36,6 +36,7 @@ def show_blocks_news():
                     
                     table_data.append({
                         "Model Fake Score": transaction.model_score,
+                        "Total Votes": len(transaction.positive_votes) + len(transaction.negative_votes),
                         "Percent of Fake Votes": str(percent_fake_votes) + "%",
                         "Percent of True Votes": str(100 - percent_fake_votes)  + "%",
                         "ID": transaction.id,

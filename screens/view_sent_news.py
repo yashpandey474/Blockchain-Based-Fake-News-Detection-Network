@@ -54,7 +54,8 @@ def view_sent_news():
                                 percent_fake_votes = 100*(len(verified_transaction.negative_votes)/(len(verified_transaction.negative_votes) + len(verified_transaction.positive_votes)))
                                 transaction_data["Percent of Fake Votes"] = str(percent_fake_votes) + "%"
                                 transaction_data["Percent of True Votes"] = str(100 - percent_fake_votes)  + "%"
-                            
+                                transaction_data["Total Votes"] =  len(verified_transaction.positive_votes) + len(verified_transaction.negative_votes),
+
                 table_data.append(transaction_data)
                 
                 

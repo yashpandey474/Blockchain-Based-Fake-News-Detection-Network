@@ -18,12 +18,16 @@ class Blockchain:
         for i in range(1, len(chain)):
             # CURRENT BLOCK
             block = chain[i]
+            
             # PREVIOUS BLOCK
             last_block = chain[i - 1]
+            
             # VERIFY BLOCK AND PREVIOUS BLOCK HASH
             if not Block.verify_block(block) or not Block.block_hash(last_block) != block.last_hash:
                 print("Failed verification")
                 return False
+            
+            
         print("Received valid chain")
         return True
 
