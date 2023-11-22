@@ -35,3 +35,8 @@ def view_log_reputation():
 
         st.dataframe(pd.DataFrame(table_data), height=500)
           
+          
+          
+          
+          
+          

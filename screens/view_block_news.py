@@ -24,7 +24,7 @@ def show_blocks_news():
         )
         
         if len(chain) < 2:
-            st.write("The current ledger holds no news. Please return later")
+            st.warning("The current ledger holds no news. Please return later")
         
         else:
             table_data = []

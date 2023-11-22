@@ -10,10 +10,9 @@ import screens.change_screen as change_screen_
 
 # START LISTENING ON P2P SERVER
 
-
 def run_p2pserver(p2pserver):
     print("Running p2p server")
-    p2pserver.listen()
+    p2pserver.start_server()
 
 
 def run_background_task(background):
@@ -51,7 +50,7 @@ def initialise(private_key=None):
 
         st.session_state.p2pserver = p2pserver
         st.session_state.background = background_task
-
+        
         p2p_thread = threading.Thread(
             target=run_p2pserver, args=(
                 st.session_state.p2pserver,), daemon=True

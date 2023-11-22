@@ -18,20 +18,27 @@ def login():
         
         #IF PRIVATE KEY ENTERED
         if user_input:
-            with st.spinner("Please Wait"):
+            with st.spinner("Verifying Key"):
                 vc = crypto_logic.verify(user_input)
 
             if vc[0]:
-                # st.markdown(f'<span style="color:green"><b><i>{vc[1]}</b></i></span>', unsafe_allow_html=True)
-                with st.spinner("Please Wait"):
+                with st.spinner("Initialising Your Account"):
                     initialise(vc[2])
-                    change_screen_.change_screen("main_page")
+                    while not st.session_state.p2pserver.initialised:
+                        pass
+                    st.write("Server Initialised. Waiting for connections..")
+                    
+                progress_bar = st.progress(0)
+                for i in range(1, 101): 
+                    time.sleep(0.02)  
+                    progress_bar.progress(i)
+                    
+                change_screen_.change_screen("main_page")
+                st.session_state.gen_key_pressed = False
 
             else:
-                # st.markdown(f'<span style="color:yellow"><b>{vc[1]}</b></span>', unsafe_allow_html=True)
                 st.error(vc[1])
         else:
-            # st.markdown('<span style="color:yellow"><b>Key Not Provided</b></span>', unsafe_allow_html=True)
             st.warning("Private Key Not Provided")
             
     b1= st.button("Sign up instead")
@@ -43,4 +50,3 @@ def login():
     elif b2:
         with st.spinner("Please Wait"): 
             change_screen_.change_screen("enter")
-
