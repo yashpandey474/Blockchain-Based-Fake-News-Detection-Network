@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class HeartbeatManager:
-    def __init__(self, myClientPort, heartbeat_timeout=20, peers={}, server_url="http://65.1.130.255/app", accounts=None):
+    def __init__(self, myClientPort, heartbeat_timeout=20, peers={}, server_url="https://ujjwalaggarwal.pythonanywhere.com", accounts=None):
         self.myClientPort = myClientPort
         self.context = zmq.Context()
         self.peers = peers  # map of clientPort to dictionary of lastcontacted and public key
