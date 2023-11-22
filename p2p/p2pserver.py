@@ -48,8 +48,9 @@ class P2pServer:
         self.myClientPort = 0
         self.context = zmq.Context()
         self.heartbeat_manager = None
-        
-        #IF THE P2PSERVER HAS RECEIVED CURRENT TRANSACTION POOL & CHAIN ETC.
+        self.exited_flag = False
+
+        # IF THE P2PSERVER HAS RECEIVED CURRENT TRANSACTION POOL & CHAIN ETC.
         self.initialised = False
 
     def private_send_message(self, clientPort, message):
@@ -111,6 +112,10 @@ class P2pServer:
 
     def start_server(self):
         while True:
+            if self.exited_flag:
+                self.endserver()
+                break
+
             port = random.randint(50000, 65533)
             if self.is_port_available(port) and self.is_port_available(port+1):
                 try:
@@ -148,7 +153,9 @@ class P2pServer:
         thread = threading.Thread(target=self.broadcast_new_node)
         thread.start()
 
+        self.initialised = True
         print("New thread started")
+
         while True:
             message = zmq_socket.recv_string()
             zmq_socket.send_string(
@@ -160,6 +167,7 @@ class P2pServer:
         responses = []
         encrypted_message = self.get_encrypted_message(message)
         print(f"Peers: {self.peers}")
+
         for (clientPort, data) in self.peers.copy().items():
             if (clientPort != self.myClientPort):
                 responses.append(self.private_send_message(
@@ -201,12 +209,12 @@ class P2pServer:
             logging.error(f"Failed to fetch peers: {e}")
             print('Failed to fetch peers')
 
-    def listen(self):
-        print("Starting tcp server...")
-        server_thread = threading.Thread(
-            target=self.start_server, daemon=True)
-        server_thread.start()
-        print("Server thread started")
+    # def listen(self):
+    #     print("Starting tcp server...")
+    #     server_thread = threading.Thread(
+    #         target=self.start_server, daemon=True)
+    #     server_thread.start()
+    #     print("Server thread started")
 
     def send_current_block_proposer(self, clientPort):
         message = {
@@ -249,23 +257,28 @@ class P2pServer:
         # IF BLOCKCAIN RECIEVED
         if data["type"] == MESSAGE_TYPE["chain"]:
             # TRY TO REPLACE IF LONGER CHAIN
-            
+
             ret = self.blockchain.replace_chain(data["chain"])
-            
+
             # IF NOT THE LONGEST CHAIN; DONT REPLACE ANYTHING ELSE AS THIS NODE'S DATA IS CLEARLY OUTDATED
             if not ret:
                 return
-            
+
             print("REPLACED CHAIN")
+
             self.accounts.from_json(json_data=data["accounts"])
             print("REPLACED ACCOUNTS")
+
             print(self.accounts.to_json())
-            
+
             self.transaction_pool = TransactionPool.from_json(
                 data["transaction_pool"])
+
             print("REPLACED TRANSACTION POOL")
             print(self.transaction_pool)
-            
+
+            self.block_proposer = data["block_proposer"]
+            print("UPDATED BLOCK PROPOSER: ", self.block_proposer)
             # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
             if not self.initialised:
                 self.initialised = True
@@ -284,8 +297,7 @@ class P2pServer:
             # CHECK BLOCK IS PROPOSED BY CURRENT BLOCK PROPOSER
             block = Block.from_json(data["block"])
 
-            print(block.transactions)
-            if self.block_proposer != block.validator:
+            if self.block_proposer and self.block_proposer != block.validator:
                 print("RECEIVED BLOCK DOESN'T HAVE CORRECT VALIDATOR!")
                 return
 
@@ -317,21 +329,17 @@ class P2pServer:
             self.heartbeat_manager.addToClients(clientPort, data["public_key"])
             self.accounts.addANewClient(
                 address=data["public_key"], clientPort=clientPort, userType=self.user_type)
-            
+
             if (clientPort != self.myClientPort):
                 self.send_chain(clientPort)
-
 
         elif data["type"] == MESSAGE_TYPE["vote"]:
             self.handle_votes(data)
 
-        elif data["type"] == MESSAGE_TYPE["block_proposer_address"]:
-            # SET THE CURRENT BLOCK PROPOSER ACC. TO MESSAGE
-            self.block_proposer = data["address"]
-
     def handle_votes(self, data):
         # CHECK IF THE VOTE IS VALID [FROM AN ACTIVE VALIDATOR]
-        if not self.accounts.accounts[data["address"]].isActive or not self.accounts.accounts[data["address"]].isValidator:
+        if (not self.accounts.accounts[data["address"]].isActive or
+                not self.accounts.accounts[data["address"]].isValidator):
             print("INVALID VOTE")
             return
 
@@ -357,7 +365,7 @@ class P2pServer:
 
         # JUST IN CASE OF PASS BY VALUE
         for index, transaction in enumerate(self.received_block.transactions):
-            self.received_block.transactions[index] = self.trasaction_dict[transaction.id]
+            self.received_block.transactions[index] = transactions_dict[transaction.id]
 
     def broadcast_new_validator(self, stake):
         """
@@ -403,12 +411,9 @@ class P2pServer:
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
             "accounts": self.accounts.to_json(),
-            "transaction_pool": self.transaction_pool.to_json()
+            "transaction_pool": self.transaction_pool.to_json(),
+            "block_proposer": self.block_proposer
         }
-        print(message["transaction_pool"])
-        # also print its type
-        print("\n \n type of transaction pool")
-        print(type(message["transaction_pool"]))
         self.send_direct_encrypted_message(
             message=message, clientPort=clientPort)
 
@@ -455,15 +460,8 @@ class P2pServer:
     def endserver(self):
         self.heartbeat_manager.stop()
         self.heartbeat_manager = None
-        self.peers = {}
-        self.myClientPort = 0
         self.block_proposer = None
         self.block_received = None
         self.received_block = None
-        self.blockchain = Blockchain()
-        self.transaction_pool = TransactionPool()
-        self.wallet = Wallet(
-            private_key=None, name=None, email=None
-        )
         self.context.destroy()
         self.accounts = Accounts()
