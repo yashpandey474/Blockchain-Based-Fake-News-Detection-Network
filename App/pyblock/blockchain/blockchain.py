@@ -1,6 +1,5 @@
 from .block import Block
 from .account import *
-from pyblock.wallet.wallet import Wallet
 from pyblock.wallet.transaction_pool import * 
 
 

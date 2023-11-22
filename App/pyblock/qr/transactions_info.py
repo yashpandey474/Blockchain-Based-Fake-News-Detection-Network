@@ -16,4 +16,4 @@ Sender Reputation: {transaction.sender_reputation},
 Content URL: https://{transaction.ipfs_address}.ipfs.dweb.link
     """
 
-    return make_qr(data, show)
+    return make_qr(data, show, transaction.ipfs_address)
