@@ -153,10 +153,10 @@ blocks_broadcasted_message = """
 
 navbar_style = """
             <style>
-            stRadio p{
+            .stRadio p{
                 font-size: 20px;
             }
-            stRadio>label>div>p{
+            .stRadio>label>div>p{
                 font-size: 24px;
             }
             </style>

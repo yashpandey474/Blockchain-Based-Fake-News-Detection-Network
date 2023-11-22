@@ -78,7 +78,7 @@ if __name__ == "__main__":
     st.markdown(
     """
     <style>
-    stButton>button {
+    .stButton>button {
         width: 350px;
         height: 100px;
         text-align: center;
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         margin: 0 auto;
         padding: 0;
     }
-    stButton p{
+    .stButton p{
         font-size: 20px;
         style: bold;
         font-weight: 800;
@@ -95,7 +95,9 @@ if __name__ == "__main__":
     </style>
     """,
     unsafe_allow_html=True
-)
+    )
+    
+    
     
     
     if "screen" not in st.session_state:
