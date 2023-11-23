@@ -99,6 +99,7 @@ if __name__ == "__main__":
     
     
     if "screen" not in st.session_state:
+        st.session_state.stake_submitted = False
         st.session_state.gen_key_pressed = False
         st.session_state.name = ""
         st.session_state.email = ""
