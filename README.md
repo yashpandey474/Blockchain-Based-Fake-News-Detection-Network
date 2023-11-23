@@ -3,7 +3,7 @@
 ## Project Overview
 
 This project develops a blockchain-based network for detecting fake news, leveraging NLP bases ML models and a consortium of auditors. The system operates on a consortium blockchain, enabling anonymous participation for readers to access news and submit news items as transactions.
-
+![Alt text](<ENTER NETWORK-1.jpeg>)
 ## Running the Project
 
 #### _Ensure your internet is working_ before proceeding
@@ -35,6 +35,13 @@ This project develops a blockchain-based network for detecting fake news, levera
      - Valid Certificate will be of the format ABCD****, for this POC.
 
 5. If you receive an import error, kindly reload the page or run the commands in a new terminal. It is a streamlit bug rather than a code problem.
+
+6. When you press "Go to Main", please wait for the server to initialise and connections. It will show a spinner & progress bar & take you to the main page automatically.
+
+7. For viewing transactions in mempool or sent transactions, wait for the progress bar to load.
+
+8. Similarly, please wait for the spinner showing "Please wait.." to finish before pressing buttons.
+
    
 ### Key Features
 

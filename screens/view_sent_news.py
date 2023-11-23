@@ -27,6 +27,7 @@ def view_sent_news():
 
         else:
             table_data = []
+            
             progress_bar = st.progress(0)
             current_progress = 1
             i = 1
@@ -67,7 +68,7 @@ def view_sent_news():
                 i += 1
                 table_data.append(transaction_data)
                 
-                
+            # t.empty()
             progress_bar.empty()
             st.write("Transactions loaded successfully!")
             st.dataframe(pd.DataFrame(table_data), height=500)
