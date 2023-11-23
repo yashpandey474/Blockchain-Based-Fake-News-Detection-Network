@@ -33,24 +33,25 @@ def upload_file():
                 )
                 
                 if st.button("Submit News"):
-                    time.sleep(0.02)
-                    st.session_state.transaction_fee = transaction_fee
-                    transaction = Transaction.generate_from_file(
-                        sender_wallet=st.session_state.p2pserver.wallet,
-                        file=uploaded_file,
-                        blockchain=st.session_state.p2pserver.blockchain,
-                        fee = st.session_state.transaction_fee
-                    )
 
-                    st.session_state.upload_file_executed = True
                     
                     # BROADCASE NEWLY CREATED TRANSACTION
                     with st.spinner("Broadcasting Transaction.."):
+                        st.session_state.transaction_fee = transaction_fee
+                        transaction = Transaction.generate_from_file(
+                            sender_wallet=st.session_state.p2pserver.wallet,
+                            file=uploaded_file,
+                            blockchain=st.session_state.p2pserver.blockchain,
+                            fee = st.session_state.transaction_fee
+                        )
+
+                        st.session_state.upload_file_executed = True
                         st.session_state.p2pserver.broadcast_transaction(
                             transaction
                         )
                     print("BROADCASTED TRANSACTION")
-                    st.rerun()
+                    st.success("File successfully uploaded.")
+                    # st.rerun()
                     
         else:
             st.success("File successfully uploaded.")
