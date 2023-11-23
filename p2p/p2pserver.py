@@ -290,6 +290,11 @@ class P2pServer:
                 data["received_block"]) if data["received_block"] else None
             printy("REPLACED RECEIVED BLOCK: ", self.received_block)
 
+            
+            #SET THE CURRENT RECEIVED BLOCK TO RECEIVE VOTES
+            if data["received_block"]:
+                self.received_block = Block.from_json(data["received_block"])
+            
             # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
             if not self.initialised:
                 self.initialised = True
@@ -418,13 +423,14 @@ class P2pServer:
 
     def send_chain(self, clientPort):
         chain_as_json = [block.to_json() for block in self.blockchain.chain]
+        block_json = (self.received_block.to_json() if self.received_block.to_json() else None)
         message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
             "accounts": self.accounts.to_json(),
             "transaction_pool": self.transaction_pool.to_json(),
             "block_proposer": self.block_proposer,
-            "received_block": self.received_block.to_json() if self.received_block else None
+            "received_block": block_json
         }
 
         self.send_direct_encrypted_message(

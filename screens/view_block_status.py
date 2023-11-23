@@ -26,6 +26,7 @@ def propose_block():
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen and change_screen_.screen_mapping[selected_option] != "view_block_status":
             change_screen_.change_screen_navbar(selected_option)
             
+        #SHOW MESSAGE
         st.markdown(
             "<h1 style='text-align: center;'>You are the current block proposer</h1>",
             unsafe_allow_html=True
