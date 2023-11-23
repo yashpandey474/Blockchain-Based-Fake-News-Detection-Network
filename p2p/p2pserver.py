@@ -344,7 +344,7 @@ class P2pServer:
             clientPort = data["clientPort"]
             self.heartbeat_manager.addToClients(clientPort, data["public_key"])
             self.accounts.addANewClient(
-                address=data["public_key"], clientPort=clientPort, userType=self.user_type)
+                address=data["public_key"], clientPort=clientPort, userType=data["user_type"])
 
             if (clientPort != self.myClientPort):
                 self.send_chain(clientPort)
@@ -417,7 +417,8 @@ class P2pServer:
         message = {
             "type": MESSAGE_TYPE["new_node"],
             "public_key": self.wallet.get_public_key(),
-            "clientPort": self.myClientPort
+            "clientPort": self.myClientPort,
+            "user_type": self.user_type
         }
         self.broadcast_message(message)
 
