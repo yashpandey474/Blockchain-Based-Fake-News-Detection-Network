@@ -28,7 +28,7 @@ MESSAGE_TYPE = {
 # to handle self.... self.message_received(None, None, message)
 logging.basicConfig(level=logging.INFO)
 # Configuration
-server_url = 'https://ujjwalaggarwal.pythonanywhere.com'  # Local server URL
+server_url = 'https://ujjwalaggarwal.pythonanywhere.com/app'  # Local server URL
 send_timeout = 5000
 receive_timeout = 5000
 heartbeat_timeout = 30  # seconds, adjust as needed
