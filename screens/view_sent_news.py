@@ -35,14 +35,14 @@ def view_sent_news():
             
             for transaction in sent_transactions:
                 status_pool = st.session_state.p2pserver.transaction_pool.transaction_exist(transaction)
-                content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
+                # content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
                 
                 transaction_data = {
                         "Status": "",
                         "Model Score": transaction.model_score,
                         "Transaction Fee": transaction.fee,
                         "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
-                        "Title": content.split("\n")[0],
+                        # "Title": content.split("\n")[0],
                         "Content URL": "https://"+ transaction.ipfs_address +".ipfs.dweb.link",
                         "ID": transaction.id
                 }
