@@ -6,23 +6,35 @@ This project develops a blockchain-based network for detecting fake news, levera
 
 ## Running the Project
 
+#### _Ensure your internet is working_ before proceeding
+
 1. Clone the repository locally.
 
-2. CD into the repository folder
-```
-cd BlockchainProject2
-```
-2. Install dependencies by running the command  (you can make a virtual env if you like)
-```
-pip install -r requirements.txt
-```
+2. Change working directory into the repository folder
+    ```
+    cd BlockchainProject2
+    ```
+
+2. Install dependencies by running the command 
+    (you can make a virtual environment if you want (recommended))
+    ```
+    pip install -r requirements.txt
+    ```
+
 3. Run the following command in your command line interface: 
 
-```
-streamlit run screens/GUI.py 
-```
+    ```
+    streamlit run screens/GUI.py 
+    ```
 
-4. When signing up, the email should be i
+    to start the blockchain project in your default browser.
+
+
+4. Login/Sign up to continue
+     - When signing up, the email should be in the format username@domain.service
+     - Valid Certificate will be of the format ABCD****, for this POC.
+
+
    
 ### Key Features
 
@@ -39,10 +51,11 @@ streamlit run screens/GUI.py
 ### Process Flow
 
 1. **Auditor Joining**: Requires authentication proof for registration.
-2. **Reader Joining**: Simple registration with minimal information.
-3. **News Broadcasting**: Users can upload and broadcast news, accompanied by a machine learning model score.
-4. **Block Creation and Voting**: Auditors propose and vote on blocks containing news transactions.
-5. **Validation and Ledger Addition**: Blocks receiving majority votes are added to the blockchain, making the news visible with associated authenticity metrics.
+2. **Bootstrap Nodes**: Developer maintained nodes that are always active and used as entry points to the blockchain. They help discover peers in the network.
+3. **Reader Joining**: Simple registration with minimal information.
+4. **News Broadcasting**: Users can upload and broadcast news, accompanied by a machine learning model score.
+5. **Block Creation and Voting**: Auditors propose and vote on blocks containing news transactions.
+6. **Validation and Ledger Addition**: Blocks receiving majority votes are added to the blockchain, making the news visible with associated authenticity metrics.
 
 ### Output
 
