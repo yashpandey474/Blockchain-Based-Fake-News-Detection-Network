@@ -100,6 +100,8 @@ def become_validator():
             
             #IF SUBMITTED STAKE: SUCCESSFUL MESSAGE
             elif st.session_state.stake_submitted:
+                stake = st.session_state.blockchain.get_stake(st.session_state.p2pserver.wallet.get_public_key())
+                st.session_state.stake = stake
                 if not st.session_state.validator:
                     st.success(
                             f"You are successfully registered as a validator with stake: {st.session_state.stake}")
