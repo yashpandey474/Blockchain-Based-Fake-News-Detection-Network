@@ -37,7 +37,7 @@ def view_sent_news():
                         "Transaction Fee": transaction.fee,
                         "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
                         "Title": content.split("\n")[0],
-                        "Text": " ".join(content.split("\n")[1:]),
+                        "Content URL": "https://"+ transaction.ipfs_address +".ipfs.dweb.link",
                         "ID": transaction.id
                 }
                 
