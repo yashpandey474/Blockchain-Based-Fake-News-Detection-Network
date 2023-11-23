@@ -41,7 +41,6 @@ def printy(*args):
         print(joined_string)
 
 
-
 class P2pServer:
     def __init__(self, blockchain: Type[Blockchain], transaction_pool: Type[TransactionPool], wallet: Type[Wallet], user_type="Reader"):
         self.blockchain = blockchain
@@ -52,7 +51,7 @@ class P2pServer:
         self.received_block = None
         self.block_received = None
         self.block_proposer = None
-        self.peers = {} 
+        self.peers = {}
         self.myClientPort = 0
         self.context = zmq.Context()
         self.heartbeat_manager = None
@@ -76,7 +75,7 @@ class P2pServer:
             zmq_socket.send_string(message)
             reply = zmq_socket.recv_string()
             printy(f"Received reply from {clientPort}: {reply}")
-            
+
         except Exception as e:
             reply = f"Failed to send message {message} to {clientPort}: {e}"
         finally:
@@ -233,18 +232,18 @@ class P2pServer:
 
         self.send_direct_encrypted_message(message, clientPort)
 
-
     # FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
+
     def message_received(self, message):
-        
-        #RECEIVED A MESSAGE
+
+        # RECEIVED A MESSAGE
         printy(f"Received message: {message}")
 
         try:
             # CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
 
-        #ERROR IN JSON DECODING
+        # ERROR IN JSON DECODING
         except json.JSONDecodeError:
             printy("Failed to decode JSON")
             return
@@ -253,14 +252,12 @@ class P2pServer:
         if not ChainUtil.decryptWithSoftwareKey(data):
             printy("Invalid message recieved.")
             return
-        
-        
-        #GET CLIENT PORT
+
+        # GET CLIENT PORT
         clientPort = data["clientPort"]
         printy("CLIENT PORT OF USER IS: ", clientPort)
 
-
-        #PRINT THE TYPE OF MESSAGE
+        # PRINT THE TYPE OF MESSAGE
         printy("MESSAGE RECIEVED OF TYPE", data["type"])
 
         # IF BLOCKCAIN RECIEVED
@@ -287,10 +284,12 @@ class P2pServer:
 
             self.block_proposer = data["block_proposer"]
             printy("UPDATED BLOCK PROPOSER: ", self.block_proposer)
-            
-            #SET THE CURRENT RECEIVED BLOCK TO RECEIVE VOTES
-            self.received_block = Block.from_json(data["received_block"])
-            
+
+            # SET THE CURRENT RECEIVED BLOCK TO RECEIVE VOTES
+            self.received_block = Block.from_json(
+                data["received_block"]) if data["received_block"] else None
+            printy("REPLACED RECEIVED BLOCK: ", self.received_block)
+
             # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
             if not self.initialised:
                 self.initialised = True
@@ -425,10 +424,9 @@ class P2pServer:
             "accounts": self.accounts.to_json(),
             "transaction_pool": self.transaction_pool.to_json(),
             "block_proposer": self.block_proposer,
-            "received_block": self.received_block.to_json()
+            "received_block": self.received_block.to_json() if self.received_block else None
         }
-        
-    
+
         self.send_direct_encrypted_message(
             message=message, clientPort=clientPort)
 
