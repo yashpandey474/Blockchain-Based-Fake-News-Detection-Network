@@ -38,7 +38,7 @@ def vote_on_block():
                 transaction_id = transaction.id
                 vote = st.radio(
                     f"Vote on News", ("True", "Fake"),
-                    key=f"{time.time()}vote_received_{transaction.id}"
+                    key=f"vote2_received_{transaction.id}"
                 )
 
                 transaction_votes[transaction_id] = vote

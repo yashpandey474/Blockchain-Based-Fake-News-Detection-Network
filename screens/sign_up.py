@@ -77,11 +77,11 @@ def sign_up():
         if st.button("Submit Details"):
             pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
             if not re.match(pattern, email):
-                st.warning("Invalid Email ID")
+                st.warning("Invalid Email ID. Valid format: username@domain.something")
                 
             else:
                 if st.session_state.user_type == "Auditor" and not crypto_logic.verify_certificate(certificate_id):
-                    st.warning("Invalid Certificate ID")
+                    st.warning("Invalid Certificate ID. Valid format for PoC: ABCD*****")
                 else:
                     st.session_state.name = name
                     st.session_state.email = email
