@@ -25,7 +25,9 @@ def become_validator():
 
         #GET CURRENT BALANCE
         st.session_state.balance = st.session_state.p2pserver.accounts.get_balance(st.session_state.wallet.get_public_key())
+        
         user_type = ("Validating Auditor" if st.session_state.validator else st.session_state.user_type)
+        
         
         #SHOW THE MESSAGE
         st.markdown(f"""
@@ -83,7 +85,6 @@ def become_validator():
                 #SUBMT STAKE
                 if st.button("Submit Stake"):
                     old_stake = st.session_state.stake
-                    st.session_state.stake = stake
                         
                     #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
                     if old_stake != stake:
@@ -95,19 +96,22 @@ def become_validator():
                         
                     #REMOVE THE BUTTONS FOR DEFINING STAKE
                     st.session_state.stake_submitted = True
+                    st.session_state.validator = True
                     st.rerun()
                     
             
             #IF SUBMITTED STAKE: SUCCESSFUL MESSAGE
             elif st.session_state.stake_submitted:
+                #GET CURRENT STAKE IN NETWORK 
                 stake = st.session_state.blockchain.get_stake(st.session_state.p2pserver.wallet.get_public_key())
-                st.session_state.stake = stake
-                if not st.session_state.validator:
-                    st.success(
-                            f"You are successfully registered as a validator with stake: {st.session_state.stake}")
-                    st.session_state.validator = True
+                
+                #IF HAD NOT STAKE
+                if st.session_state.stake == 0:
+                    st.success(f"You are successfully registered as a validator with stake: {stake}")
 
+                #PREVIOUSLY HAD STAKE
                 else:
-                    st.success(f"Your stake has been successfully modified to: {st.session_state.stake}")
-                        
-            
+                    st.success(f"Your stake has been successfully modified to: {stake}")
+                    
+                #SET STAKE
+                st.session_state.stake = stake

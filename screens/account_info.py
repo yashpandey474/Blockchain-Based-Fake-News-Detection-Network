@@ -27,8 +27,11 @@ def show_account_info():
         stake = st.session_state.blockchain.get_stake(public_key)
         
         #DISPLAY THE DETAILS
-        st.write("Current Reputation = ", balance + stake)
-        st.write("Current Balance = ", balance)
+        user_type = ("Validating Auditor" if st.session_state.validator else st.session_state.user_type)
+        
+        st.write("User Type: ", user_type)
+        st.write("Current Reputation: ", balance + stake)
+        st.write("Current Balance: ", balance)
         if st.session_state.user_type == "Auditor":
             st.write("Currrent Stake in Network = ", stake)
         
