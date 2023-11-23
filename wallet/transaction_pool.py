@@ -12,8 +12,6 @@ class TransactionPool:
     def to_json(self):
         return [tx.to_json() for tx in self.transactions]
 
-
-
     @staticmethod
     def from_json(json_data):
         transactions = set([Transaction.from_json(tx) for tx in json_data])
@@ -24,7 +22,7 @@ class TransactionPool:
     def check_oldest_transaction(self, timestamp):
         # GET THE OLDEST TRANSACTION
         return False if len(self.transactions) == 0 else (min(self.transactions, key=lambda tx: tx.timestamp).timestamp <= timestamp)
-    
+
     def add_transaction(self, transaction):
         # ADD A TRANSACTION TO SET
         return self.transactions.add(transaction)
@@ -41,11 +39,13 @@ class TransactionPool:
             return False
 
         return True
+
     def verify_transactions_exist(self, transactions):
+        print(f"VERIFYING TRANSACTION {transaction.id}")
         # VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED
         for transaction in transactions:
             # IF NOT IN MEMPOOL OR NOT VALID
             if not self.transaction_exist(transaction):
                 return False
-            
+
         return True

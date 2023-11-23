@@ -58,6 +58,8 @@ class Blockchain:
 
     # VERIFY BLOCK IS VALID [WHEN RECEIVED! AS THEN THE SENDERS MUST HAVE ENOUGH BALANCE FOR TRANSACTIONS.]
     def is_valid_block(self, block, transaction_pool, accounts):
+        print(
+            f"VERIFYING BLOCK . Transaction pool in json {transaction_pool.to_json()}")
 
         # IF ALL TRRANSACTIIONS EXISTS AND ALL ACCOUNTS HAVE ENOUGH BALANCE
         if not (
