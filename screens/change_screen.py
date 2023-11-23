@@ -251,6 +251,7 @@ def change_screen_navbar(nav_selection):
     
     if screen:
         
+        
         #IF GOING TO BECOME VALIDATOR PAGE
         if nav_selection == "Manage Stake in Network":
             st.session_state.stake_submitted = False
@@ -284,7 +285,13 @@ async def watch(test):
 
 def change_screen(input_string):
     print("CHANGE SCREEN CALLED ", input_string)
+    
+    if input_string == "sign_up_generate":
+        st.session_state.main_pressed = False
+        st.session_state.gen_key_pressed = False
+        
     if input_string == "enter":
+        st.session_state.main_pressed = False
         st.session_state.gen_key_pressed = False
         st.session_state.name = ""
         st.session_state.email = ""

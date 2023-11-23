@@ -23,36 +23,44 @@ def sign_up_generate():
                 st.markdown(change_screen_.readers_guidelines)
 
         # GENERATE A NEW PRIVATE KEY FOR USER
-        if st.button("Generate a new Private Key"):
-            st.session_state.gen_key_pressed = True
-            
-            with st.spinner("Generating Key"):
-                st.session_state.private_key = crypto_logic.gen_sk()
-            st.success("Generated Private key. Please store it safely.")
+        if not st.session_state.gen_key_pressed:
+            if st.button("Generate a new Private Key"):
+                with st.spinner("Generating Key"):
+                    st.session_state.private_key = crypto_logic.gen_sk()
+                st.success("Generated Private key. Please store it safely.")
 
-            # PRINT THE PRIVATE KEY
-            with st.expander("Click to view private key"):
-                kk = st.session_state.private_key.export_key().decode()
-                kk = kk.replace("\n", "<br>")
-                st.markdown(kk, unsafe_allow_html=True)
-
-            # INITIALISE ACCOUNT & WALLET OF SESSION
-        if st.session_state.gen_key_pressed:
-            if st.button("Go to main"):
-                
-                with st.spinner("Initialising Server"):
-                    initialise(st.session_state.private_key)
-                    while not st.session_state.p2pserver.initialised:
-                        pass
-                
-                    st.write("Server Initialised. Waiting for connections..")
-                progress_bar = st.progress(0)
-                for i in range(1, 101): 
-                    time.sleep(0.02)  
-                    progress_bar.progress(i)
+                # PRINT THE PRIVATE KEY
+                with st.expander("Click to view private key"):
+                    kk = st.session_state.private_key.export_key().decode()
+                    kk = kk.replace("\n", "<br>")
+                    st.markdown(kk, unsafe_allow_html=True)
                     
-                change_screen_.change_screen("main_page")
-                st.session_state.gen_key_pressed = False
+                st.session_state.gen_key_pressed = True
+
+        # IF GENERATED PRIVATE KEY
+        if st.session_state.gen_key_pressed and not st.session_state.main_pressed:
+                
+                #SHOW BUTTON TO GO TO MAIN
+                if st.button("Go to main"):
+                    #MAIN PRESSED AND GEN KEY PRESSED IS FALSE
+                    st.session_state.main_pressed = True
+                    change_screen_.add_space()
+                    
+        if st.session_state.main_pressed:
+                # change_screen_.add_space()
+            with st.spinner("Initialising Server"):
+                initialise(st.session_state.private_key)
+                while not st.session_state.p2pserver.initialised:
+                    pass
+                
+                st.write("Server Initialised. Waiting for connections..")
+                
+            progress_bar = st.progress(0)
+            for i in range(1, 101): 
+                time.sleep(0.02)  
+                progress_bar.progress(i)
+                    
+            change_screen_.change_screen("main_page")
 
         if st.button("Back"):
             with st.spinner("Please Wait"): 
@@ -85,8 +93,13 @@ def sign_up():
                 else:
                     st.session_state.name = name
                     st.session_state.email = email
+                    change_screen_.add_space()
                     with st.spinner("Please Wait"):
                          change_screen_.change_screen("sign_up_generate")
+                         
+                         
+                    
+                    
 
         # GO TO PREVIOUS SCREEN
         if st.button("Back"):
