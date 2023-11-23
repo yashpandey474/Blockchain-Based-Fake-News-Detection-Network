@@ -13,6 +13,8 @@ def block_valid():
 def propose_block():
     st.balloons()
     if st.session_state.screen == "propose_block":
+        
+        #SHOW THE NAVBAR
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
             change_screen_.navbar_style, unsafe_allow_html=True)
@@ -29,6 +31,7 @@ def propose_block():
             change_screen_.view_block_status_message
         )
         
+        #IF ALREADY MADE BLOCK
         if st.session_state.p2pserver.received_block:
             st.warning("You have already transmitted the block")
             st.write("Current Confirmations on Block: ", len(
@@ -43,9 +46,11 @@ def propose_block():
             #GET CURRENT MEMPOOL TRANSACTIONS
             transactions = st.session_state.p2pserver.transaction_pool.transactions
 
+            #NO TRANSACTIONS IN MEMPOOL
             if not transactions:
                 st.warning("No transactions in the mempool.")
-                
+            
+            
             else:
                 #FOR EACH TRANSACTION
                 for transaction in transactions:
@@ -65,7 +70,7 @@ def propose_block():
                     
                     #WHETHER NEWS IS FAKE OR TRUE
                     vote_value = st.radio("Vote on News:", [
-                                        "Fake", "True"], key=f"{time.time()}vote_{transaction.id}")
+                                        "Fake", "True"], key=f"vote1_{transaction.id}")
                     
                     if include_value == "True":
                         selected_transactions.append(transaction)
