@@ -3,6 +3,10 @@ from blockchain.block import Block
 from .account import Accounts
 
 
+def printv(v):
+    print(f"\033[95m{v}\033[00m")
+
+
 # CLASS FOR THE NETWORK'S BLOCKCHAIN
 class Blockchain:
     def __init__(self):
@@ -24,10 +28,10 @@ class Blockchain:
 
             # VERIFY BLOCK AND PREVIOUS BLOCK HASH
             if not (Block.verify_block(block) and Block.block_hash(last_block) == block.last_hash):
-                print("Failed verification")
+                printv("Failed verification")
                 return False
 
-        print("Received valid chain")
+        printv("Received valid chain")
         return True
 
     # REPLACE THE CHAIN WITH RECEIVED CHAIN
@@ -35,15 +39,15 @@ class Blockchain:
         new_chain = [Block.from_json(block) for block in new_chain]
         # IF SMALLER CHAIN; NEVER REPLACE
         if len(new_chain) < len(self.chain):
-            print("Received chain is not longer than the current chain")
+            printv("Received chain is not longer than the current chain")
             return False
 
         # CHECK IF CHAIN IS VALID
         elif not self.is_valid_chain(new_chain):
-            print("Received chain is invalid")
+            printv("Received chain is invalid")
             return False
 
-        print("Replacing the current chain with new chain")
+        printv("Replacing the current chain with new chain")
         # REPLACE THE CHAIN
         self.chain = new_chain
         return True
@@ -66,14 +70,14 @@ class Blockchain:
             transaction_pool.verify_transactions_exist(block.transactions)
             and accounts.verify_transactions_balance(block.transactions)
         ):
-            print(transaction_pool.verify_transactions_exist(block.transactions))
-            print(accounts.verify_transactions_balance(block.transactions))
-            print("FIRST VERIFICATION FAILED.")
+            printv(transaction_pool.verify_transactions_exist(block.transactions))
+            printv(accounts.verify_transactions_balance(block.transactions))
+            printv("FIRST VERIFICATION FAILED.")
             return False
 
         # IF PREVIOUS HASH IS CORRECT & CORRECT SIGNATURE & TRANSACTIONS
         if not (Block.verify_block(block)):
-            print("SECOND VERIFICATION FAILED.")
+            printv("SECOND VERIFICATION FAILED.")
             return False
 
         return True
