@@ -8,7 +8,7 @@ from ipfs.ipfs_handler import IPFSHandler
 
 def show_transactions():
     if st.session_state.screen == "show_transac":
-        
+        #NAVIGATION BAR
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
             change_screen_.navbar_style, unsafe_allow_html=True)

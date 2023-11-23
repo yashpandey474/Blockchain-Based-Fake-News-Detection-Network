@@ -89,6 +89,11 @@ if __name__ == "__main__":
             background-size: cover;
             background-position: center;
     }
+    
+    .st-dh {
+            border-color: red; /* Change 'red' to the color you want */
+            border-left-color: transparent !important;
+    }
 
     </style>
     """,

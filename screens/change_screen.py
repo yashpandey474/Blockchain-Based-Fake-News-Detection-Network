@@ -248,14 +248,18 @@ def add_space():
 def change_screen_navbar(nav_selection):
     # Map the nav_selection to corresponding actions
     screen = screen_mapping.get(nav_selection)
-
+    
     if screen:
-        if nav_selection == "Modify Stake" or nav_selection == "Become a Validator":
+        
+        #IF GOING TO BECOME VALIDATOR PAGE
+        if nav_selection == "Manage Stake in Network":
             st.session_state.stake_submitted = False
 
+        #IF GOING TO UPLOAD FILE PAGE
         if nav_selection == "Upload News":
             st.session_state.upload_file_executed = False
 
+        #CHANGE THE SCREEN
         with st.spinner("Please Wait"):
             change_screen(screen)
 
