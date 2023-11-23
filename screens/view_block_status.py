@@ -65,7 +65,7 @@ def propose_block():
                     
                     #WHETHER NEWS IS FAKE OR TRUE
                     vote_value = st.radio("Vote on News:", [
-                                        "Fake", "True"], key=f"vote_{transaction.id}")
+                                        "Fake", "True"], key=f"{time.time()}vote_{transaction.id}")
                     
                     if include_value == "True":
                         selected_transactions.append(transaction)

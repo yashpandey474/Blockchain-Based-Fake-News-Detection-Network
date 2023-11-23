@@ -1,6 +1,6 @@
 import streamlit as st
 import change_screen as change_screen_
-
+import time
 
 def vote_on_block():
     if st.session_state.screen == "vote_on_block":
@@ -37,7 +37,8 @@ def vote_on_block():
             for transaction in block.transactions:
                 transaction_id = transaction.id
                 vote = st.radio(
-                    f"Vote on News", ("True", "Fake")
+                    f"Vote on News", ("True", "Fake"),
+                    key=f"{time.time()}vote_received_{transaction.id}"
                 )
 
                 transaction_votes[transaction_id] = vote
