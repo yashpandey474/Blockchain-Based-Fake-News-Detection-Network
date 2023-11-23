@@ -36,17 +36,14 @@ def show_transactions():
             i = 1
             total_transactions = len(transac_pool)
             for transaction in transac_pool:
-                
-                content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
-                
-                
+                # content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
                 table_data.append({
                     "Model Score": transaction.model_score,
                     "Sender Reputation": transaction.sender_reputation,
                     "Sender Stake": st.session_state.p2pserver.blockchain.get_stake(transaction.sender_address),
                     "Transaction Fee": transaction.fee,
                     "Timestamp": datetime.fromtimestamp(transaction.timestamp).strftime("%I:%M %p on %d %B, %Y"),
-                    "Title": content.split("\n")[0],
+                    # "Title": content.split("\n")[0],
                     "Content URL": "https://"+ transaction.ipfs_address +".ipfs.dweb.link",
                     "Sender Address": transaction.sender_address,
                     "ID": transaction.id
