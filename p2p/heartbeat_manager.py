@@ -11,8 +11,12 @@ heartbeat_interval = 10
 logging.basicConfig(level=logging.INFO)
 
 
-def printg(v):
-    print(f"\033[92m{v}\033[00m")
+def printg(*args):
+    joined_string = ' '.join(str(arg) for arg in args)
+    try:
+        print(f"\033[92m{joined_string}\033[00m")
+    except:
+        print(joined_string)
 
 
 class HeartbeatManager:
@@ -168,6 +172,7 @@ class HeartbeatManager:
             self.update_last_contacted(message['clientPort'])
 
     def addToClients(self, clientPort, public_key):
+        print(f"Adding to clients to heartbeat peers{clientPort}")
         if (clientPort not in self.peers):
             self.peers[clientPort] = {
                 'public_key': public_key,

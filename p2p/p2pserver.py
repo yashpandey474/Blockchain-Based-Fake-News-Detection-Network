@@ -34,8 +34,13 @@ receive_timeout = 5000
 heartbeat_timeout = 30  # seconds, adjust as needed
 
 
-def printy(v):
-    print(f"\033[93m{v}\033[00m")
+def printy(*args):
+    joined_string = ' '.join(str(arg) for arg in args)
+    try:
+        print(f"\033[93m{joined_string}\033[00m")
+    except:
+        print(joined_string)
+
 
 
 class P2pServer:
