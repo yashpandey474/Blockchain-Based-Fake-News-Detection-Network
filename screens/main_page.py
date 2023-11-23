@@ -23,9 +23,9 @@ def main_page():
         st.markdown(change_screen_.readers_guidelines)
         
         
-    if st.button("Exit Application"):
-        st.session_state.p2pserver.flag = True
-        change_screen_.change_screen("enter")
+    # if st.button("Exit Application"):
+    #     st.session_state.p2pserver.flag = True
+    #     change_screen_.change_screen("enter")
         
     
         
