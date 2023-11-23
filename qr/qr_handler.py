@@ -4,7 +4,7 @@ from PIL import Image
 
 def make_qr(text:str, show = 0, id=""):
     qr = segno.make_qr(text)
-    qr.save("qr.png",scale = 20)
+    qr.save(f"Generated_QRs/{id}.png",scale = 20)
 
     if show:
         Image.open(f"Generated_QRs/{id}.png").show()
