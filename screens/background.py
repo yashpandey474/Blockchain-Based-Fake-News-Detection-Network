@@ -41,12 +41,12 @@ class Background:
                         # PUNISH THE BLOCK PROPOSER FOR NO BLOCK!
                         self.p2pserver.accounts.reduce_balance(
                             self.p2pserver.block_proposer, PENALTY_NO_BLOCK, "RECEIVED BLOCK DID NOT GET ENOUGH VOTES")
-                        print("RECEIVED BLOCK DID NOT GET ENOUGH VOTES\n")
+                        print("As block proposer, your block didn't get enough votes\n")
                 else:
                     if (self.p2pserver.transaction_pool.check_oldest_transaction(current_time-BLOCK_VALIDATOR_CHOOSE_INTERVAL)):
                         self.p2pserver.accounts.reduce_balance(
                             self.p2pserver.block_proposer, PENALTY_NO_BLOCK, "BLOCK PROPOSER DIDNT PROPOSE THE BLOCK IN TIME")
-                        print("BLOCK PROPOSER DIDNT PROPOSE THE BLOCK IN TIME\n")
+                        print("As block proposer, didn't propose a block in time\n")
 
                     else:
                         print(

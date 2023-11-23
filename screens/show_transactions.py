@@ -23,6 +23,8 @@ def show_transactions():
             change_screen_.show_transactions_message,
             unsafe_allow_html=True
         )
+        
+        
         transac_pool = st.session_state.p2pserver.transaction_pool.transactions
 
         if len(transac_pool) < 1:
@@ -31,6 +33,11 @@ def show_transactions():
 
         else:
             table_data = []
+            
+            progress_bar = st.progress(0)
+            current_progress = 1
+            i = 1
+            total_transactions = len(transac_pool)
             for transaction in transac_pool:
                 # TODO: get from ipfs is taking time. Need to fix it.
                 # content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
@@ -45,5 +52,11 @@ def show_transactions():
                     "Sender Address": transaction.sender_address,
                     "ID": transaction.id
                 })
+                
+                current_progress = int((i / total_transactions) * 100)
+                progress_bar.progress(current_progress)
+                i += 1
 
+            progress_bar.empty()
+            st.write("Transactions loaded successfully!")
             st.dataframe(pd.DataFrame(table_data), height=500)

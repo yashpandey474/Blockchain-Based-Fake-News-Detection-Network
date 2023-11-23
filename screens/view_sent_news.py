@@ -27,6 +27,11 @@ def view_sent_news():
 
         else:
             table_data = []
+            progress_bar = st.progress(0)
+            current_progress = 1
+            i = 1
+            total_transactions = len(sent_transactions)
+            
             for transaction in sent_transactions:
                 status_pool = st.session_state.p2pserver.transaction_pool.transaction_exist(transaction)
                 content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
@@ -56,10 +61,15 @@ def view_sent_news():
                                 transaction_data["Percent of True Votes"] = str(100 - percent_fake_votes)  + "%"
                                 transaction_data["Total Votes"] =  len(verified_transaction.positive_votes) + len(verified_transaction.negative_votes),
 
+
+                current_progress = int((i / total_transactions) * 100)
+                progress_bar.progress(current_progress)
+                i += 1
                 table_data.append(transaction_data)
                 
                 
-
+            progress_bar.empty()
+            st.write("Transactions loaded successfully!")
             st.dataframe(pd.DataFrame(table_data), height=500)
 
         
