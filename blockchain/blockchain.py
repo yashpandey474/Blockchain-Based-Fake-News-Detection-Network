@@ -2,12 +2,17 @@
 from blockchain.block import Block
 from .account import Accounts
 
-
-def printv(v):
-    print(f"\033[95m{v}\033[00m")
-
-
 # CLASS FOR THE NETWORK'S BLOCKCHAIN
+
+
+def printv(*args):
+    joined_string = ' '.join(str(arg) for arg in args)
+    try:
+        print(f"\033[95m{joined_string}\033[00m")
+    except:
+        print(joined_string)
+
+
 class Blockchain:
     def __init__(self):
         # LIST OF BLOCKS
