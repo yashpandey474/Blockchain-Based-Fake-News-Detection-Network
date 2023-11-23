@@ -19,10 +19,10 @@ pip install -r requirements.txt
 3. Run the following command in your command line interface: 
 
 ```
-streamlit run App/GUI.py 
+streamlit run screens/GUI.py 
 ```
 
-4. When signing up, the email should be in th
+4. When signing up, the email should be i
    
 ### Key Features
 

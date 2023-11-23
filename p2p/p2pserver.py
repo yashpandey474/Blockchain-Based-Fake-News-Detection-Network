@@ -25,13 +25,12 @@ MESSAGE_TYPE = {
     "block_proposer_address": "BLOCK_PROPOSER_ADDRESS",
     "new_node": "NEW_NODE"
 }
-# to handle self.... self.message_received(None, None, message)
+
 logging.basicConfig(level=logging.INFO)
-# Configuration
 server_url = 'https://ujjwalaggarwal.pythonanywhere.com/app'  # Local server URL
 send_timeout = 5000
 receive_timeout = 5000
-heartbeat_timeout = 30  # seconds, adjust as needed
+heartbeat_timeout = 30
 
 
 def printy(*args):
@@ -53,7 +52,7 @@ class P2pServer:
         self.received_block = None
         self.block_received = None
         self.block_proposer = None
-        self.peers = {}  # map of clientPort to dictionary of lastcontacted and public key
+        self.peers = {} 
         self.myClientPort = 0
         self.context = zmq.Context()
         self.heartbeat_manager = None
@@ -77,6 +76,7 @@ class P2pServer:
             zmq_socket.send_string(message)
             reply = zmq_socket.recv_string()
             printy(f"Received reply from {clientPort}: {reply}")
+            
         except Exception as e:
             reply = f"Failed to send message {message} to {clientPort}: {e}"
         finally:
@@ -233,23 +233,18 @@ class P2pServer:
 
         self.send_direct_encrypted_message(message, clientPort)
 
-    # FUNCTION CALLED WHEN A CLIENT LEAVES SERVER
-
-    # def client_left(self, client, server):
-    #     printy("Client left:", client['id'])
-
-    #     # REMOVE CLIENT FROM CONNECTIONS
-    #     self.connections.remove(client)
-    #     # self.accounts.clientLeft(clientport=client)
 
     # FUNCTION CALLED WHEN A MESSAGE IS RECIEVED FROM ANOTHER CLIENT
     def message_received(self, message):
+        
+        #RECEIVED A MESSAGE
         printy(f"Received message: {message}")
 
         try:
             # CONVERT FROM JSON TO DICTIONARY
             data = json.loads(message)
 
+        #ERROR IN JSON DECODING
         except json.JSONDecodeError:
             printy("Failed to decode JSON")
             return
@@ -258,19 +253,24 @@ class P2pServer:
         if not ChainUtil.decryptWithSoftwareKey(data):
             printy("Invalid message recieved.")
             return
-
+        
+        
+        #GET CLIENT PORT
         clientPort = data["clientPort"]
+        printy("CLIENT PORT OF USER IS: ", clientPort)
 
+
+        #PRINT THE TYPE OF MESSAGE
         printy("MESSAGE RECIEVED OF TYPE", data["type"])
 
         # IF BLOCKCAIN RECIEVED
         if data["type"] == MESSAGE_TYPE["chain"]:
             # TRY TO REPLACE IF LONGER CHAIN
-
             ret = self.blockchain.replace_chain(data["chain"])
 
             # IF NOT THE LONGEST CHAIN; DONT REPLACE ANYTHING ELSE AS THIS NODE'S DATA IS CLEARLY OUTDATED
             if not ret:
+                printy("RECEIVED CHAIN WAS INVALID")
                 return
 
             printy("REPLACED CHAIN")
@@ -278,16 +278,17 @@ class P2pServer:
             self.accounts.from_json(json_data=data["accounts"])
             printy("REPLACED ACCOUNTS")
 
-            printy(self.accounts.to_json())
+            printy("ACCOUNTS: ", self.accounts.to_json())
 
             self.transaction_pool = TransactionPool.from_json(
                 data["transaction_pool"])
 
-            printy("REPLACED TRANSACTION POOL")
-            printy(self.transaction_pool)
+            printy("REPLACED TRANSACTION POOL", self.transaction_pool)
 
             self.block_proposer = data["block_proposer"]
             printy("UPDATED BLOCK PROPOSER: ", self.block_proposer)
+            
+            
             # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
             if not self.initialised:
                 self.initialised = True
