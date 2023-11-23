@@ -1,7 +1,7 @@
 import streamlit as st
 from wallet.transaction import Transaction
 import change_screen as change_screen_
-
+import time 
 def upload_file():
 
     navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
@@ -23,6 +23,7 @@ def upload_file():
                     st.session_state.p2pserver.wallet.get_public_key()
                 )
                 st.write("Your current balance: ", balance)
+                
                 # ASK FOR OPTIONAL TRANSACTION FEE
                 transaction_fee = st.number_input(
                     "Enter transaction fee amount you want to include", 
@@ -32,15 +33,15 @@ def upload_file():
                 )
                 
                 if st.button("Submit News"):
-
+                    time.sleep(0.02)
+                    st.session_state.transaction_fee = transaction_fee
                     transaction = Transaction.generate_from_file(
                         sender_wallet=st.session_state.p2pserver.wallet,
                         file=uploaded_file,
                         blockchain=st.session_state.p2pserver.blockchain,
-                        fee=transaction_fee
+                        fee = st.session_state.transaction_fee
                     )
 
-                    # st.success(f"Successfully Uploaded File: {uploaded_file.name}")
                     st.session_state.upload_file_executed = True
                     
                     # BROADCASE NEWLY CREATED TRANSACTION
