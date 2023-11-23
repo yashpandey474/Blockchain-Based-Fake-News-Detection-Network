@@ -128,6 +128,7 @@ def calculate_lexical_diversity(text):
 
 def get_score(content):
     global nlp, stemmer, stop_words, sid, model, scaler
+
     nlp = spacy.load('en_core_web_sm')
     stemmer = PorterStemmer()
     stop_words = nlp.Defaults.stop_words

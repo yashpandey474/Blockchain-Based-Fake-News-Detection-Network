@@ -34,7 +34,7 @@ This project develops a blockchain-based network for detecting fake news, levera
      - When signing up, the email should be in the format username@domain.service
      - Valid Certificate will be of the format ABCD****, for this POC.
 
-
+5. If you receive an import error, kindly reload the page or run the commands in a new terminal. It is a streamlit bug rather than a code problem.
    
 ### Key Features
 

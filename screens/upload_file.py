@@ -36,7 +36,7 @@ def upload_file():
 
                     
                     # BROADCASE NEWLY CREATED TRANSACTION
-                    with st.spinner("Broadcasting Transaction.."):
+                    with st.spinner("Running Machine Learning Model.."):
                         st.session_state.transaction_fee = transaction_fee
                         transaction = Transaction.generate_from_file(
                             sender_wallet=st.session_state.p2pserver.wallet,
@@ -45,13 +45,15 @@ def upload_file():
                             fee = st.session_state.transaction_fee
                         )
 
-                        st.session_state.upload_file_executed = True
+                    with st.spinner("Broadcasting Transation.."):
                         st.session_state.p2pserver.broadcast_transaction(
                             transaction
                         )
+                        
+                        st.session_state.upload_file_executed = True
+                        
                     print("BROADCASTED TRANSACTION")
                     st.success("File successfully uploaded.")
-                    # st.rerun()
                     
         else:
             st.success("File successfully uploaded.")
