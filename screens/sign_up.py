@@ -72,7 +72,7 @@ def sign_up():
         st.title("Sign Up as a " + st.session_state.user_type)
 
         default_name = "Enter Name"
-        default_email = "email@service.domain"
+        default_email = "email@domain.service"
         default_certificate_id = "ABCD"
 
         name = st.text_input("Enter Your Name", value=default_name)

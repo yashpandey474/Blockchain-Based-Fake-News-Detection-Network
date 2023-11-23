@@ -65,9 +65,6 @@ def initialise(private_key=None):
         background_thread.start()
         
         st.session_state.initialise = True
-        
-        #STANDARD SLEEP TIME TO GET LATEST ACCOUNTS AND TRANSACTION POOL
-        # time.sleep(4)
 
         print("EVERYTHING INITIALIZED")
 
