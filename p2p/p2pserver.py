@@ -423,7 +423,7 @@ class P2pServer:
 
     def send_chain(self, clientPort):
         chain_as_json = [block.to_json() for block in self.blockchain.chain]
-        block_json = (self.received_block.to_json() if self.received_block.to_json() else None)
+        block_json = (self.received_block.to_json() if self.received_block else None)
         message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
