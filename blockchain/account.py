@@ -219,9 +219,11 @@ class Accounts:
                     "Client with this address already exists and is active.")
 
             else:
+                #MAKE HIM ACTIVE AND SET THE CLIENT PORT
                 self.accounts[address].isActive = True
                 self.accounts[address].clientPort = clientPort
 
+        #INITIALISE THE ACCOUNT
         self.initialize(address, clientPort=clientPort,
                         balance=config.DEFAULT_BALANCE[userType])
 

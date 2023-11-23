@@ -5,6 +5,7 @@ import pandas as pd
 
 def view_log_reputation():
     if st.session_state.screen == "view_log_reputation":
+        #SHOW NAVIGATION BAR
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
@@ -12,9 +13,14 @@ def view_log_reputation():
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
             
+            
+        #SHOW MESSAGE
         st.markdown(change_screen_.reputation_log_message)
         
+        
+        #SPINNNER FOR GETTING REPUTATION
         with st.spinner('Loading data...'):
+            
           progress_bar = st.progress(0)  # Initialize progress bar
           log_reputation = st.session_state.p2pserver.accounts.accounts[
               st.session_state.p2pserver.wallet.get_public_key()
