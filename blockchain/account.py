@@ -206,7 +206,6 @@ class Accounts:
                 f"Stake must be at least {config.MIN_STAKE} to become a validator.")
 
         # ADJUST BALANCE & STAKE OF ACCOUNT
-
         account.balance = account.balance - stake + account.stake
         account.stake = stake
         account.isValidator = True

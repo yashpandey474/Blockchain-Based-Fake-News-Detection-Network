@@ -20,15 +20,16 @@ class Background:
             current_time = int(time.time())
             time_elapsed = current_time - START_TIME.timestamp()
 
-            # Check if the time elapsed is a multiple of the interval
             if time_elapsed % BLOCK_VALIDATOR_CHOOSE_INTERVAL == 0:
-                # Perform the required actions
-
+               
                 # IF THERE WAS A RECEIVED BLOCK FROM PREVIOUS BLOCK PROPOSERR
                 if self.p2pserver.received_block:
+                    
                     # IF THE BLOCK HAD VOTES FROM MAJORITY
                     if self.can_add_block(self.p2pserver.received_block):
+                        
                         print("RECEIVED BLOCK ADDED TO CHAIN\n")
+                        
                         # ADD THE BLOCK TO THE BLOCKCHAIN
                         self.p2pserver.blockchain.append_block(
                             self.p2pserver.received_block,

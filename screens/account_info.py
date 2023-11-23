@@ -4,13 +4,16 @@ import change_screen as change_screen_
 
 def show_account_info():
     if st.session_state.screen == "account_info":
+        
+        #NAVBAR INFO
         navigation_options = change_screen_.navigation_options.get(st.session_state.user_type, ())
         st.markdown(
             change_screen_.navbar_style, unsafe_allow_html=True)
         selected_option = st.sidebar.radio("\>> Navigation", navigation_options)
         if selected_option and change_screen_.screen_mapping[selected_option] != st.session_state.screen:
             change_screen_.change_screen_navbar(selected_option)
-            
+           
+        #DISPLAY MESSAGE 
         st.markdown(
             change_screen_.view_account_info_message
         )

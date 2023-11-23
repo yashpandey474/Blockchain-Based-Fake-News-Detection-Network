@@ -40,7 +40,7 @@ class TransactionPool:
             return False
 
         return True
-
+    
     def verify_transactions_exist(self, transactions):
         print(f"VERIFYING TRANSACTIONS")
         # VERIFY ALL THE TRANSACTIONS EXIST & ALL ARE VERIFIED

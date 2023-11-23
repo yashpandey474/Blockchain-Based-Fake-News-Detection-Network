@@ -21,6 +21,7 @@ def become_validator():
         #GET CURRENT BALANCE
         
         st.session_state.balance = st.session_state.p2pserver.accounts.get_balance(st.session_state.wallet.get_public_key())
+        user_type = ("Validating Auditor" if st.session_state.validator else st.session_state.user_type)
         st.markdown(f"""
     # Manage Stake in Network
 
@@ -29,7 +30,7 @@ def become_validator():
 
     ## Your Current Status:
 
-    - **User Type:** {st.session_state.user_type}
+    - **User Type:** {user_type}
     - **Current Balance:** {st.session_state.balance}
     - **Minimum Stake Required:** {config.MIN_STAKE}
 
@@ -69,7 +70,7 @@ def become_validator():
                     old_stake = st.session_state.stake
                     st.session_state.stake = stake
                         
-                        #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
+                    #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
                     if old_stake != stake:
                         with st.spinner("Notifying Network.."):
                             st.session_state.p2pserver.broadcast_new_validator(
