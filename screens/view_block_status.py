@@ -11,7 +11,11 @@ def block_valid():
 
 #CREATE A NEW BLOCK
 def propose_block():
-    st.balloons()
+    #SHOW BALLOONS IF JUST ENTERED SCREEN
+    if not st.session_state.balloons:
+        st.session_state.balloons = True
+        st.balloons()
+        
     if st.session_state.screen == "propose_block":
         
         #SHOW THE NAVBAR
@@ -131,6 +135,7 @@ def view_block_status():
         if st.session_state.p2pserver.block_proposer == st.session_state.wallet.get_public_key():
             
             with st.spinner("Please Wait"):
+                st.session_state.balloons = False
                 change_screen_.change_screen("propose_block")
 
         
