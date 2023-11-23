@@ -39,7 +39,7 @@ def show_transactions():
             i = 1
             total_transactions = len(transac_pool)
             for transaction in transac_pool:
-                # TODO: get from ipfs is taking time. Need to fix it.
+                # get from ipfs is taking too much time. not required right now for proof of concept
                 # content = IPFSHandler.get_from_ipfs(transaction.ipfs_address)
                 table_data.append({
                     "Model Score": transaction.model_score,

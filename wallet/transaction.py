@@ -132,9 +132,8 @@ class Transaction:
         }
 
         # GET THE MODEL SCORE
-        # TODO: UNCOMMENT THIS
         # model_score = transaction.get_transaction_score()
-
+        # Ends up taking too much resources. not needed for proof of concept
         # # Compare the model_score with transaction.model_score within the error bound
         # if abs(model_score - transaction.model_score) > error_bound:
         #     print("MODEL SCORE NOT MATCHING")
