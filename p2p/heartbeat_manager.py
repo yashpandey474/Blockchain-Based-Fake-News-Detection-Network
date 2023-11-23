@@ -11,6 +11,10 @@ heartbeat_interval = 10
 logging.basicConfig(level=logging.INFO)
 
 
+def printg(v):
+    print(f"\033[92m{v}\033[00m")
+
+
 class HeartbeatManager:
     def __init__(self, myClientPort, heartbeat_timeout=20, peers={}, server_url="https://ujjwalaggarwal.pythonanywhere.com/app", accounts=None):
         self.myClientPort = myClientPort
@@ -34,16 +38,16 @@ class HeartbeatManager:
             reply = zmq_socket.recv_string()
         except Exception as e:
             # if e.errno == zmq.ETIMEDOUT:
-            #     print("TIMED OUT\n")
+            #     printg("TIMED OUT\n")
             logging.error(f"Error communicating with {clientPort}: {e}")
         finally:
             zmq_socket.close()
         return reply
 
     def start_heartbeat_client(self):
-        print(f"Starting heartbeat client")
+        printg(f"Starting heartbeat client")
         while True:
-            print(f"Current peers: {len(self.peers)}")
+            printg(f"Current peers: {len(self.peers)}")
             self.heartbeat_decision(isFirstTime=not (self.one_time))
             while (self.heartbeat_counter > 0):
                 time.sleep(3)
@@ -57,18 +61,18 @@ class HeartbeatManager:
                 self.peers[clientPort]['lastcontacted'], time.time())
 
     def removeApi(self, clientPorts):
-        print("Removing with public key and address")
-        print(clientPorts)
+        printg("Removing with public key and address")
+        printg(clientPorts)
 
         url = f'{self.server_url}/remove/'
 
-        # Print the URL and the data to be sent
-        print(f"URL: {url}")
-        print(f"Data being sent: {clientPorts}")
+        # printg the URL and the data to be sent
+        printg(f"URL: {url}")
+        printg(f"Data being sent: {clientPorts}")
 
         try:
             response = requests.post(url, json=clientPorts)
-            print(f"Remove api. Response from server: {response.json()}")
+            printg(f"Remove api. Response from server: {response.json()}")
             return response.json()
         except requests.RequestException as e:
             logging.error(f"Remove failed: {e}")
@@ -89,7 +93,7 @@ class HeartbeatManager:
             self.make_apicall_and_remove(inactive_peers)
 
     def send_heartbeat_to_peer(self, clientPort):
-        print("Sending heartbeat")
+        printg("Sending heartbeat")
         heartbeat_message = json.dumps({
             "type": "heartbeat",
             "clientPort": self.myClientPort
@@ -120,7 +124,7 @@ class HeartbeatManager:
                 self.update_heartbeat_counter()
 
         if len(toremove) > 0:
-            print(f"To remove {toremove}")
+            printg(f"To remove {toremove}")
             self.make_apicall_and_remove(clientPorts=toremove)
 
     @staticmethod
@@ -135,29 +139,29 @@ class HeartbeatManager:
         reply = self.private_send_message(clientPort=self.getHeartBeatPort(clientPort),
                                           message=message)
         if reply is None:
-            print(f"Peer {clientPort} is inactive")
+            printg(f"Peer {clientPort} is inactive")
             self.update_heartbeat_counter()
             return clientPort
         else:
-            print(f"Peer {clientPort} is active")
+            printg(f"Peer {clientPort} is active")
             self.update_last_contacted(clientPort)
             self.update_heartbeat_counter()
         return None
 
     def start_heartbeat_server(self):
-        print(
+        printg(
             f"Starting heartbeat server on port {self.getHeartBeatPort(self.myClientPort)}")
         zmq_socket = self.context.socket(zmq.REP)
         zmq_socket.bind(f"tcp://{self.getHeartBeatPort(self.myClientPort)}")
 
-        print("Creating new thread for client heartbeat")
+        printg("Creating new thread for client heartbeat")
         thread = threading.Thread(target=self.start_heartbeat_client)
         thread.start()
-        print("New thread started")
+        printg("New thread started")
 
         while True:
             message = zmq_socket.recv_string()
-            print(f"Received heartbeat: {message}")
+            printg(f"Received heartbeat: {message}")
             zmq_socket.send_string(json.dumps(
                 {"type": "heartbeat", "status": "success"}))
             message = json.loads(message)
@@ -174,6 +178,6 @@ class HeartbeatManager:
         self.start_heartbeat_server()
 
     def stop(self):
-        print("Stopping heartbeat manager")
+        printg("Stopping heartbeat manager")
         self.context.destroy()
-        print("Heartbeat manager stopped")
+        printg("Heartbeat manager stopped")
