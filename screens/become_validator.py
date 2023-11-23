@@ -28,7 +28,6 @@ def become_validator():
         
         user_type = ("Validating Auditor" if st.session_state.validator else st.session_state.user_type)
         
-        
         #SHOW THE MESSAGE
         st.markdown(f"""
     # Manage Stake in Network
@@ -49,7 +48,7 @@ def become_validator():
 
     """)
         
-        
+
         #IF NOT ENOUGH BALANCE
         if st.session_state.balance  + st.session_state.stake < config.MIN_STAKE:
             st.error(f"You don't have enough balance to stake. Minimum Stake Required: {config.MIN_STAKE}")
@@ -61,6 +60,15 @@ def become_validator():
             if st.session_state.validator:
                 #DISPLAY CURRENT STAKE
                 st.write("Your Current Stake: ", st.session_state.stake)
+                
+            #IF SUBMITTED STAKE: SUCCESSFUL MESSAGE
+            if st.session_state.stake_submitted:
+                
+                #GET CURRENT STAKE IN NETWORK 
+                stake = st.session_state.p2pserver.blockchain.get_stake(st.session_state.p2pserver.wallet.get_public_key())
+                
+                st.success(f"Your stake in the network is now: {stake}")
+                    
                 
             #IF HASNT SUBMITTED STAKE
             if not st.session_state.stake_submitted:
@@ -85,7 +93,7 @@ def become_validator():
                 #SUBMT STAKE
                 if st.button("Submit Stake"):
                     old_stake = st.session_state.stake
-                        
+                    
                     #BROADCAST TO REMAINING PEERS OF NEW VALIDATOR
                     if old_stake != stake:
                         #BROADCAST NEW VALIDATOR
@@ -95,23 +103,10 @@ def become_validator():
                             )
                         
                     #REMOVE THE BUTTONS FOR DEFINING STAKE
-                    st.session_state.stake_submitted = True
+                    st.session_state.stake = stake
                     st.session_state.validator = True
+                    st.session_state.stake_submitted = True
                     st.rerun()
                     
             
-            #IF SUBMITTED STAKE: SUCCESSFUL MESSAGE
-            elif st.session_state.stake_submitted:
-                #GET CURRENT STAKE IN NETWORK 
-                stake = st.session_state.blockchain.get_stake(st.session_state.p2pserver.wallet.get_public_key())
-                
-                #IF HAD NOT STAKE
-                if st.session_state.stake == 0:
-                    st.success(f"You are successfully registered as a validator with stake: {stake}")
-
-                #PREVIOUSLY HAD STAKE
-                else:
-                    st.success(f"Your stake has been successfully modified to: {stake}")
-                    
-                #SET STAKE
-                st.session_state.stake = stake
+            

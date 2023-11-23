@@ -53,7 +53,7 @@ class Background:
                             "PROPOSER DIDNT GET ENOUGH TIME OR NO BLOCKS. NEXT CYCLE\n")
                 # CHOOSE THE BLOCK PROPOSER AT THE START TO NOT HAVE DELAY BECAUSE OF APPENDING
                 self.p2pserver.block_proposer = self.p2pserver.accounts.choose_validator(
-                    current_time)
+                    current_time//10)
 
                 # SET THE RECEIVED BLOCK TO NONE
                 self.p2pserver.received_block = None
