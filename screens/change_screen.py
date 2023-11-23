@@ -232,8 +232,7 @@ screen_mapping = {
     "Sent News": "view_sent_news",
     "Reputation Log": "view_log_reputation",
     "Transactions in Mempool": "show_transac",
-    "Modify Stake": "become_validator",
-    "Become a Validator": "become_validator",
+    "Manage Stake in Network": "become_validator",
     "Current Block Status": "view_block_status",
     "Broadcasted Blocks": "view_sent_blocks",
     "Enter Page": "enter"
