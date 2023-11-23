@@ -289,7 +289,8 @@ class P2pServer:
             printy("UPDATED BLOCK PROPOSER: ", self.block_proposer)
             
             #SET THE CURRENT RECEIVED BLOCK TO RECEIVE VOTES
-            self.received_block = Block.from_json(data["received_block"])
+            if data["received_block"]:
+                self.received_block = Block.from_json(data["received_block"])
             
             # SET INITIALISED TO TRUE AND ALLOW USER TO GO TO MAIN PAGE
             if not self.initialised:
@@ -419,13 +420,14 @@ class P2pServer:
 
     def send_chain(self, clientPort):
         chain_as_json = [block.to_json() for block in self.blockchain.chain]
+        block_json = (self.received_block.to_json() if self.received_block.to_json() else None)
         message = {
             "type": MESSAGE_TYPE["chain"],
             "chain": chain_as_json,
             "accounts": self.accounts.to_json(),
             "transaction_pool": self.transaction_pool.to_json(),
             "block_proposer": self.block_proposer,
-            "received_block": self.received_block.to_json()
+            "received_block": block_json
         }
         
     
