@@ -5,7 +5,7 @@ import time
 import zmq
 import logging
 
-receive_timeout = 1000
+receive_timeout = 2000
 send_timeout = 1000
 heartbeat_interval = 10
 logging.basicConfig(level=logging.INFO)
