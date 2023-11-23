@@ -3,6 +3,7 @@
 ## Project Overview
 
 This project develops a blockchain-based network for detecting fake news, leveraging NLP bases ML models and a consortium of auditors. The system operates on a consortium blockchain, enabling anonymous participation for readers to access news and submit news items as transactions.
+
 ![Alt text](<ENTER NETWORK-1.jpeg>)
 ## Running the Project
 
@@ -42,6 +43,27 @@ This project develops a blockchain-based network for detecting fake news, levera
 
 8. Similarly, please wait for the spinner showing "Please wait.." to finish before pressing buttons.
 
+9. To upload a file, go to upload file page and upload a text file, attaching a transaction fee.
+
+![Alt text](<UPLOAD NEWS.jpeg>)
+
+10. To view sent news, go to the sent news page. Similarly for viewing mempool and broadcasted blocks etc. The pages are present in the navbar.
+
+11. The timer for the next block proposer is shown on every screen. Once this counter reaches 0, a new block proposer is chosen which is visible on the VIEW BLOCK STATUS page.
+
+12. If you are chosen as the block proposer, you'll be shown the transactions in mempool on the VIEW BLOCK STATUS page to vote on them as "fake" news or not while showing the sender reputation, ML model score etc.
+
+![Alt text](<CREATE BLOCK.jpeg>)
+
+
+13. You can again view the current confirmations on the block in VIEW BLOCK STATUS.
+
+14. You can view changes to your reputation in the REPUTATION LOG. The reasons for these changes may be broadcasting fake news, not broadcasting a block when chosen as a proposer, etc. (better described in report)
+
+
+
+![Alt text](<VIEW BLOCK STATUS.jpeg>)
+
    
 ### Key Features
 
@@ -49,6 +71,9 @@ This project develops a blockchain-based network for detecting fake news, levera
 - **Auditor Participation**: Auditors, verified through a third-party service (e.g., Intel SGX), are responsible for block creation and news validation via voting.
 - **Reputation System**: Differentiates between auditors and readers in terms of initial reputation scores, which are adjusted based on activity.
 - **Consensus Mechanism**: Uses Proof of Stake (PoS) for secure and efficient consensus.
+
+![Alt text](<VOTING BLOCK.jpeg>)
+
 
 ### Network Structure
 
