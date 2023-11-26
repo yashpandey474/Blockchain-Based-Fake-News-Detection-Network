@@ -54,7 +54,7 @@ def main():
         asyncio.run(change_screen_.watch(t))
         
     else:
-        change_screen_.screen_functions["enter"]()
+        screen_functions["enter"]()
 
 
         
