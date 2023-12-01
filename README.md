@@ -16,7 +16,7 @@ This project develops a blockchain-based network for detecting fake news, levera
 
 2. Change working directory into the repository folder
     ```
-    cd BlockchainProject2
+    cd Blockchain-Based-Fake-News-Detection-Network 
     ```
 
 2. Install dependencies by running the command 
